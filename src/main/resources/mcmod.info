@@ -1,0 +1,16 @@
+[
+{
+  "modid": "blockpalette",
+  "name": "Block Palette",
+  "description": "CreativeMode block grouping/sorting",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["dags"],
+  "credits": "doot",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
