@@ -1,7 +1,7 @@
 [
 {
   "modid": "blockpalette",
-  "name": "Block Palette",
+  "name": "BlockPalette",
   "description": "CreativeMode block grouping/sorting",
   "version": "${version}",
   "mcversion": "${mcversion}",
