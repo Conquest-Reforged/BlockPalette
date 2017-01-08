@@ -48,11 +48,17 @@ public class PaletteRegistry {
 
     public void setupTabFilters() {
         for (CreativeTabs tab : CreativeTabs.CREATIVE_TAB_ARRAY) {
+            // Don't filter the search tab
+            if (tab == CreativeTabs.SEARCH) {
+                continue;
+            }
             if (Config.filter_variants) {
                 if (!(tab instanceof FilteredCreativeTab)) {
+                    // Tabs insert themselves in 'CREATIVE_TAB_ARRAY' on instantiation
                     new FilteredCreativeTab(this, tab);
                 }
             } else if (tab instanceof FilteredCreativeTab) {
+                // Unwrap the tab from the filter
                 ((FilteredCreativeTab) tab).restore();
             }
         }
