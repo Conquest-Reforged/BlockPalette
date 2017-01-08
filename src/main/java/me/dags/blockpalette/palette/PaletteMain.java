@@ -15,7 +15,7 @@ import java.io.File;
 
 public class PaletteMain implements IResourceManagerReloadListener {
 
-    public final KeyBinding show = new KeyBinding("Show Palette", Keyboard.getKeyIndex("C"), "Block Palette");
+    public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.getKeyIndex("C"), "Block Palette");
 
     private PaletteRegistry registry = new PaletteRegistry(this);
     private UIPalette currentPalette = UIPalette.EMPTY;

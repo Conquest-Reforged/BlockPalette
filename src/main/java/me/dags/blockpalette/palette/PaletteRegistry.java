@@ -273,11 +273,15 @@ public class PaletteRegistry {
         private final int hashCode;
 
         private Mapping(ItemStack stack) {
-            Block block = ((ItemBlock) stack.getItem()).getBlock();
             this.itemStack = stack;
             this.hashCode = itemStack.getItem().getUnlocalizedName(itemStack).hashCode();
-            this.mainTab = block.getCreativeTabToDisplayOn() == CreativeTabs.BUILDING_BLOCKS;
-            this.isFullBlock = block.getDefaultState().isFullBlock();
+            this.mainTab = itemStack.getItem().getCreativeTab() == CreativeTabs.BUILDING_BLOCKS;
+            if (stack.getItem() instanceof ItemBlock) {
+                Block block = ((ItemBlock) stack.getItem()).getBlock();
+                this.isFullBlock = block.getDefaultState().isFullBlock();
+            } else {
+                this.isFullBlock = false;
+            }
         }
 
         private boolean overrides(Mapping other) {
