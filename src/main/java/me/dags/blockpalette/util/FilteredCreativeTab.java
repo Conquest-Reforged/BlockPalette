@@ -23,7 +23,10 @@ public class FilteredCreativeTab extends CreativeTabs {
 
     @Override
     public void displayAllRelevantItems(List<ItemStack> items) {
+        // Get all the items from the wrapped CreativeTab
         wrapped.displayAllRelevantItems(items);
+
+        // Remove items if they aren't mapped as the 'main' block for their particle texture
         paletteRegistry.filterItems(items);
     }
 

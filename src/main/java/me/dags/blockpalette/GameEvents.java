@@ -3,8 +3,11 @@ package me.dags.blockpalette;
 import me.dags.blockpalette.palette.PaletteMain;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -19,7 +22,7 @@ public class GameEvents {
 
     private final PaletteMain main;
 
-    private boolean isInCreativeInventory = false;
+    private boolean inCreativeInventory = false;
     private int mouseX = 0, mouseY = 0;
     private int width = 0, height = 0;
 
@@ -37,7 +40,7 @@ public class GameEvents {
     }
 
     @SubscribeEvent
-    public void onDrawScreen(GuiScreenEvent.InitGuiEvent.Pre event) {
+    public void onInitGui(GuiScreenEvent.InitGuiEvent.Pre event) {
         if (event.getGui() instanceof GuiContainerCreative) {
             main.getRegistry().setupTabFilters();
         }
@@ -45,7 +48,7 @@ public class GameEvents {
 
     @SubscribeEvent
     public void onDrawScreen(GuiScreenEvent.DrawScreenEvent.Pre event) {
-        if (isInCreativeInventory = event.getGui() instanceof GuiContainerCreative) {
+        if (inCreativeInventory = event.getGui() instanceof GuiContainerCreative) {
             GuiContainerCreative inventory = (GuiContainerCreative) event.getGui();
 
             mouseX = event.getMouseX();
@@ -68,14 +71,13 @@ public class GameEvents {
                 }
             } else if (inventory.getSlotUnderMouse() != null && Keyboard.isKeyDown(main.show.getKeyCode())) {
                 main.newPalette(inventory.getSlotUnderMouse().getStack());
-                event.setCanceled(true);
             }
         }
     }
 
     @SubscribeEvent
     public void onMouseInputEvent(GuiScreenEvent.MouseInputEvent.Pre event) {
-        if (isInCreativeInventory && main.getCurrentPalette().isActive()) {
+        if (inCreativeInventory && main.getCurrentPalette().isActive()) {
             event.setCanceled(true);
 
             int button = Mouse.getEventButton();

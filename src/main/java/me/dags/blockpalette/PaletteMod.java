@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 /**
  * @author dags <dags@dags.me>
  */
-@Mod(modid = PaletteMod.MOD_ID, version = PaletteMod.VERSION)
+@Mod(modid = PaletteMod.MOD_ID, version = PaletteMod.VERSION, clientSideOnly = true)
 public class PaletteMod {
 
     public static final String MOD_ID = "blockpalette";
