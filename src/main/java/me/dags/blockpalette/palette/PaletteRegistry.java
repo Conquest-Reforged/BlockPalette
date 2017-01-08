@@ -67,7 +67,7 @@ public class PaletteRegistry {
     }
 
     public UIPalette getPalette(ItemStack itemStack) {
-        if (itemStack == null || !(itemStack.getItem() instanceof ItemBlock)) {
+        if (itemStack == null || Block.getBlockFromItem(itemStack.getItem()) == null) {
             return UIPalette.EMPTY;
         }
 
@@ -273,15 +273,11 @@ public class PaletteRegistry {
         private final int hashCode;
 
         private Mapping(ItemStack stack) {
+            Block block = Block.getBlockFromItem(stack.getItem());
             this.itemStack = stack;
             this.hashCode = itemStack.getItem().getUnlocalizedName(itemStack).hashCode();
             this.mainTab = itemStack.getItem().getCreativeTab() == CreativeTabs.BUILDING_BLOCKS;
-            if (stack.getItem() instanceof ItemBlock) {
-                Block block = ((ItemBlock) stack.getItem()).getBlock();
-                this.isFullBlock = block.getDefaultState().isFullBlock();
-            } else {
-                this.isFullBlock = false;
-            }
+            this.isFullBlock = block != null && block.getDefaultState().isFullBlock();
         }
 
         private boolean overrides(Mapping other) {
