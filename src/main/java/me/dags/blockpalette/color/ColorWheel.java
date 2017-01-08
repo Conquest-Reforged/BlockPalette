@@ -22,8 +22,6 @@ public class ColorWheel {
     private float leniency = 0.25F;
     // Controls at what point a color should be determined to be gray
     private float grayPoint = 15F;
-    // Show semi-transparent textures in results
-    private boolean allowTranslucent = false;
 
     public ColorWheel() {
         this(24);
@@ -63,11 +61,6 @@ public class ColorWheel {
         refresh();
     }
 
-    public void setAllowTranslucent(boolean allowTranslucent) {
-        this.allowTranslucent = allowTranslucent;
-        refresh();
-    }
-
     public void refresh() {
         getGrays().clear();
         for (ColorHue hue : hues) {
@@ -85,14 +78,6 @@ public class ColorWheel {
         }
 
         textureMap.put(texture.name, texture);
-
-        if (texture.hasTransparency) {
-            return;
-        }
-
-        if (!allowTranslucent && texture.hasTranslucency) {
-            return;
-        }
 
         if (isGray(texture)) {
             grays.addTexture(texture);

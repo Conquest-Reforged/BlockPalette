@@ -1,7 +1,5 @@
 package me.dags.blockpalette.color;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-
 /**
  * @author dags <dags@dags.me>
  */
@@ -16,8 +14,6 @@ public class Texture {
     final int hue;
     final Float saturation;
     final Float lightness;
-    final boolean hasTranslucency;
-    final boolean hasTransparency;
 
     private final int rgDif;
     private final int gbDif;
@@ -30,31 +26,23 @@ public class Texture {
         this.hue = -1;
         this.saturation = 0F;
         this.lightness = 0F;
-        this.hasTranslucency = true;
-        this.hasTransparency = true;
         this.rgDif = 0;
         this.gbDif = 0;
     }
 
 
-    Texture(String name, int width, int height, int[] data) {
+    public Texture(String name, int width, int height, int[] data) {
         int r = 0, g = 0, b = 0, size = width * height;
-        boolean translucent = false;
-        boolean transparent = false;
+
         for (int i = 0; i < size; i++) {
             int c = data[i];
             int alpha = (c >> 24) & 0xff;
-
             if (alpha == 0) {
                 size--;
-                transparent = true;
             } else {
                 r += c >> 16 & 0xFF;
                 g += c >> 8 & 0xFF;
                 b += c & 0xFF;
-                if (alpha < 255) {
-                    translucent = true;
-                }
             }
         }
 
@@ -94,8 +82,6 @@ public class Texture {
         this.hue = ColorWheel.clampHue(hue);
         this.lightness = lightness;
         this.saturation = saturation;
-        this.hasTranslucency = translucent;
-        this.hasTransparency = transparent;
         this.rgDif = Math.max(red, green) - Math.min(red, green);
         this.gbDif = Math.max(green, blue) - Math.min(green, blue);
     }
@@ -116,16 +102,5 @@ public class Texture {
     @Override
     public String toString() {
         return String.format("%s rgb(%s,%s,%s) hue(%s) hsl(%s,%s,%s)", name, red, green, blue, hue, hue, saturation, lightness);
-    }
-
-    public static Texture fromSprite(TextureAtlasSprite sprite) {
-        if (sprite.getFrameCount() > 0) {
-            int[][] data = sprite.getFrameTextureData(0);
-            if (data.length > 0) {
-                int[] pixels = data[0];
-                return new Texture(sprite.getIconName(), sprite.getIconWidth(), sprite.getIconHeight(), pixels);
-            }
-        }
-        return null;
     }
 }

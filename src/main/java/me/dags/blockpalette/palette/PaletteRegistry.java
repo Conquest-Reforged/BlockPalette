@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -226,7 +227,7 @@ public class PaletteRegistry {
             return;
         }
 
-        Texture texture = Texture.fromSprite(model.getParticleTexture());
+        Texture texture = PaletteRegistry.fromSprite(model.getParticleTexture());
         if (texture != null) {
             colorWheel.addTexture(texture);
         }
@@ -259,6 +260,17 @@ public class PaletteRegistry {
     private static IBakedModel getItemModel(ItemStack itemStack) {
         IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(itemStack);
         return model != null && model.getParticleTexture() != null ? model : missingModel();
+    }
+
+    private static Texture fromSprite(TextureAtlasSprite sprite) {
+        if (sprite.getFrameCount() > 0) {
+            int[][] data = sprite.getFrameTextureData(0);
+            if (data.length > 0) {
+                int[] pixels = data[0];
+                return new Texture(sprite.getIconName(), sprite.getIconWidth(), sprite.getIconHeight(), pixels);
+            }
+        }
+        return null;
     }
 
     private static IBakedModel missingModel() {
