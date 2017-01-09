@@ -48,7 +48,7 @@ public class UIPalette {
         this.options.add(parent);
         this.config = new UIConfig(mod);
         this.radius = 25 + (3 * options.size()); // magic
-        this.increment = Math.min(options.size() / 3, 1); // magic
+        this.increment = Math.max(options.size() / 3, 1); // magic
     }
 
     private boolean animationTick() {
