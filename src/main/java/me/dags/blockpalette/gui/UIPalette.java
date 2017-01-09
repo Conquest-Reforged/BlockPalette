@@ -26,6 +26,7 @@ public class UIPalette {
 
     private int centerX = 0;
     private int centerY = 0;
+    private int increment = 1;
     private int currentRadius = 1;
     private boolean guiOpen = true;
     private boolean overlay = false;
@@ -46,7 +47,8 @@ public class UIPalette {
         this.options.addAll(entries);
         this.options.add(parent);
         this.config = new UIConfig(mod);
-        this.radius = 25 + (3 * options.size());
+        this.radius = 25 + (3 * options.size()); // magic
+        this.increment = Math.min(options.size() / 3, 1); // magic
     }
 
     private boolean animationTick() {
@@ -178,7 +180,7 @@ public class UIPalette {
 
     private void drawOpen(int mouseX, int mouseY) {
         if (currentRadius < radius && animationTick()) {
-            currentRadius = Math.min(radius, currentRadius + Config.animation_speed);
+            currentRadius = Math.min(radius, currentRadius + (increment * Config.animation_speed));
             expand();
         }
         drawOptions(mouseX, mouseY);
@@ -187,7 +189,7 @@ public class UIPalette {
     private void drawClose(int mouseX, int mouseY) {
         if (isActive()) {
             if (animationTick()) {
-                currentRadius = Math.max(0, currentRadius - Config.animation_speed);
+                currentRadius = Math.max(0, currentRadius - (increment * Config.animation_speed));
                 expand();
             }
             drawOptions(mouseX, mouseY);
