@@ -54,7 +54,6 @@ public class GameEvents {
             creativeEvents.onDrawScreen(inventory, event.getMouseX(), event.getMouseY(), event);
         } else if (inCreativeInventory) {
             inCreativeInventory = false;
-            System.out.println("Closed");
         }
     }
 
