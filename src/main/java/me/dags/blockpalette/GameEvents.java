@@ -1,10 +1,10 @@
 package me.dags.blockpalette;
 
-import me.dags.blockpalette.creative.CreativeGUIEvents;
-import me.dags.blockpalette.creative.CreativeKeybindMode;
-import me.dags.blockpalette.creative.CreativeMouseMode;
-import me.dags.blockpalette.palette.PaletteMain;
+import me.dags.blockpalette.creative.CreativePickMode;
+import me.dags.blockpalette.creative.KeybindPickMode;
+import me.dags.blockpalette.creative.MousePickMode;
 import me.dags.blockpalette.creative.PickMode;
+import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -20,13 +20,13 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public class GameEvents {
 
     private final PaletteMain main;
-    private CreativeGUIEvents creativeEvents;
+    private CreativePickMode creativeEvents;
 
     private boolean inCreativeInventory = false;
 
     public GameEvents(PaletteMain main) {
         this.main = main;
-        creativeEvents = new CreativeKeybindMode(main);
+        creativeEvents = new KeybindPickMode(main);
     }
 
     @SubscribeEvent
@@ -41,7 +41,7 @@ public class GameEvents {
     @SubscribeEvent
     public void onInitGui(GuiScreenEvent.InitGuiEvent.Pre event) {
         if (event.getGui() instanceof GuiContainerCreative) {
-            creativeEvents = Config.pick_mode == PickMode.HOT_KEY ? new CreativeKeybindMode(main) : new CreativeMouseMode(main);
+            creativeEvents = Config.pick_mode == PickMode.KEYBOARD ? new KeybindPickMode(main) : new MousePickMode(main);
             creativeEvents.onInitGui();
         }
     }

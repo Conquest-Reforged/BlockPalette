@@ -42,6 +42,10 @@ public class PaletteMain implements IResourceManagerReloadListener {
         }
     }
 
+    public boolean isInventoryKey(int keyCode) {
+        return keyCode == Minecraft.getMinecraft().gameSettings.keyBindInventory.getKeyCode();
+    }
+
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
         registry = new PaletteRegistry(this);

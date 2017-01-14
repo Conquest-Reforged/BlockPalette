@@ -13,7 +13,7 @@ public class Config {
 
     public static boolean filter_variants = true;
     public static boolean match_textures = true;
-    public static PickMode pick_mode = PickMode.MOUSE_PRESS;
+    public static PickMode pick_mode = PickMode.MOUSE;
     public static int animation_speed = 5;
 
     public static ColorMode color_mode = ColorMode.ADJACENT;

@@ -7,13 +7,13 @@ import org.lwjgl.input.Keyboard;
 /**
  * @author dags <dags@dags.me>
  */
-public class CreativeMouseMode extends CreativeGUIEvents {
+public class MousePickMode extends CreativePickMode {
 
     private boolean showDown = false;
     private boolean lCtrlDown = false;
     private boolean lShiftDown = false;
 
-    public CreativeMouseMode(PaletteMain main) {
+    public MousePickMode(PaletteMain main) {
         super(main);
     }
 
@@ -71,7 +71,7 @@ public class CreativeMouseMode extends CreativeGUIEvents {
         }
 
         if (main.getCurrentPalette().isActive()) {
-            if (keyCode == Keyboard.KEY_ESCAPE || keyCode == main.show.getKeyCode()) {
+            if (keyCode == Keyboard.KEY_ESCAPE || keyCode == main.show.getKeyCode() || main.isInventoryKey(keyCode)) {
                 main.getCurrentPalette().onClose();
                 main.getCurrentPalette().setInactive();
             }

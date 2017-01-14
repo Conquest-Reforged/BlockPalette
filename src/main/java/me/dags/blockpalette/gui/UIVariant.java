@@ -34,6 +34,7 @@ public class UIVariant extends Gui {
     private int yPos = 0;
 
     private float spacing = 0F;
+    private boolean drawgged = false;
     private boolean hovered = false;
     private boolean visible = false;
     private boolean selected = false;
@@ -105,11 +106,11 @@ public class UIVariant extends Gui {
         return visible;
     }
 
-    public boolean mouseOver(int mouseX, int mouseY) {
-        return overCenter(mouseX, mouseY) ? parent : area.present() && area.contains(mouseX, mouseY) || overIcon(mouseX, mouseY);
+    public boolean overSegment(int mouseX, int mouseY) {
+        return overCenter(mouseX, mouseY) ? parent : area.present() && area.contains(mouseX, mouseY) || overSlot(mouseX, mouseY);
     }
 
-    private boolean overIcon(int mouseX, int mouseY) {
+    public boolean overSlot(int mouseX, int mouseY) {
         return mouseX >= xPos && mouseX <= xPos + SIZE && mouseY >= yPos && mouseY <= yPos + SIZE;
     }
 
@@ -194,7 +195,7 @@ public class UIVariant extends Gui {
         this.hovered = visible;
 
         if (visible) {
-            this.hovered = mouseOver(mouseX, mouseY);
+            this.hovered = overSegment(mouseX, mouseY);
 
             // Draw the segment
             if (showHue && !this.parent) {
@@ -241,7 +242,6 @@ public class UIVariant extends Gui {
             GlStateManager.disableLighting();
             GlStateManager.disableBlend();
 
-            // Draw the item
             RenderHelper.enableGUIStandardItemLighting();
             Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(itemStack, xPos + ITEM_PADDING, yPos + ITEM_PADDING);
             RenderHelper.disableStandardItemLighting();

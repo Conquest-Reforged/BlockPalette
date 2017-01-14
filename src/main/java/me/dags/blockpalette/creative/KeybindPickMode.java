@@ -6,9 +6,9 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 /**
  * @author dags <dags@dags.me>
  */
-public class CreativeKeybindMode extends CreativeGUIEvents {
+public class KeybindPickMode extends CreativePickMode {
 
-    public CreativeKeybindMode(PaletteMain main) {
+    public KeybindPickMode(PaletteMain main) {
         super(main);
     }
 

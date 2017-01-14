@@ -4,8 +4,8 @@ package me.dags.blockpalette.creative;
  * @author dags <dags@dags.me>
  */
 public enum PickMode {
-    HOT_KEY("Hold HotKey"),
-    MOUSE_PRESS("Click Mouse"),
+    KEYBOARD("Keyboard"),
+    MOUSE("Mouse"),
     ;
 
     public final String display;
@@ -16,16 +16,16 @@ public enum PickMode {
 
     public PickMode next() {
         switch (this) {
-            case MOUSE_PRESS:
-                return HOT_KEY;
+            case MOUSE:
+                return KEYBOARD;
             default:
-                return MOUSE_PRESS;
+                return MOUSE;
         }
     }
 
     public static int toId(PickMode mode) {
         switch (mode) {
-            case MOUSE_PRESS:
+            case MOUSE:
                 return 1;
             default:
                 return 0;
@@ -35,9 +35,9 @@ public enum PickMode {
     public static PickMode fromId(int id) {
         switch (id) {
             case 1:
-                return MOUSE_PRESS;
+                return MOUSE;
             default:
-                return HOT_KEY;
+                return KEYBOARD;
         }
     }
 }

@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.CreativeCrafting;
 import net.minecraft.item.ItemStack;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +21,10 @@ public class UIPalette {
     public static final UIPalette EMPTY = new UIPalette();
 
     private final PaletteMain mod;
-    private final List<UIVariant> options = new ArrayList<UIVariant>();
+    private final List<UIVariant> options = new ArrayList<>();
     private final int radius;
-    private UIConfig config;
+    private final UIConfig config;
+    private final UIInventory inventory;
 
     private int centerX = 0;
     private int centerY = 0;
@@ -32,8 +34,11 @@ public class UIPalette {
     private boolean overlay = false;
     private long timer = 0L;
 
+    private UIVariant underMouse = null;
+
     private UIPalette() {
         this.config = null;
+        this.inventory = null;
         this.mod = null;
         this.radius = 0;
     }
@@ -47,6 +52,7 @@ public class UIPalette {
         this.options.addAll(entries);
         this.options.add(parent);
         this.config = new UIConfig(mod);
+        this.inventory = new UIInventory(this);
         this.radius = 25 + (3 * options.size()); // magic
         this.increment = Math.max(options.size() / 3, 1); // magic
     }
@@ -93,6 +99,10 @@ public class UIPalette {
         draw(-999, -999);
     }
 
+    UIVariant getVariantUnderMouse() {
+        return underMouse;
+    }
+
     public void draw(int mouseX, int mouseY) {
         if (!isPresent()) {
             return;
@@ -107,6 +117,8 @@ public class UIPalette {
             drawOpen(mouseX, mouseY);
 
             config.draw(mouseX, mouseY);
+
+            inventory.draw(mouseX, mouseY);
         } else {
             drawClose(mouseX, mouseY);
         }
@@ -116,29 +128,41 @@ public class UIPalette {
         if (!isPresent()) {
             return;
         }
-
-        for (UIVariant entry : options) {
-            if (entry.mouseOver(mouseX, mouseY)) {
-                if (button == 0) {
-                    boolean selected = !entry.isSelected();
-                    entry.setSelected(selected);
-                    return;
-                } else if (button == 1) {
-                    mod.newPalette(entry.getItemStack());
-                    return;
-                }
-            }
+        if (currentRadius != radius) {
+            return;
         }
 
         config.mouseClick(mouseX, mouseY, button);
+        inventory.mouseClick(mouseX, mouseY, button);
     }
 
     public void mouseRelease(int mouseX, int mouseY, int button) {
         if (!isPresent()) {
             return;
         }
+        if (currentRadius != radius) {
+            return;
+        }
+
+        boolean lshift = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
+
+        for (UIVariant entry : options) {
+            if (entry.overSegment(mouseX, mouseY)) {
+                if (lshift && button == 0) {
+                    boolean selected = !entry.isSelected();
+                    entry.setSelected(selected);
+                } else if (button == 1) {
+                    mod.newPalette(entry.getItemStack());
+                }
+            }
+        }
 
         config.mouseRelease(mouseX, mouseY, button);
+        inventory.mouseRelease(mouseX, mouseY, button);
+    }
+
+    public void keyTyped(char c, int keyCode) {
+        inventory.keyTyped(c, keyCode);
     }
 
     public void onClose() {
@@ -146,26 +170,24 @@ public class UIPalette {
             return;
         }
 
-        guiOpen = false;
-        config.onClose();
-
         EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-
-        if (!player.capabilities.isCreativeMode) {
-            return;
-        }
-
-        // Give selected items
-        for (UIVariant entry : options) {
-            if (entry.isSelected()) {
-                player.inventory.addItemStackToInventory(entry.getItemStack());
-            }
-        }
-
-        // Send changes
         CreativeCrafting crafting = new CreativeCrafting(Minecraft.getMinecraft());
         player.inventoryContainer.addListener(crafting);
-        player.inventoryContainer.detectAndSendChanges();
+
+        guiOpen = false;
+        config.onClose();
+        inventory.onClose();
+
+        if (player.capabilities.isCreativeMode) {
+            for (UIVariant entry : options) {
+                if (entry.isSelected()) {
+                    player.inventory.addItemStackToInventory(entry.getItemStack());
+                }
+            }
+
+            player.inventoryContainer.detectAndSendChanges();
+        }
+
         player.inventoryContainer.removeListener(crafting);
     }
 
@@ -175,6 +197,8 @@ public class UIPalette {
         }
 
         config.onResize(mc, w, h);
+        inventory.onResize(mc, w, h);
+
         expand();
     }
 
@@ -197,15 +221,14 @@ public class UIPalette {
     }
 
     private void drawOptions(int mouseX, int mouseY) {
-        UIVariant hovered = null;
-
+        underMouse = null;
         boolean drawSegments = options.size() > 3;
 
         for (UIVariant option : options) {
             option.draw(mouseX, mouseY, drawSegments && Config.show_hue);
 
-            if (hovered == null && option.isVisible() && option.mouseOver(mouseX, mouseY)) {
-                hovered = option;
+            if (underMouse == null && option.isVisible() && option.overSegment(mouseX, mouseY)) {
+                underMouse = option;
                 option.drawHighlighted();
             }
 
@@ -214,8 +237,8 @@ public class UIPalette {
             }
         }
 
-        if (hovered != null) {
-            String text = hovered.getDisplayText();
+        if (underMouse != null) {
+            String text = underMouse.getDisplayText();
             int width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text);
             int x = centerX - (width / 2);
             int y = centerY + radius + 30;
