@@ -202,7 +202,7 @@ public class UIPalette {
         boolean drawSegments = options.size() > 3;
 
         for (UIVariant option : options) {
-            option.draw(mouseX, mouseY, drawSegments);
+            option.draw(mouseX, mouseY, drawSegments && Config.show_hue);
 
             if (hovered == null && option.isVisible() && option.mouseOver(mouseX, mouseY)) {
                 hovered = option;

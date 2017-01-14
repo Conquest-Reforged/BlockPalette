@@ -40,6 +40,9 @@ public class UIConfig {
         Gui.ActionButton colorModeButton = new Gui.ActionButton("Mode: " + Config.color_mode.display, color_mode);
         colorModeButton.setWidth(button_width);
 
+        Gui.ActionButton hueButton = new Gui.ActionButton("Show Hue: " + Config.show_hue, hue);
+        hueButton.setWidth(button_width);
+
         GuiSlider animationSlider = new Gui.ActionSlider(1F, 10F, Config.animation_speed, animation, none);
         animationSlider.setWidth(button_width);
 
@@ -61,6 +64,7 @@ public class UIConfig {
         addToSection(left, "general", animationSlider);
 
         addToSection(right, "color", colorModeButton);
+        addToSection(right, "color", hueButton);
         addToSection(right, "color", angleSlider);
         addToSection(right, "color", groupSlider);
         addToSection(right, "color", leniencySlider);
@@ -197,6 +201,13 @@ public class UIConfig {
             Config.color_mode = ColorMode.next(Config.color_mode);
             button.displayString = "Mode: " + Config.color_mode.display;
             main.newPalette();
+        }
+    };
+
+    private final Gui.Action hue = new Gui.Action() {
+        public void onAction(GuiButton button) {
+            Config.show_hue = !Config.show_hue;
+            button.displayString = "Show Hue: " + Config.show_hue;
         }
     };
 

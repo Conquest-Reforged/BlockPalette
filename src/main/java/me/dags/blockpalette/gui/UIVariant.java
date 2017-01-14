@@ -190,14 +190,14 @@ public class UIVariant extends Gui {
         return (modifier * start) + rotation;
     }
 
-    public void draw(int mouseX, int mouseY, boolean showSegments) {
+    public void draw(int mouseX, int mouseY, boolean showHue) {
         this.hovered = visible;
 
         if (visible) {
             this.hovered = mouseOver(mouseX, mouseY);
 
             // Draw the segment
-            if (showSegments && !this.parent) {
+            if (showHue && !this.parent) {
                 GlStateManager.enableBlend();
                 GlStateManager.disableTexture2D();
 
