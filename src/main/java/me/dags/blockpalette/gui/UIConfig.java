@@ -34,6 +34,9 @@ public class UIConfig {
         Gui.ActionButton modeButton = new Gui.ActionButton(Config.match_textures ? "Mode: Match Texture" : "Mode: Match Color", mode);
         modeButton.setWidth(button_width);
 
+        Gui.ActionButton pickMode = new Gui.ActionButton("Pick Mode: " + Config.pick_mode.display, pick);
+        pickMode.setWidth(button_width);
+
         Gui.ActionButton filterButton = new Gui.ActionButton(Config.filter_variants ? "Inventory Filter: On" : "Inventory Filter: Off", filter);
         filterButton.setWidth(button_width);
 
@@ -60,6 +63,7 @@ public class UIConfig {
 
 
         addToSection(left, "general", modeButton);
+        addToSection(left, "general", pickMode);
         addToSection(left, "general", filterButton);
         addToSection(left, "general", animationSlider);
 
@@ -180,6 +184,18 @@ public class UIConfig {
             button.displayString = Config.match_textures ? "Mode: Match Texture" : "Mode: Match Color";
             setSectionVisibility(right, "color", !Config.match_textures);
             main.newPalette();
+        }
+    };
+
+    private final Gui.Action pick = new Gui.Action() {
+        public void onAction(GuiButton button) {
+            Config.pick_mode = Config.pick_mode.next();
+            button.displayString = "Pick Mode: " + Config.pick_mode.display;
+
+            if (main.getCurrentPalette().isOverlay()) {
+                GuiContainerCreative creative = new GuiContainerCreative(Minecraft.getMinecraft().thePlayer);
+                Minecraft.getMinecraft().displayGuiScreen(creative);
+            }
         }
     };
 
