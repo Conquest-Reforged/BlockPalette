@@ -12,9 +12,9 @@ public class ColorF {
     public final float blue;
 
     ColorF(Texture texture) {
-        red = (texture.red / 255F);
-        green = (texture.green / 255F);
-        blue = (texture.blue / 255F);
+        red = texture.red;
+        green = texture.green;
+        blue = texture.blue;
     }
 
     public ColorF(float r, float g, float b) {

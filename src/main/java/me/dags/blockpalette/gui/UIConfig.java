@@ -37,9 +37,6 @@ public class UIConfig {
         Gui.ActionButton pickMode = new Gui.ActionButton("Pick Mode: " + Config.pick_mode.display, pick);
         pickMode.setWidth(button_width);
 
-        Gui.ActionButton filterButton = new Gui.ActionButton(Config.filter_variants ? "Inventory Filter: On" : "Inventory Filter: Off", filter);
-        filterButton.setWidth(button_width);
-
         Gui.ActionButton colorModeButton = new Gui.ActionButton("Mode: " + Config.color_mode.display, color_mode);
         colorModeButton.setWidth(button_width);
 
@@ -64,7 +61,6 @@ public class UIConfig {
 
         addToSection(left, "general", modeButton);
         addToSection(left, "general", pickMode);
-        addToSection(left, "general", filterButton);
         addToSection(left, "general", animationSlider);
 
         addToSection(right, "color", colorModeButton);
@@ -192,19 +188,6 @@ public class UIConfig {
             Config.pick_mode = Config.pick_mode.next();
             button.displayString = "Pick Mode: " + Config.pick_mode.display;
 
-            if (main.getCurrentPalette().isOverlay()) {
-                GuiContainerCreative creative = new GuiContainerCreative(Minecraft.getMinecraft().thePlayer);
-                Minecraft.getMinecraft().displayGuiScreen(creative);
-            }
-        }
-    };
-
-    private final Gui.Action filter = new Gui.Action() {
-        public void onAction(GuiButton button) {
-            Config.filter_variants = !Config.filter_variants;
-            button.displayString = Config.filter_variants ? "Inventory Filter: On" : "Inventory Filter: Off";
-
-            // Update CreativeUI if we are overlaying it with the palette
             if (main.getCurrentPalette().isOverlay()) {
                 GuiContainerCreative creative = new GuiContainerCreative(Minecraft.getMinecraft().thePlayer);
                 Minecraft.getMinecraft().displayGuiScreen(creative);

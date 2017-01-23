@@ -7,6 +7,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
 
+import java.io.IOException;
+
 /**
  * @author dags <dags@dags.me>
  */
@@ -38,12 +40,9 @@ public class GuiScreenPalette extends GuiScreen {
     }
 
     @Override
-    public void keyTyped(char c, int code) {
+    public void keyTyped(char c, int code) throws IOException {
+        super.keyTyped(c, code);
         main.getCurrentPalette().keyTyped(c, code);
-
-        if (Config.pick_mode == PickMode.MOUSE && code == main.show.getKeyCode()) {
-            Minecraft.getMinecraft().setIngameFocus();
-        }
     }
 
     @Override

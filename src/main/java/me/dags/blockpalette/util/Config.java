@@ -11,7 +11,6 @@ import java.io.File;
  */
 public class Config {
 
-    public static boolean filter_variants = true;
     public static boolean match_textures = true;
     public static PickMode pick_mode = PickMode.MOUSE;
     public static int animation_speed = 5;
@@ -29,7 +28,6 @@ public class Config {
         cfg.load();
         match_textures = cfg.get("general", "match_textures", true).getBoolean();
         pick_mode = PickMode.fromId(cfg.get("general", "pick_mode", 0).getInt());
-        filter_variants = cfg.get("general", "filter_variants", true).getBoolean();
         animation_speed = cfg.get("general", "filter_variants", animation_speed).getInt();
         color_mode = ColorMode.fromId(cfg.get("color", "color_mode", ColorMode.getId(color_mode)).getInt());
         show_hue = cfg.get("color", "show_hue", show_hue).getBoolean();
@@ -43,7 +41,6 @@ public class Config {
         cfg.get("general", "match_textures", match_textures).set(match_textures);
         cfg.get("general", "pick_mode", 0).set(PickMode.toId(pick_mode));
         cfg.get("general", "animation_speed", animation_speed).set(animation_speed);
-        cfg.get("general", "filter_variants", filter_variants).set(filter_variants);
         cfg.get("color", "color_mode", 0).set(ColorMode.getId(color_mode));
         cfg.get("color", "show_hue", show_hue).set(show_hue);
         cfg.get("color", "angle", angle).set(angle);

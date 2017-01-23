@@ -45,33 +45,29 @@ public class ColorHue {
         isDirty = true;
     }
 
-    public void matchSaturation(Collection<Texture> results, float saturation, float tolerance) {
+    public void matchSaturation(Collection<Texture> results, float strength, float tolerance) {
         List<Texture> textures = getTextures();
         if (textures.isEmpty()) {
             return;
         }
 
         for (Texture texture : textures) {
-            if (delta(texture.saturation, saturation) <= tolerance) {
+            if (Math.abs(texture.strength - strength) <= tolerance) {
                 results.add(texture);
             }
         }
     }
 
-    public void matchLuminance(Collection<Texture> results, float luminance, float tolerance) {
+    public void matchLuminance(Collection<Texture> results, float brightness, float tolerance) {
         List<Texture> textures = getTextures();
         if (textures.isEmpty()) {
             return;
         }
 
         for (Texture texture : textures) {
-            if (delta(texture.saturation, luminance) <= tolerance) {
+            if (Math.abs(texture.brightness - brightness) <= tolerance) {
                 results.add(texture);
             }
         }
-    }
-
-    private static float delta(float f1, float f2) {
-        return Math.min(f1, f2) - Math.max(f1, f2);
     }
 }

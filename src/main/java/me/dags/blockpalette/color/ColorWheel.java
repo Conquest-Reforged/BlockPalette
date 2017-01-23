@@ -8,20 +8,20 @@ import java.util.*;
 public class ColorWheel {
 
     private static final int MAX_OFFSET = 60;
-    private static final Comparator<Texture> LUMINANCE = lightness();
-    private static final Comparator<Texture> SATURATION = saturation();
+    private static final Comparator<Texture> SORT_GRAY = sortGray();
+    private static final Comparator<Texture> SORT_COLOR = sortColor();
 
     private final int mod;
     private final ColorHue[] hues;
-    private final ColorHue grays = new ColorHue(LUMINANCE);
+    private final ColorHue grays = new ColorHue(SORT_GRAY);
     private final Map<String, Texture> textureMap = new HashMap<>();
 
     // The angle used to determine triad and tetrad points
     private int angle = 30;
     // Controls how leniently saturation levels will be matched
-    private float leniency = 0.25F;
+    private float leniency = 0.95F;
     // Controls at what point a color should be determined to be gray
-    private float grayPoint = 15F;
+    private float grayPoint = 0.15F;
 
     public ColorWheel() {
         this(24);
@@ -31,7 +31,7 @@ public class ColorWheel {
         this.hues = new ColorHue[colorGroups];
         this.mod = 359 / (colorGroups - 1);
         for (int i = 0; i < hues.length; i++) {
-            hues[i] = new ColorHue(SATURATION);
+            hues[i] = new ColorHue(SORT_COLOR);
         }
     }
 
@@ -57,7 +57,7 @@ public class ColorWheel {
     }
 
     public void setGrayPoint(float grayPoint) {
-        this.grayPoint = Math.min(100, Math.max(1, grayPoint));
+        this.grayPoint = Math.min(1F, Math.max(0F, grayPoint));
         refresh();
     }
 
@@ -96,7 +96,7 @@ public class ColorWheel {
     }
 
     public boolean isGray(Texture texture) {
-        return texture.isGray(grayPoint);
+        return texture.saturation <= grayPoint;
     }
 
     public List<Texture> getAdjacent(Texture texture, int size) {
@@ -117,15 +117,15 @@ public class ColorWheel {
         }
 
         if (isGray(texture)) {
-            float opposite = Math.min(1F, Math.max(0F, 1F - texture.lightness));
-            List<Texture> l1 = matchGray(texture.lightness, size);
+            float opposite = Math.min(1F, Math.max(0F, 1F - texture.brightness));
+            List<Texture> l1 = matchGray(texture.brightness, size);
             List<Texture> l2 = matchGray(opposite, size);
             l1.addAll(l2);
             return l1;
         } else {
             int opposite = clampHue(texture.hue - 180);
-            List<Texture> l1 = matchColor(texture.hue, texture.hue, size);
-            List<Texture> l2 = matchColor(opposite, texture.hue, size);
+            List<Texture> l1 = matchColor(texture.hue, texture.strength, size);
+            List<Texture> l2 = matchColor(opposite, texture.strength, size);
             l1.addAll(l2);
             return l1;
         }
@@ -159,9 +159,9 @@ public class ColorWheel {
         int h1 = texture.hue;
         int h2 = clampHue(texture.hue - angle);
         int h3 = clampHue(texture.hue + angle);
-        List<Texture> l1 = matchColor(h1, texture.hue, groupSize);
-        List<Texture> l2 = matchColor(h2, texture.hue, groupSize);
-        List<Texture> l3 = matchColor(h3, texture.hue, groupSize);
+        List<Texture> l1 = matchColor(h1, texture.strength, groupSize);
+        List<Texture> l2 = matchColor(h2, texture.strength, groupSize);
+        List<Texture> l3 = matchColor(h3, texture.strength, groupSize);
 
         int min = Math.min(l1.size(), Math.min(l2.size(), l3.size()));
         if (min != groupSize) {
@@ -180,9 +180,9 @@ public class ColorWheel {
         int h1 = texture.hue;
         int h2 = clampHue(texture.hue - 180 - angle);
         int h3 = clampHue(texture.hue - 180 + angle);
-        List<Texture> l1 = matchColor(h1, texture.hue, groupSize);
-        List<Texture> l2 = matchColor(h2, texture.hue, groupSize);
-        List<Texture> l3 = matchColor(h3, texture.hue, groupSize);
+        List<Texture> l1 = matchColor(h1, texture.strength, groupSize);
+        List<Texture> l2 = matchColor(h2, texture.strength, groupSize);
+        List<Texture> l3 = matchColor(h3, texture.strength, groupSize);
 
         int min = Math.min(l1.size(), Math.min(l2.size(), l3.size()));
         if (min != groupSize) {
@@ -201,10 +201,10 @@ public class ColorWheel {
         int h2 = clampHue(texture.hue + angle);
         int h3 = clampHue(texture.hue + 180);
         int h4 = clampHue(texture.hue + 180 + angle);
-        List<Texture> l1 = matchColor(h1, texture.hue, groupSize);
-        List<Texture> l2 = matchColor(h2, texture.hue, groupSize);
-        List<Texture> l3 = matchColor(h3, texture.hue, groupSize);
-        List<Texture> l4 = matchColor(h4, texture.hue, groupSize);
+        List<Texture> l1 = matchColor(h1, texture.strength, groupSize);
+        List<Texture> l2 = matchColor(h2, texture.strength, groupSize);
+        List<Texture> l3 = matchColor(h3, texture.strength, groupSize);
+        List<Texture> l4 = matchColor(h4, texture.strength, groupSize);
 
         int min = Math.min(l1.size(), Math.min(l2.size(), Math.min(l3.size(), l4.size())));
         if (min != groupSize) {
@@ -226,15 +226,15 @@ public class ColorWheel {
 
     private List<Texture> getGrayTriad(Texture texture, int groupSize) {
         float range, p1, p2, p3;
-        if (texture.lightness < 1 / 3) {
-            range = 1F - texture.lightness;
-            p1 = texture.lightness;
-        } else if (texture.lightness > 2 / 3) {
-            range = texture.lightness;
+        if (texture.brightness < 1 / 3) {
+            range = 1F - texture.brightness;
+            p1 = texture.brightness;
+        } else if (texture.brightness > 2 / 3) {
+            range = texture.brightness;
             p1 = 0;
         } else {
-            range = 2F * Math.min(texture.lightness, 1F - texture.lightness);
-            p1 = texture.lightness - (range / 2);
+            range = 2F * Math.min(texture.brightness, 1F - texture.brightness);
+            p1 = texture.brightness - (range / 2);
         }
         p2 = p1 + (range / 2);
         p3 = p1 + range;
@@ -255,7 +255,7 @@ public class ColorWheel {
     }
 
     private List<Texture> getGrayTetrad(Texture texture, int groupSize) {
-        float l = texture.lightness;
+        float l = texture.brightness;
         float range, p1, p2, p3, p4;
 
         if (l < 0.25F) {
@@ -297,15 +297,15 @@ public class ColorWheel {
         return l1;
     }
 
-    private List<Texture> matchColor(int hue, float saturation, int size) {
+    private List<Texture> matchColor(int hue, float strength, int size) {
         Set<Texture> results = new LinkedHashSet<>();
 
         for (int offset = 0; offset < MAX_OFFSET && results.size() < size; offset++) {
             if (offset == 0) {
-                getHue(clampHue(hue)).matchSaturation(results, saturation, leniency);
+                getHue(clampHue(hue)).matchSaturation(results, strength, leniency);
             } else {
-                getHue(clampHue(hue - offset)).matchSaturation(results, saturation, leniency);
-                getHue(clampHue(hue + offset)).matchSaturation(results, saturation, leniency);
+                getHue(clampHue(hue - offset)).matchSaturation(results, strength, leniency);
+                getHue(clampHue(hue + offset)).matchSaturation(results, strength, leniency);
             }
         }
         List<Texture> list = new ArrayList<>(results);
@@ -313,21 +313,21 @@ public class ColorWheel {
         // Adds a bit of variance in the returned textures
         Collections.shuffle(list);
         trimList(list, size);
-        Collections.sort(list, SATURATION);
+        Collections.sort(list, SORT_COLOR);
 
         return list;
     }
 
-    private List<Texture> matchGray(float luminance, int size) {
+    private List<Texture> matchGray(float brightness, int size) {
         Set<Texture> results = new LinkedHashSet<>();
-        grays.matchLuminance(results, luminance, leniency / 2);
+        grays.matchLuminance(results, brightness, leniency / 2);
 
         List<Texture> list = new ArrayList<>(results);
 
         // Adds a bit of variance in the returned textures
         Collections.shuffle(list);
         trimList(list, size);
-        Collections.sort(list, LUMINANCE);
+        Collections.sort(list, SORT_GRAY);
 
         return list;
     }
@@ -348,20 +348,26 @@ public class ColorWheel {
         return Math.min(hue, 359);
     }
 
-    private static Comparator<Texture> lightness() {
+    private static Comparator<Texture> sortGray() {
         return new Comparator<Texture>() {
             @Override
             public int compare(Texture t1, Texture t2) {
-                return t2.lightness.compareTo(t1.lightness);
+                return t2.luminosity.compareTo(t1.luminosity);
             }
         };
     }
 
-    private static Comparator<Texture> saturation() {
+    private static Comparator<Texture> sortColor() {
         return new Comparator<Texture>() {
             @Override
             public int compare(Texture t1, Texture t2) {
-                return t2.saturation.compareTo(t1.saturation);
+                if (Math.abs(t2.strength - t1.strength) < 0.05F) {
+                    return t2.luminosity.compareTo(t1.luminosity);
+                }
+                if (Math.abs(t2.saturation - t1.saturation) < 0.1F) {
+                    return t2.brightness.compareTo(t1.brightness);
+                }
+                return t2.strength.compareTo(t1.strength);
             }
         };
     }

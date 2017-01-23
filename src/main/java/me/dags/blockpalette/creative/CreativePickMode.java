@@ -22,9 +22,7 @@ public abstract class CreativePickMode {
         this.main = main;
     }
 
-    public void onInitGui() {
-        main.getRegistry().setupTabFilters();
-    }
+    public void onInitGui() {}
 
     public void onDrawScreen(GuiContainerCreative creative, int mouseX, int mouseY, Event event) {
         this.mouseX = mouseX;

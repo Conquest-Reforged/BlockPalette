@@ -6,9 +6,6 @@ import me.dags.blockpalette.creative.MousePickMode;
 import me.dags.blockpalette.creative.PickMode;
 import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.util.Config;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -32,10 +29,6 @@ public class GameEvents {
     @SubscribeEvent
     public void onTick(TickEvent.RenderTickEvent event) {
         main.onTick();
-        FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
-        ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
-        int left = resolution.getScaledWidth() - renderer.getStringWidth("Demo") - 5;
-        renderer.drawString("Demo", left, 5, 0xFF0000, false);
     }
 
     @SubscribeEvent

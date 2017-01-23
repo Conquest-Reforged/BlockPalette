@@ -6,7 +6,6 @@ import me.dags.blockpalette.color.Texture;
 import me.dags.blockpalette.gui.UIPalette;
 import me.dags.blockpalette.gui.UIVariant;
 import me.dags.blockpalette.util.Config;
-import me.dags.blockpalette.util.FilteredCreativeTab;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -45,24 +44,6 @@ public class PaletteRegistry {
                 for (ItemStack stack : items) {
                     register(stack);
                 }
-            }
-        }
-    }
-
-    public void setupTabFilters() {
-        for (CreativeTabs tab : CreativeTabs.CREATIVE_TAB_ARRAY) {
-            // Don't filter the search or inventory tabs
-            if (tab.getTabLabel().equals(CreativeTabs.SEARCH.getTabLabel()) || tab.getTabLabel().equals(CreativeTabs.INVENTORY.getTabLabel())) {
-                continue;
-            }
-            if (Config.filter_variants) {
-                if (!(tab instanceof FilteredCreativeTab)) {
-                    // Tabs insert themselves in 'CREATIVE_TAB_ARRAY' on instantiation
-                    new FilteredCreativeTab(this, tab);
-                }
-            } else if (tab instanceof FilteredCreativeTab) {
-                // Unwrap the tab from the filter
-                ((FilteredCreativeTab) tab).restore();
             }
         }
     }

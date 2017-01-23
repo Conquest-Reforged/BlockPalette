@@ -8,26 +8,25 @@ public class Texture {
     public static final Texture EMPTY = new Texture();
 
     public final String name;
-    final int red;
-    final int green;
-    final int blue;
     final int hue;
+    final float red;
+    final float green;
+    final float blue;
     final Float saturation;
-    final Float lightness;
-
-    private final int rgDif;
-    private final int gbDif;
+    final Float brightness;
+    final Float luminosity;
+    final Float strength;
 
     private Texture() {
         this.name = "EMPTY";
-        this.red = 0;
-        this.green = 0;
-        this.blue = 0;
         this.hue = -1;
+        this.red = 0F;
+        this.green = 0F;
+        this.blue = 0F;
         this.saturation = 0F;
-        this.lightness = 0F;
-        this.rgDif = 0;
-        this.gbDif = 0;
+        this.brightness = 0F;
+        this.luminosity = 0F;
+        this.strength = 0F;
     }
 
 
@@ -51,39 +50,18 @@ public class Texture {
         g /= size;
         b /= size;
 
-        float rr = r / 255F;
-        float gg = g / 255F;
-        float bb = b / 255F;
+        this.red = r / 255F;
+        this.green = g / 255F;
+        this.blue = b / 255F;
 
-        float max = Math.max(Math.max(rr, gg), bb);
-        float min = Math.min(Math.min(rr, gg), bb);
-
-        float hue;
-        float lightness;
-        float saturation;
-
-        if (rr == max) {
-            hue = ((gg - bb) / (max - min));
-        } else if (gg == max) {
-            hue = (2 + ((bb - rr) / (max - min)));
-        } else {
-            hue = (4 + ((rr - gg) / (max - min)));
-        }
-
-        hue = hue * 60;
-        lightness = (min + max) / 2;
-        saturation = min == max ? 0 : lightness > 0.5 ? (max - min) / (2F - max - min) : (max - min) / max + min;
-
+        float[] hsb = RGBtoHSB(red, green, blue);
 
         this.name = name;
-        this.red = r;
-        this.green = g;
-        this.blue = b;
-        this.hue = ColorWheel.clampHue(hue);
-        this.lightness = lightness;
-        this.saturation = saturation;
-        this.rgDif = Math.max(red, green) - Math.min(red, green);
-        this.gbDif = Math.max(green, blue) - Math.min(green, blue);
+        this.hue = Math.round(hsb[0]);
+        this.saturation = hsb[1];
+        this.brightness = hsb[2];
+        this.luminosity = 0.2126F * red + 0.715F * green + 0.0722F * blue;
+        this.strength = brightness * saturation;
     }
 
     public boolean isPresent() {
@@ -94,13 +72,46 @@ public class Texture {
         return new ColorF(this);
     }
 
-    boolean isGray(float grayPoint) {
-        float point = grayPoint / lightness;
-        return saturation < 0.5 && rgDif < point && gbDif < point;
-    }
-
     @Override
     public String toString() {
-        return String.format("%s rgb(%s,%s,%s) hue(%s) hsl(%s,%s,%s)", name, red, green, blue, hue, hue, saturation, lightness);
+        return String.format("%s rgb(%s,%s,%s) hue(%s) hsb(%s,%s,%s)", name, red, green, blue, hue, hue, saturation, brightness);
+    }
+
+    // com.sun.javafx.util.Utils.RGBtoHSB(..)
+    private static float[] RGBtoHSB(float r, float g, float b) {
+        float hue, saturation, brightness;
+        float[] hsbvals = new float[3];
+        float cmax = (r > g) ? r : g;
+        if (b > cmax) cmax = b;
+        float cmin = (r < g) ? r : g;
+        if (b < cmin) cmin = b;
+
+        brightness = cmax;
+        if (cmax != 0)
+            saturation = (cmax - cmin) / cmax;
+        else
+            saturation = 0;
+
+        if (saturation == 0) {
+            hue = 0;
+        } else {
+            float redc = (cmax - r) / (cmax - cmin);
+            float greenc = (cmax - g) / (cmax - cmin);
+            float bluec = (cmax - b) / (cmax - cmin);
+            if (r == cmax)
+                hue = bluec - greenc;
+            else if (g == cmax)
+                hue = 2.0F + redc - bluec;
+            else
+                hue = 4.0F + greenc - redc;
+            hue = hue / 6.0F;
+            if (hue < 0)
+                hue = hue + 1.0F;
+        }
+        hsbvals[0] = hue * 360F;
+        hsbvals[1] = saturation;
+        hsbvals[2] = brightness;
+
+        return hsbvals;
     }
 }
