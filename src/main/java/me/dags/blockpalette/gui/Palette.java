@@ -2,7 +2,6 @@ package me.dags.blockpalette.gui;
 
 import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.palette.PaletteItem;
-import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -11,7 +10,6 @@ import net.minecraft.client.gui.inventory.CreativeCrafting;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -29,17 +27,17 @@ public class Palette {
     private static final ResourceLocation MASK0 = new ResourceLocation("blockpalette", "textures/gui/wheel_mask0.png");
     private static final ResourceLocation MASK1 = new ResourceLocation("blockpalette", "textures/gui/wheel_mask1.png");
 
-    private static final int EDGES = 6;
-    private static final int SCALE_THRESHOLD = 18;
-    private static final float CENTER_SCALE = 1.75F;
+    private static final int EDGES = 6; // number of sides on polygon
+    private static final int SCALE_THRESHOLD = 18; // number of filled slots before scaling down items
+    private static final float CENTER_SCALE = 1.75F; // scale of item in center
 
-    private final int radius = 75;
     private final List<Slot> allSlots = new ArrayList<>();
     private final List<Slot> slots = new ArrayList<>();
-    private final Slot center;
+    private final int radius = 75;
     private final float scale;
+    private final Slot center;
 
-    private int invertColor = 0x000000;
+    private int selectedColor = 0xFFFFFF;
     private int highlightColor = 0xFFFFFF;
     private float highlightRadius = 1.1F;
 
@@ -73,30 +71,24 @@ public class Palette {
         return radius + 40;
     }
 
+    public void setSelected(Slot slot) {
+        this.selected = slot;
+    }
+
     public void setHighlightColor(int r, int g, int b) {
         this.highlightColor = ColorF.rgb(r, g, b);
-        this.invertColor = ColorF.rgb(255 - r, 255 - g, 255 - b);
+        this.selectedColor = ColorF.rgb(Math.max(0, r - 45), Math.max(0, g - 45), Math.max(0, b - 45));
     }
 
     public void setHighlightRadius(float highlightRadius) {
         this.highlightRadius = highlightRadius;
     }
 
-    public void mouseClicked(int mouseX, int mouseY) {
-        if (selected != null) {
-            selected = null;
-        }
-
-        if (underMouse != null) {
-            if (Keyboard.isKeyDown(PaletteMain.selectKeyID)) {
-                underMouse.setSelected(!underMouse.isSelected());
-            } else {
-                selected = underMouse;
-            }
-        }
-    }
-
     public void drawScreen(int mouseX, int mouseY) {
+        if (!isPresent()) {
+            return;
+        }
+
         handleMouse(mouseX, mouseY);
 
         int rad = radius + 44;
@@ -126,7 +118,7 @@ public class Palette {
         }
 
         for (Slot slot : allSlots) {
-            slot.setHighlight(highlightColor, invertColor, highlightRadius);
+            slot.setHighlight(highlightColor, selectedColor, highlightRadius);
             slot.draw();
         }
 
@@ -186,12 +178,16 @@ public class Palette {
     }
 
     public void resize(int width, int height) {
+        if (!isPresent()) {
+            return;
+        }
+
         this.centerX = width / 2;
         this.centerY = height / 2;
         this.center.setPosition(centerX, centerY);
         this.center.setScale(CENTER_SCALE);
 
-        Polygon polygon = new Polygon(EDGES, radius, 40, 40);
+        me.dags.blockpalette.shape.Polygon polygon = new me.dags.blockpalette.shape.Polygon(EDGES, radius, 40, 40);
         polygon.init(centerX, centerY);
 
         float spacing = 360F / (float) slots.size();
@@ -211,6 +207,10 @@ public class Palette {
     }
 
     public void close() {
+        if (!isPresent()) {
+            return;
+        }
+
         EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
         CreativeCrafting crafting = new CreativeCrafting(Minecraft.getMinecraft());
         player.inventoryContainer.addListener(crafting);
@@ -233,12 +233,12 @@ public class Palette {
     }
 
     private static SlotBounds innerBounds(int centerX, int centerY) {
-        Polygon polygon = new Polygon(6, 40, 1, 1);
+        me.dags.blockpalette.shape.Polygon polygon = new me.dags.blockpalette.shape.Polygon(6, 40, 1, 1);
         polygon.init(centerX, centerY);
         return polygon.outline();
     }
 
-    public static Palette texturePalette(PaletteItem main, List<PaletteItem> items) {
+    public static Palette texturePalette(PaletteItem centerItem, List<PaletteItem> items) {
         int count = Math.max(SCALE_THRESHOLD, items.size());
         float scale = 1.15F;
         if (count > SCALE_THRESHOLD) {
@@ -247,7 +247,7 @@ public class Palette {
         }
 
         List<Slot> slots = new ArrayList<>();
-        Slot center = new Slot(main);
+        Slot center = new Slot(centerItem);
 
         for (int i = 0; i < count; i++) {
             PaletteItem stack = i < items.size() ? items.get(i) : PaletteItem.EMPTY;
@@ -258,7 +258,7 @@ public class Palette {
         return new Palette(center, slots, scale);
     }
 
-    public static Palette colorPalette(PaletteItem main, List<PaletteItem> items) {
+    public static Palette colorPalette(PaletteItem centerItem, List<PaletteItem> items) {
         int count = items.size();
         float scale = 1.15F;
         if (count > SCALE_THRESHOLD) {
@@ -267,7 +267,7 @@ public class Palette {
         }
 
         List<Slot> slots = new ArrayList<>();
-        Slot center = new Slot(main);
+        Slot center = new Slot(centerItem);
 
         for (int i = 0; i < count; i++) {
             PaletteItem stack = i < items.size() ? items.get(i) : PaletteItem.EMPTY;

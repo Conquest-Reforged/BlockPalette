@@ -15,7 +15,7 @@ import java.io.File;
 
 public class PaletteMain implements IResourceManagerReloadListener {
 
-    public static final int selectKeyID = Keyboard.KEY_LCONTROL;
+    public static final int switchKeyID = Keyboard.KEY_LCONTROL;
 
     public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.getKeyIndex("C"), "Block Palette");
     private PaletteRegistry registry = new PaletteRegistry(this);
@@ -29,14 +29,14 @@ public class PaletteMain implements IResourceManagerReloadListener {
         return palette;
     }
 
-    public void newPalette(ItemStack itemStack) {
-        palette = registry.getPalette0(itemStack);
-    }
-
     public void showPaletteScreen() {
         if (palette.isPresent()) {
             Minecraft.getMinecraft().displayGuiScreen(new PaletteScreen(this));
         }
+    }
+
+    public void newPalette(ItemStack itemStack) {
+        palette = registry.getPalette0(itemStack);
     }
 
     public boolean isInventoryKey(int keyCode) {
@@ -61,7 +61,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
     public void onTick() {
         Minecraft minecraft = Minecraft.getMinecraft();
         if (minecraft.thePlayer != null && minecraft.currentScreen == null && Minecraft.isGuiEnabled()) {
-            if (show.isPressed()) {
+            if (!getPalette().isPresent() && show.isPressed()) {
                 newPalette(minecraft.thePlayer.getHeldItemMainhand());
                 showPaletteScreen();
             }

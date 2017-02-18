@@ -109,9 +109,25 @@ public class PaletteScreen extends GuiScreen {
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         paletteSettings.mousePressed(minecraft, mouseX, mouseY);
         colorSettings.mousePressed(minecraft, mouseX, mouseY);
-        main.getPalette().mouseClicked(mouseX, mouseY);
+
         for (GuiButton button : buttons) {
             button.mousePressed(minecraft, mouseX, mouseY);
+        }
+
+        main.getPalette().setSelected(null);
+        Slot underMouse = main.getPalette().getUnderMouse();
+
+        if (underMouse != null) {
+            if (mouseButton == 0) {
+                if (Keyboard.isKeyDown(PaletteMain.switchKeyID)) {
+                    main.newPalette(underMouse.getStack());
+                    refresh.run();
+                } else {
+                    main.getPalette().setSelected(underMouse);
+                }
+            } else if (mouseButton == 1 && !underMouse.isEmpty()) {
+                underMouse.setSelected(!underMouse.isSelected());
+            }
         }
     }
 
@@ -130,10 +146,6 @@ public class PaletteScreen extends GuiScreen {
     @Override
     public void keyTyped(char key, int code) throws IOException {
         super.keyTyped(key, code);
-
-        if (!isCreativeOverlay && code == main.show.getKeyCode()) {
-            Minecraft.getMinecraft().displayGuiScreen(null);
-        }
     }
 
     @Override
@@ -160,10 +172,8 @@ public class PaletteScreen extends GuiScreen {
             button.drawButton(minecraft, mouseX, mouseY);
         }
 
-        if (Config.pick_mode == PickMode.KEYBOARD) {
-            if (!isCreativeOverlay && !Keyboard.isKeyDown(main.show.getKeyCode())) {
-                Minecraft.getMinecraft().displayGuiScreen(null);
-            }
+        if (Config.pick_mode == PickMode.KEYBOARD && !isCreativeOverlay && !Keyboard.isKeyDown(main.show.getKeyCode())) {
+            Minecraft.getMinecraft().setIngameFocus();
         }
     }
 

@@ -1,4 +1,6 @@
-package me.dags.blockpalette.gui;
+package me.dags.blockpalette.shape;
+
+import me.dags.blockpalette.gui.SlotBounds;
 
 import java.awt.*;
 import java.util.ArrayList;

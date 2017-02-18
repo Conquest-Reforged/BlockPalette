@@ -1,4 +1,4 @@
-package me.dags.blockpalette.gui;
+package me.dags.blockpalette.shape;
 
 import java.awt.*;
 

@@ -89,8 +89,8 @@ public class Hotbar {
         GlStateManager.disableRescaleNormal();
     }
 
-    public void mouseRelease(int mouseX, int mouseY, int btn) {
-        if (Keyboard.isKeyDown(PaletteMain.selectKeyID)) {
+    public void mouseRelease(int mouseX, int mouseY, int button) {
+        if (button == 1 || Keyboard.isKeyDown(PaletteMain.switchKeyID)) {
             return;
         }
 
