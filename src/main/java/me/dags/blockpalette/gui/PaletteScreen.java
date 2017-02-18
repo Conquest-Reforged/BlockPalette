@@ -148,6 +148,9 @@ public class PaletteScreen extends GuiScreen {
     @Override
     public void keyTyped(char key, int code) throws IOException {
         super.keyTyped(key, code);
+        if (Config.pick_mode == PickMode.MOUSE && !isCreativeOverlay && code == main.show.getKeyCode()) {
+            minecraft.setIngameFocus();
+        }
     }
 
     @Override
@@ -175,7 +178,7 @@ public class PaletteScreen extends GuiScreen {
         }
 
         if (Config.pick_mode == PickMode.KEYBOARD && !isCreativeOverlay && !Keyboard.isKeyDown(main.show.getKeyCode())) {
-            Minecraft.getMinecraft().setIngameFocus();
+            minecraft.setIngameFocus();
         }
     }
 
@@ -184,7 +187,7 @@ public class PaletteScreen extends GuiScreen {
     }
 
     private void refreshScreen() {
-        ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
+        ScaledResolution resolution = new ScaledResolution(minecraft);
         main.getPalette().resize(resolution.getScaledWidth(), resolution.getScaledHeight());
         main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
 
@@ -202,7 +205,7 @@ public class PaletteScreen extends GuiScreen {
     }
 
     private void resize() {
-        ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
+        ScaledResolution resolution = new ScaledResolution(minecraft);
         width = resolution.getScaledWidth();
         height = resolution.getScaledHeight();
         main.getPalette().resize(resolution.getScaledWidth(), resolution.getScaledHeight());
@@ -291,8 +294,8 @@ public class PaletteScreen extends GuiScreen {
             public void onUpdate(PickMode value) {
                 Config.pick_mode = value;
                 if (isCreativeOverlay) {
-                    GuiContainerCreative creative = new GuiContainerCreative(Minecraft.getMinecraft().thePlayer);
-                    Minecraft.getMinecraft().displayGuiScreen(creative);
+                    GuiContainerCreative creative = new GuiContainerCreative(minecraft.thePlayer);
+                    minecraft.displayGuiScreen(creative);
                 }
             }
         });
