@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class PaletteMod {
 
     public static final String MOD_ID = "blockpalette";
-    public static final String VERSION = "1.0-DEMO";
+    public static final String VERSION = "1.1";
 
     private final PaletteMain main = new PaletteMain();
     private final GameEvents events = new GameEvents(main);
