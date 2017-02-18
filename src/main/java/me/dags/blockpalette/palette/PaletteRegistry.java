@@ -57,6 +57,9 @@ public class PaletteRegistry {
             return getVariantPalette(itemStack);
         }
 
+        itemStack = itemStack.copy();
+        itemStack.stackSize = 1;
+
         colorWheel.setAngle(Config.angle);
         colorWheel.setLeniency(Config.leniency);
 
