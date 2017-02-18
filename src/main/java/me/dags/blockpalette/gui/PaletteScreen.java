@@ -107,13 +107,6 @@ public class PaletteScreen extends GuiScreen {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        paletteSettings.mousePressed(minecraft, mouseX, mouseY);
-        colorSettings.mousePressed(minecraft, mouseX, mouseY);
-
-        for (GuiButton button : buttons) {
-            button.mousePressed(minecraft, mouseX, mouseY);
-        }
-
         main.getPalette().setSelected(null);
         Slot underMouse = main.getPalette().getUnderMouse();
 
@@ -122,6 +115,7 @@ public class PaletteScreen extends GuiScreen {
                 if (Keyboard.isKeyDown(PaletteMain.switchKeyID)) {
                     main.newPalette(underMouse.getStack());
                     refresh.run();
+                    return;
                 } else {
                     main.getPalette().setSelected(underMouse);
                 }
@@ -129,11 +123,19 @@ public class PaletteScreen extends GuiScreen {
                 underMouse.setSelected(!underMouse.isSelected());
             }
         }
+
+        hotbar.mouseRelease(mouseX, mouseY, mouseButton);
+
+        paletteSettings.mousePressed(minecraft, mouseX, mouseY);
+        colorSettings.mousePressed(minecraft, mouseX, mouseY);
+
+        for (GuiButton button : buttons) {
+            button.mousePressed(minecraft, mouseX, mouseY);
+        }
     }
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int mouseButton) {
-        hotbar.mouseRelease(mouseX, mouseY, mouseButton);
         paletteSettings.mouseReleased(mouseX, mouseY);
         colorSettings.mouseReleased(mouseX, mouseY);
         main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());

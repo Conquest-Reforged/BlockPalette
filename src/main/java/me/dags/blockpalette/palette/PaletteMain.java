@@ -15,7 +15,7 @@ import java.io.File;
 
 public class PaletteMain implements IResourceManagerReloadListener {
 
-    public static final int switchKeyID = Keyboard.KEY_LCONTROL;
+    public static final int switchKeyID = Keyboard.KEY_LSHIFT;
 
     public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.getKeyIndex("C"), "Block Palette");
     private PaletteRegistry registry = new PaletteRegistry(this);

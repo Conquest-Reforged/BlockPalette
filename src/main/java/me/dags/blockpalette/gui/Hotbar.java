@@ -55,6 +55,7 @@ public class Hotbar {
         // hotbar
         GlStateManager.color(1F, 1F, 1F, 1F);
         GlStateManager.enableBlend();
+        GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();
         Minecraft.getMinecraft().getTextureManager().bindTexture(WIDGETS_TEX_PATH);
         net.minecraft.client.gui.Gui.drawModalRectWithCustomSizedTexture(left, top, 0, 0, 182, 22, 256, 256);
@@ -76,21 +77,21 @@ public class Hotbar {
 
         if (!selected.isEmpty()) {
             GlStateManager.pushMatrix();
-            GlStateManager.enableDepth();
-            GlStateManager.translate(mouseX, mouseY, 300F);
+            GlStateManager.translate(mouseX, mouseY, 0F);
+            GlStateManager.translate(0 ,0, 500F);
             ItemStack stack = selected.getItemStack();
             Slot.drawHighlightedStack(stack, 0, 0, Config.highlight_scale, 0xFFFFFF);
             Minecraft.getMinecraft().getRenderItem().renderItemOverlays(fontRenderer, stack, -8, -8);
-            GlStateManager.disableDepth();
             GlStateManager.popMatrix();
         }
 
+        GlStateManager.disableDepth();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableRescaleNormal();
     }
 
     public void mouseRelease(int mouseX, int mouseY, int button) {
-        if (button == 1 || Keyboard.isKeyDown(PaletteMain.switchKeyID)) {
+        if (button == 1) {
             return;
         }
 
