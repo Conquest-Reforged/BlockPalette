@@ -14,6 +14,11 @@ public enum PickMode {
         this.display = in;
     }
 
+    @Override
+    public String toString() {
+        return display;
+    }
+
     public PickMode next() {
         switch (this) {
             case MOUSE:

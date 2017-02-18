@@ -1,7 +1,7 @@
 package me.dags.blockpalette.palette;
 
-import me.dags.blockpalette.gui.GuiScreenPalette;
-import me.dags.blockpalette.gui.UIPalette;
+import me.dags.blockpalette.gui.Palette;
+import me.dags.blockpalette.gui.PaletteScreen;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -15,30 +15,27 @@ import java.io.File;
 
 public class PaletteMain implements IResourceManagerReloadListener {
 
-    public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.getKeyIndex("C"), "Block Palette");
+    public static final int selectKeyID = Keyboard.KEY_LCONTROL;
 
+    public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.getKeyIndex("C"), "Block Palette");
     private PaletteRegistry registry = new PaletteRegistry(this);
-    private UIPalette currentPalette = UIPalette.EMPTY;
+    private Palette palette = Palette.EMPTY;
 
     public PaletteRegistry getRegistry() {
         return registry;
     }
 
-    public UIPalette getCurrentPalette() {
-        return currentPalette;
-    }
-
-    public void newPalette() {
-        newPalette(currentPalette.getParentStack());
+    public Palette getPalette() {
+        return palette;
     }
 
     public void newPalette(ItemStack itemStack) {
-        currentPalette = registry.getPalette(itemStack);
+        palette = registry.getPalette0(itemStack);
     }
 
     public void showPaletteScreen() {
-        if (currentPalette.isPresent()) {
-            Minecraft.getMinecraft().displayGuiScreen(new GuiScreenPalette(this));
+        if (palette.isPresent()) {
+            Minecraft.getMinecraft().displayGuiScreen(new PaletteScreen(this));
         }
     }
 
@@ -50,7 +47,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
     public void onResourceManagerReload(IResourceManager resourceManager) {
         registry = new PaletteRegistry(this);
         registry.buildPalettes();
-        currentPalette = UIPalette.EMPTY;
+        palette = Palette.EMPTY;
     }
 
     public void onPreInit(File config) {
@@ -64,13 +61,9 @@ public class PaletteMain implements IResourceManagerReloadListener {
     public void onTick() {
         Minecraft minecraft = Minecraft.getMinecraft();
         if (minecraft.thePlayer != null && minecraft.currentScreen == null && Minecraft.isGuiEnabled()) {
-            if (show.isPressed() && !currentPalette.isActive()) {
+            if (show.isPressed()) {
                 newPalette(minecraft.thePlayer.getHeldItemMainhand());
                 showPaletteScreen();
-            }
-
-            if (currentPalette.isActive()) {
-                currentPalette.draw();
             }
         }
     }

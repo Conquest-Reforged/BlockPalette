@@ -15,8 +15,10 @@ public abstract class CreativePickMode {
 
     final PaletteMain main;
     ItemStack stackUnderMouse = null;
-    int mouseX = 0, mouseY = 0;
-    private int width = 0, height = 0;
+    int mouseX = 0;
+    int mouseY = 0;
+    private int width = 0;
+    private int height = 0;
 
     CreativePickMode(PaletteMain main) {
         this.main = main;
@@ -28,11 +30,12 @@ public abstract class CreativePickMode {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
 
-        if (main.getCurrentPalette().isActive()) {
+
+        if (main.getPalette().isPresent()) {
             if (width != creative.width || height != creative.height) {
                 width = creative.width;
                 height = creative.height;
-                main.getCurrentPalette().onResize(creative.mc, width, height);
+                main.getPalette().resize(width, height);
             }
         }
 

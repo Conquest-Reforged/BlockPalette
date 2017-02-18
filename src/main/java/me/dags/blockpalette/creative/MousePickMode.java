@@ -1,46 +1,59 @@
 package me.dags.blockpalette.creative;
 
+import me.dags.blockpalette.gui.PaletteScreen;
 import me.dags.blockpalette.palette.PaletteMain;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import org.lwjgl.input.Keyboard;
+
+import java.io.IOException;
 
 /**
  * @author dags <dags@dags.me>
  */
 public class MousePickMode extends CreativePickMode {
 
+    private PaletteScreen screen;
     private boolean showDown = false;
     private boolean lCtrlDown = false;
     private boolean lShiftDown = false;
 
     public MousePickMode(PaletteMain main) {
         super(main);
+        this.screen = new PaletteScreen(main);
+        this.screen.initGui();
+        this.main.newPalette(null);
     }
 
     @Override
     void drawScreen(Event event) {
-        if (main.getCurrentPalette().isActive()) {
-            main.getCurrentPalette().setOverlay(true);
-            main.getCurrentPalette().draw(mouseX, mouseY);
+        if (main.getPalette().isPresent()) {
+            screen.drawScreen(mouseX, mouseY, 0F);
             event.setCanceled(true);
         }
     }
 
     @Override
     void pressMouse(Event event, int button) {
-        if (main.getCurrentPalette().isActive()) {
-            main.getCurrentPalette().mouseClick(mouseX, mouseY, button);
-            event.setCanceled(true);
+        if (main.getPalette().isPresent()) {
+            try {
+                screen.mouseClicked(mouseX, mouseY, button);
+                event.setCanceled(true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else if (stackUnderMouse != null && button == 0 && !modifierKey()) {
             main.newPalette(stackUnderMouse);
+            screen = new PaletteScreen(main);
+            screen.setCreativeOverlay(true);
+            screen.initGui();
             event.setCanceled(true);
         }
     }
 
     @Override
     void releaseMouse(Event event, int button) {
-        if (main.getCurrentPalette().isActive()) {
-            main.getCurrentPalette().mouseRelease(mouseX, mouseY, button);
+        if (main.getPalette().isPresent()) {
+            screen.mouseReleased(mouseX, mouseY, button);
             event.setCanceled(true);
         }
     }
@@ -55,7 +68,7 @@ public class MousePickMode extends CreativePickMode {
             showDown = true;
         }
 
-        if (main.getCurrentPalette().isActive()) {
+        if (main.getPalette().isPresent()) {
             event.setCanceled(true);
         }
     }
@@ -70,10 +83,10 @@ public class MousePickMode extends CreativePickMode {
             showDown = false;
         }
 
-        if (main.getCurrentPalette().isActive()) {
+        if (main.getPalette().isPresent()) {
             if (keyCode == Keyboard.KEY_ESCAPE || keyCode == main.show.getKeyCode() || main.isInventoryKey(keyCode)) {
-                main.getCurrentPalette().onClose();
-                main.getCurrentPalette().setInactive();
+                screen.onGuiClosed();
+                main.newPalette(null);
             }
             event.setCanceled(true);
         }

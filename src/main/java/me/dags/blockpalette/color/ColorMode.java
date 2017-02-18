@@ -17,6 +17,11 @@ public enum ColorMode {
         this.display = in;
     }
 
+    @Override
+    public String toString() {
+        return display;
+    }
+
     public static int maxId() {
         return ColorMode.values().length - 1;
     }

@@ -28,4 +28,15 @@ public class ColorF {
         green = 1F;
         blue = 1F;
     }
+
+    public int colorCode() {
+        return rgb(Math.round(red * 255), Math.round(green * 255), Math.round(blue * 255));
+    }
+
+    public static int rgb(int r, int g, int b) {
+        int rgb = r;
+        rgb = (rgb << 8) + g;
+        rgb = (rgb << 8) + b;
+        return rgb;
+    }
 }

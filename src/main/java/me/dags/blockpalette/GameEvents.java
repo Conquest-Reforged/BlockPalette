@@ -23,7 +23,6 @@ public class GameEvents {
 
     public GameEvents(PaletteMain main) {
         this.main = main;
-        creativeEvents = new KeybindPickMode(main);
     }
 
     @SubscribeEvent

@@ -1,10 +1,10 @@
 package me.dags.blockpalette.palette;
 
 import com.google.common.collect.Sets;
+import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.color.ColorWheel;
 import me.dags.blockpalette.color.Texture;
-import me.dags.blockpalette.gui.UIPalette;
-import me.dags.blockpalette.gui.UIVariant;
+import me.dags.blockpalette.gui.Palette;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -48,9 +48,9 @@ public class PaletteRegistry {
         }
     }
 
-    public UIPalette getPalette(ItemStack itemStack) {
+    public Palette getPalette0(ItemStack itemStack) {
         if (itemStack == null || Block.getBlockFromItem(itemStack.getItem()) == null) {
-            return UIPalette.EMPTY;
+            return Palette.EMPTY;
         }
 
         if (Config.match_textures) {
@@ -72,74 +72,64 @@ public class PaletteRegistry {
         }
     }
 
-    private UIPalette newPalette(ItemStack stack, List<UIVariant> entries) {
-        return new UIPalette(main, new UIVariant(stack, true), entries);
+    private Palette getColorPalette(ItemStack stack, List<PaletteItem> list) {
+        Texture texture = getTextureForStack(stack);
+        ColorF colorF = texture != null ? texture.getColor() : ColorF.EMPTY;
+        return Palette.colorPalette(PaletteItem.of(stack, colorF), list);
     }
 
-    public UIPalette getVariantPalette(ItemStack stack) {
+    public Palette getVariantPalette(ItemStack stack) {
         return getVariantPalette(stack, Sets.newHashSet(new Mapping(stack)));
     }
 
-    public UIPalette getVariantPalette(ItemStack stack, Set<Mapping> filter) {
+    public Palette getVariantPalette(ItemStack stack, Set<Mapping> filter) {
         List<Mapping> variants = getMatchingTexture(stack);
-        List<UIVariant> entries = statesToVariants(variants, filter);
-        return newPalette(stack, entries);
+        List<PaletteItem> entries = statesToVariants(variants, filter);
+        return Palette.texturePalette(PaletteItem.of(stack), entries);
     }
 
-    public UIPalette getAdjacentPalette(ItemStack stack) {
+    public Palette getAdjacentPalette(ItemStack stack) {
         return getAdjacentPalette(stack, Sets.newHashSet(new Mapping(stack)));
     }
 
-    public UIPalette getAdjacentPalette(ItemStack stack, Set<Mapping> filter) {
+    public Palette getAdjacentPalette(ItemStack stack, Set<Mapping> filter) {
         Texture texture = getTextureForStack(stack);
         List<Texture> adjacent = colorWheel.getAdjacent(texture, Config.group_size);
-        List<UIVariant> entries = texturesToVariants(adjacent, filter);
-        return newPalette(stack, entries);
+        List<PaletteItem> entries = texturesToVariants(adjacent, filter);
+        return getColorPalette(stack, entries);
     }
 
-    public UIPalette getComplimentaryPalette(ItemStack stack) {
+    public Palette getComplimentaryPalette(ItemStack stack) {
         return getComplimentaryPalette(stack, Sets.newHashSet(new Mapping(stack)));
     }
 
-    public UIPalette getComplimentaryPalette(ItemStack stack, Set<Mapping> filter) {
+    public Palette getComplimentaryPalette(ItemStack stack, Set<Mapping> filter) {
         Texture texture = getTextureForStack(stack);
         List<Texture> complimentary = colorWheel.getComplimentary(texture, Config.group_size);
-        List<UIVariant> entries = texturesToVariants(complimentary, filter);
-        return newPalette(stack, entries);
+        List<PaletteItem> entries = texturesToVariants(complimentary, filter);
+        return getColorPalette(stack, entries);
     }
 
-    public UIPalette getTriadPalette(ItemStack stack) {
+    public Palette getTriadPalette(ItemStack stack) {
         return getTriadPalette(stack, Sets.newHashSet(new Mapping(stack)));
     }
 
-    public UIPalette getTriadPalette(ItemStack stack, Set<Mapping> filter) {
+    public Palette getTriadPalette(ItemStack stack, Set<Mapping> filter) {
         Texture texture = getTextureForStack(stack);
         List<Texture> triad = colorWheel.getTriad(texture, Config.group_size);
-        List<UIVariant> entries = texturesToVariants(triad, filter);
-        return newPalette(stack, entries);
+        List<PaletteItem> entries = texturesToVariants(triad, filter);
+        return getColorPalette(stack, entries);
     }
 
-    public UIPalette getTetradPalette(ItemStack stack) {
+    public Palette getTetradPalette(ItemStack stack) {
         return getTetradPalette(stack, Sets.newHashSet(new Mapping(stack)));
     }
 
-    public UIPalette getTetradPalette(ItemStack stack, Set<Mapping> filter) {
+    public Palette getTetradPalette(ItemStack stack, Set<Mapping> filter) {
         Texture texture = getTextureForStack(stack);
         List<Texture> tetrad = colorWheel.getTetrad(texture, Config.group_size);
-        List<UIVariant> entries = texturesToVariants(tetrad, filter);
-        return newPalette(stack, entries);
-    }
-
-    public void filterItems(List<ItemStack> itemStacks) {
-        Iterator<ItemStack> iterator = itemStacks.iterator();
-        while (iterator.hasNext()) {
-            ItemStack stack = iterator.next();
-            String texture = getParticleTex(stack);
-            Mapping mapping = new Mapping(stack);
-            if (mappings.containsKey(texture) && !mappings.containsValue(mapping)) {
-                iterator.remove();
-            }
-        }
+        List<PaletteItem> entries = texturesToVariants(tetrad, filter);
+        return getColorPalette(stack, entries);
     }
 
     private List<Mapping> getMatchingTexture(ItemStack itemStack) {
@@ -148,26 +138,24 @@ public class PaletteRegistry {
         return states != null ? states : Collections.<Mapping>emptyList();
     }
 
-    private List<UIVariant> statesToVariants(List<Mapping> variants, Set<Mapping> filter) {
-        List<UIVariant> results = new ArrayList<>();
+    private List<PaletteItem> statesToVariants(List<Mapping> variants, Set<Mapping> filter) {
+        List<PaletteItem> results = new ArrayList<>();
         for (Mapping variant : variants) {
-            if (!filter.contains(variant)) {
+            if (filter.add(variant)) {
                 ItemStack itemStack = variant.itemStack.copy();
-                UIVariant entry = new UIVariant(itemStack, false);
-                results.add(entry);
+                results.add(PaletteItem.of(itemStack, ColorF.EMPTY));
             }
         }
         return results;
     }
 
-    private List<UIVariant> texturesToVariants(List<Texture> textures, Set<Mapping> filter) {
-        List<UIVariant> results = new ArrayList<>();
+    private List<PaletteItem> texturesToVariants(List<Texture> textures, Set<Mapping> filter) {
+        List<PaletteItem> results = new ArrayList<>();
         for (Texture texture : textures) {
             Mapping variant = mappings.get(texture.name);
-            if (variant != EMPTY_STATE && !filter.contains(variant)) {
+            if (variant != EMPTY_STATE && filter.add(variant)) {
                 ItemStack itemStack = variant.itemStack.copy();
-                UIVariant entry = new UIVariant(itemStack, false, texture.getColor());
-                results.add(entry);
+                results.add(PaletteItem.of(itemStack, texture.getColor()));
             }
         }
         return results;
