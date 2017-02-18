@@ -2,13 +2,13 @@
 {
   "modid": "blockpalette",
   "name": "BlockPalette",
-  "description": "CreativeMode block grouping/sorting",
+  "description": "A creative-mode block picker and colour wheel",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
   "authorList": ["dags"],
-  "credits": "doot",
+  "credits": "Textures by Monsterfish_",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
