@@ -2,11 +2,10 @@ package me.dags.blockpalette.gui;
 
 import me.dags.blockpalette.palette.PaletteItem;
 import me.dags.blockpalette.util.Config;
+import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -32,10 +31,6 @@ public class Slot {
 
     Slot(PaletteItem item) {
         this.item = item;
-
-        if (item == null) {
-            throw new NullPointerException("!!!!!!!!!!!!!!!!!!!!!!");
-        }
     }
 
     int xPos() {
@@ -96,30 +91,29 @@ public class Slot {
     public void draw() {
         if (!isEmpty()) {
             GlStateManager.pushMatrix();
-            GlStateManager.enableDepth();
             GlStateManager.translate(xPos, yPos, 0);
             GlStateManager.scale(scale, scale, scale);
 
+            GlStateManager.enableAlpha();
             GlStateManager.enableBlend();
-            Minecraft.getMinecraft().getTextureManager().bindTexture(SLOT);
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            Gui.drawModalRectWithCustomSizedTexture(-11, -11, 0, 0, 22, 22, 22, 22);
-            GlStateManager.disableBlend();
+            Render.drawTexture(SLOT, -11, -11, 22, 22, 0, 0, 22, 22);
 
             if (hovered || selected) {
                 int color = selected ? invertColor : highlightColor;
-                Slot.drawHighlightedItem(item, 0, 0, highlightSize, color);
+                Render.drawHighlightedItemStack(item.getItemStack(), 0, 0, highlightSize, color);
             } else {
-                Slot.drawItem(item, -8, -8);
+                Render.drawItemStack(item.getItemStack(), -8, -8);
             }
 
-            GlStateManager.disableDepth();
+            GlStateManager.disableAlpha();
+            GlStateManager.disableBlend();
             GlStateManager.popMatrix();
         }
     }
 
     public void drawBounds() {
-        if (!isEmpty() && !Config.match_textures && Config.color_opacity > 0) {
+        if (!isEmpty() && !Config.match_textures) {
             bounds.draw(item.getColor().red, item.getColor().green, item.getColor().blue, 1F);
         }
     }
@@ -131,42 +125,6 @@ public class Slot {
             int length = renderer.getStringWidth(text);
             int half = length / 2;
             renderer.drawStringWithShadow(text, cx - half, yPos, 0xFFFFFF);
-        }
-    }
-
-    static void drawItem(PaletteItem item, int x, int y) {
-        if (!item.isEmpty()) {
-            Slot.drawStack(item.getItemStack(), x, y);
-        }
-    }
-
-    static void drawHighlightedItem(PaletteItem item, int x, int y, float scale, int color) {
-        if (!item.isEmpty()) {
-            Slot.drawHighlightedStack(item.getItemStack(), x, y, scale, color);
-        }
-    }
-
-    static void drawStack(ItemStack stack, int x, int y) {
-        if (stack != null) {
-            RenderHelper.enableGUIStandardItemLighting();
-            Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, x, y);
-        }
-    }
-
-    static void drawHighlightedStack(ItemStack stack, int x, int y, float scale, int color) {
-        if (stack != null) {
-            float rescale0 = 1 / scale;
-            GlStateManager.translate(x, y, 10F);
-            GlStateManager.scale(scale, scale, scale);
-            GlStateManager.enableOutlineMode(color);
-            Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, -8, -8);
-            GlStateManager.disableOutlineMode();
-            GlStateManager.scale(rescale0, rescale0, rescale0);
-            GlStateManager.translate(x, y, 100F);
-
-            RenderHelper.enableGUIStandardItemLighting();
-            Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, -8, -8);
-            GlStateManager.disableDepth();
         }
     }
 }

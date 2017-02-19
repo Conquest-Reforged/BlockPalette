@@ -2,12 +2,14 @@ package me.dags.blockpalette.gui;
 
 import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.palette.PaletteItem;
+import me.dags.blockpalette.shape.Polygon;
 import me.dags.blockpalette.util.Config;
+import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.CreativeCrafting;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -93,29 +95,30 @@ public class Palette {
 
         int rad = radius + 44;
         int dim = (radius + 44) * 2;
+        int left = centerX - rad;
+        int top = centerY - rad;
 
-
-        GlStateManager.color(1F, 1F, 1F, 1F);
-        Minecraft.getMinecraft().getTextureManager().bindTexture(WHEEL);
-        Gui.drawModalRectWithCustomSizedTexture(centerX - rad, centerY - rad, 0, 0, dim, dim, dim , dim);
+        Render.cleanDrawTexture(WHEEL, left, top, dim, dim, 0, 0, dim, dim);
 
         if (!Config.match_textures) {
-            GlStateManager.pushMatrix();
-            drawMask(MASK0, rad, dim);
+            RenderHelper.disableStandardItemLighting();
+            Render.beginMask(MASK0, left, top, dim, dim, 0, 0, dim, dim);
             GlStateManager.disableTexture2D();
             for (Slot slot : slots) {
                 slot.drawBounds();
             }
             GlStateManager.enableTexture2D();
-            GlStateManager.popMatrix();
+            Render.endMask();
 
-            GlStateManager.pushMatrix();
-            drawMask(MASK1, rad, dim);
+            Render.beginMask(MASK1, left, top, dim, dim, 0, 0, dim, dim);
             GlStateManager.disableTexture2D();
             center.drawBounds();
             GlStateManager.enableTexture2D();
-            GlStateManager.popMatrix();
+            Render.endMask();
+            RenderHelper.enableGUIStandardItemLighting();
         }
+
+        Render.beginItems();
 
         for (Slot slot : allSlots) {
             slot.setHighlight(highlightColor, selectedColor, highlightRadius);
@@ -127,23 +130,7 @@ public class Palette {
             display.drawDisplayString(centerX, centerY + radius + 25);
         }
 
-        GlStateManager.disableAlpha();
-        GlStateManager.disableBlend();
-    }
-
-    private void drawMask(ResourceLocation location, int radius, int dim) {
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-
-        GlStateManager.colorMask(false, false, false, true);
-        GlStateManager.color(1F, 1F, 1F, Config.color_opacity);
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-
-        Minecraft.getMinecraft().getTextureManager().bindTexture(location);
-        Gui.drawModalRectWithCustomSizedTexture(centerX - radius, centerY - radius, 0, 0, dim, dim, dim, dim);
-
-        GlStateManager.colorMask(true, true, true, true);
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.DST_ALPHA, GlStateManager.DestFactor.ONE_MINUS_DST_ALPHA);
+        Render.endItems();
     }
 
     private void handleMouse(int mouseX, int mouseY) {
@@ -233,7 +220,7 @@ public class Palette {
     }
 
     private static SlotBounds innerBounds(int centerX, int centerY) {
-        me.dags.blockpalette.shape.Polygon polygon = new me.dags.blockpalette.shape.Polygon(6, 40, 1, 1);
+        Polygon polygon = new Polygon(6, 40, 1, 1);
         polygon.init(centerX, centerY);
         return polygon.outline();
     }

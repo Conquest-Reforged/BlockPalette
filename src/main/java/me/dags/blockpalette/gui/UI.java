@@ -1,12 +1,13 @@
 package me.dags.blockpalette.gui;
 
 import me.dags.blockpalette.util.Pointer;
+import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiPageButtonList;
+import net.minecraft.client.gui.GuiSlider;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -47,33 +48,10 @@ public class UI {
             hovered = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
 
             if (hovered) {
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(xPosition, yPosition, 0F);
-
-                GlStateManager.disableAlpha();
+                Render.cleanup();
                 GlStateManager.enableBlend();
-                GlStateManager.colorMask(false, false, false, true);
-                GlStateManager.color(1, 1, 1, 0.35F);
-                GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-                Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
-                Gui.drawModalRectWithCustomSizedTexture(0, 0, width, height, width, height, width, height);
-
-                GlStateManager.disableTexture2D();
-                GlStateManager.colorMask(true, true, true, true);
-                GlStateManager.blendFunc(GlStateManager.SourceFactor.DST_ALPHA, GlStateManager.DestFactor.ONE_MINUS_DST_ALPHA);
-
-                Tessellator tessellator = Tessellator.getInstance();
-                VertexBuffer buffer = tessellator.getBuffer();
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-                buffer.pos(0, height, 0).endVertex();
-                buffer.pos(width, height, 0).endVertex();
-                buffer.pos(width, 0, 0).endVertex();
-                buffer.pos(0, 0, 0).endVertex();
-                tessellator.draw();
-
-                GlStateManager.enableTexture2D();
-                GlStateManager.disableBlend();
-                GlStateManager.popMatrix();
+                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                Render.drawTexture(texture, xPosition, yPosition, width, height, 0, 0, width, height);
             }
         }
     }

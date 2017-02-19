@@ -20,7 +20,6 @@ public class Config {
     public static float highlight_scale = 1.05F;
 
     public static ColorMode color_mode = ColorMode.ADJACENT;
-    public static float color_opacity = 0.5F;
     public static int group_size = 3;
     public static int angle = 30;
     public static float leniency = 0.25F;
@@ -40,7 +39,6 @@ public class Config {
         highlight_scale = (float) cfg.get("general", "highlight_scale", highlight_scale).getDouble();
 
         color_mode = ColorMode.fromId(cfg.get("color", "color_mode", ColorMode.getId(color_mode)).getInt());
-        color_opacity = (float) cfg.get("color", "color_opacity", color_opacity).getDouble();
 
         angle = cfg.get("color", "angle", angle).getInt();
         group_size = cfg.get("color", "group_size", group_size).getInt();
@@ -57,7 +55,6 @@ public class Config {
         cfg.get("general", "highlight_blue", highlight_blue).set(highlight_blue);
         cfg.get("general", "highlight_scale", highlight_scale).set(highlight_scale);
         cfg.get("color", "color_mode", 0).set(ColorMode.getId(color_mode));
-        cfg.get("color", "color_opacity", color_opacity).set(color_opacity);
         cfg.get("color", "angle", angle).set(angle);
         cfg.get("color", "group_size", group_size).set(group_size);
         cfg.get("color", "leniency", leniency).set(leniency);

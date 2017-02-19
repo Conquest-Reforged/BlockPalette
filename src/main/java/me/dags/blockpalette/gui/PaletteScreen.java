@@ -37,7 +37,6 @@ public class PaletteScreen extends GuiScreen {
     private final Pointer<Float> highlightScale = Pointer.instant(Config.highlight_scale);
 
     private final Pointer<ColorMode> colorMode = Pointer.of(Config.color_mode);
-    private final Pointer<Float> colorOpacity = Pointer.instant(Config.color_opacity);
     private final Pointer<Integer> colorAngle = Pointer.of(Config.angle);
     private final Pointer<Integer> colorGroupSize = Pointer.of(Config.group_size);
     private final Pointer<Float> colorLeniency = Pointer.of(Config.leniency);
@@ -78,7 +77,6 @@ public class PaletteScreen extends GuiScreen {
 
         this.colorSettings.add(new UI.Label("Color Mode:", 0xFFFFFF));
         this.colorSettings.add(new UI.Cycler<>(colorMode, ColorMode.values()));
-        this.colorSettings.add(new UI.FloatSlider("Opacity", 0, 1F, colorOpacity));
 
         this.colorSettings.add(new UI.Label("Picker Settings:", 0xFFFFFF));
         this.colorSettings.add(new UI.IntSlider("Angle", 0, 120, colorAngle));
@@ -107,8 +105,8 @@ public class PaletteScreen extends GuiScreen {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        main.getPalette().setSelected(null);
         Slot underMouse = main.getPalette().getUnderMouse();
+        main.getPalette().setSelected(null);
 
         if (underMouse != null) {
             if (mouseButton == 0) {
@@ -124,7 +122,7 @@ public class PaletteScreen extends GuiScreen {
             }
         }
 
-        hotbar.mouseRelease(mouseX, mouseY, mouseButton);
+        hotbar.mouseClick(mouseX, mouseY, mouseButton);
 
         paletteSettings.mousePressed(minecraft, mouseX, mouseY);
         colorSettings.mousePressed(minecraft, mouseX, mouseY);
@@ -165,11 +163,11 @@ public class PaletteScreen extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawGradientRect(0, 0, this.width, this.height, 0x777777, -804253680);
-
         Gui.drawRect(0, 0, width, height, 0x88000000);
 
         paletteSettings.draw(minecraft, mouseX, mouseY);
         colorSettings.draw(minecraft, mouseX, mouseY);
+
         main.getPalette().drawScreen(mouseX, mouseY);
         hotbar.draw(mouseX, mouseY);
 
@@ -327,13 +325,6 @@ public class PaletteScreen extends GuiScreen {
             public void onUpdate(ColorMode value) {
                 Config.color_mode = value;
                 refresh.run();
-            }
-        });
-
-        colorOpacity.setListener(new Pointer.Listener<Float>() {
-            @Override
-            public void onUpdate(Float value) {
-                Config.color_opacity = value;
             }
         });
 

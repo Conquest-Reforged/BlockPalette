@@ -3,12 +3,12 @@ package me.dags.blockpalette.gui;
 import me.dags.blockpalette.palette.PaletteItem;
 import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.util.Config;
+import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
@@ -53,15 +53,8 @@ public class Hotbar {
 
     public void draw(int mouseX, int mouseY) {
         // hotbar
-        GlStateManager.color(1F, 1F, 1F, 1F);
-        GlStateManager.enableBlend();
-        GlStateManager.enableDepth();
-        GlStateManager.enableRescaleNormal();
-        Minecraft.getMinecraft().getTextureManager().bindTexture(WIDGETS_TEX_PATH);
-        net.minecraft.client.gui.Gui.drawModalRectWithCustomSizedTexture(left, top, 0, 0, 182, 22, 256, 256);
-
-        // items
-        RenderHelper.enableGUIStandardItemLighting();
+        Render.cleanDrawTexture(WIDGETS_TEX_PATH, left, top, 182, 22, 0, 0, 256, 256);
+        Render.beginItems();
 
         // draw slot items
         for (int i = 0; i < 9; i++) {
@@ -70,27 +63,24 @@ public class Hotbar {
                 int x = slot.xPos() + 2;
                 int y = slot.yPos() + 2;
                 ItemStack stack = slot.getStack();
-                Slot.drawStack(stack, x, y);
-                Minecraft.getMinecraft().getRenderItem().renderItemOverlays(fontRenderer, stack, x, y);
+                Render.drawItemStack(stack, x, y);
+                Render.drawOverlays(stack, x, y);
             }
         }
 
         if (!selected.isEmpty()) {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(mouseX, mouseY, 0F);
-            GlStateManager.translate(0 ,0, 500F);
             ItemStack stack = selected.getItemStack();
-            Slot.drawHighlightedStack(stack, 0, 0, Config.highlight_scale, 0xFFFFFF);
-            Minecraft.getMinecraft().getRenderItem().renderItemOverlays(fontRenderer, stack, -8, -8);
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0, 0, 200F);
+            Render.drawHighlightedItemStack(stack, mouseX, mouseY, Config.highlight_scale, 0xFFFFFF);
+            Render.drawOverlays(stack, mouseX - 8, mouseY - 8);
             GlStateManager.popMatrix();
         }
 
-        GlStateManager.disableDepth();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableRescaleNormal();
+        Render.endItems();
     }
 
-    public void mouseRelease(int mouseX, int mouseY, int button) {
+    public void mouseClick(int mouseX, int mouseY, int button) {
         if (button == 1) {
             return;
         }

@@ -28,7 +28,7 @@ public class SlotBounds {
     }
 
     public void draw(float red, float green, float blue, float derp) {
-        GlStateManager.color(red, green, blue);
+        GlStateManager.color(red, green, blue, 0.2F);
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer buffer = tessellator.getBuffer();
         for (List<Point> points : bounds) {
