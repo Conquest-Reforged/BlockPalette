@@ -1,5 +1,6 @@
 package me.dags.blockpalette.gui;
 
+import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.palette.PaletteItem;
 import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.util.Config;
@@ -26,11 +27,16 @@ public class Hotbar {
 
     private PaletteItem selected = PaletteItem.EMPTY;
     private int left = 0, top = 0;
+    private int color = 0xFFFFFF;
 
     public Hotbar(PaletteMain main) {
         this.main = main;
         this.fontRenderer = Minecraft.getMinecraft().fontRendererObj;
         initSlots(new ScaledResolution(Minecraft.getMinecraft()));
+    }
+
+    public void setColor(int r, int g, int b) {
+        this.color = ColorF.rgb(r, g, b);
     }
 
     public void initSlots(ScaledResolution resolution) {
@@ -53,7 +59,8 @@ public class Hotbar {
 
     public void draw(int mouseX, int mouseY) {
         // hotbar
-        Render.cleanDrawTexture(WIDGETS_TEX_PATH, left, top, 182, 22, 0, 0, 256, 256);
+        Render.cleanup();
+        Render.drawTexture(WIDGETS_TEX_PATH, left, top, 182, 22, 0, 0, 256, 256);
         Render.beginItems();
 
         // draw slot items
@@ -72,7 +79,7 @@ public class Hotbar {
             ItemStack stack = selected.getItemStack();
             GlStateManager.pushMatrix();
             GlStateManager.translate(0, 0, 200F);
-            Render.drawHighlightedItemStack(stack, mouseX, mouseY, Config.highlight_scale, 0xFFFFFF);
+            Render.drawHighlightedItemStack(stack, mouseX, mouseY, Config.highlight_scale, color);
             Render.drawOverlays(stack, mouseX - 8, mouseY - 8);
             GlStateManager.popMatrix();
         }

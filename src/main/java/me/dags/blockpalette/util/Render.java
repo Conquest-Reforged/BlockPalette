@@ -4,9 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -18,43 +15,73 @@ public class Render {
 
     public static void cleanup() {
         GlStateManager.depthMask(true);
-        GL11.glClear(256);
-        GlStateManager.clear(256);
         GlStateManager.enableDepth();
-        GlStateManager.depthFunc( 515);
         GlStateManager.enableAlpha();
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager.clearColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     public static void beginMask(ResourceLocation texture, int left, int top, int width, int height, float u, float v, float umax, float vmax) {
-        cleanup();
-
-        GlStateManager.enableAlpha();
-        GlStateManager.enableBlend();
-
+        GlStateManager.color(1, 1, 1, 1);
         GlStateManager.enableTexture2D();
-        Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+        GlStateManager.enableDepth();
+        GlStateManager.depthMask(true);
+        GlStateManager.depthFunc(GL11.GL_ALWAYS);
         GlStateManager.colorMask(false, false, false, true);
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0F);
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        drawTexture(texture, left, top, width, height, u, v, umax, vmax);
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.SRC_ALPHA);
 
-        GlStateManager.colorMask(true, true, true, false);
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.DST_ALPHA, GlStateManager.DestFactor.ONE);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, 0, 1);
+        drawTexture(texture, left, top, width, height, u, v, umax, vmax);
+        GlStateManager.popMatrix();
+
+        GlStateManager.disableTexture2D();
         GlStateManager.depthMask(false);
-        GlStateManager.depthFunc(514);
+        GlStateManager.depthFunc(GL11.GL_GREATER);
+        GlStateManager.colorMask(true, true, true, false);
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.DST_ALPHA);
     }
 
     public static void endMask() {
-        cleanup();
-        GlStateManager.enableTexture2D();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.colorMask(true, true, true, true);
+        GlStateManager.depthMask(true);
+        GlStateManager.depthFunc(GL11.GL_LEQUAL);
+        GlStateManager.disableDepth();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
-    public static void cleanDrawTexture(ResourceLocation texture, int left, int top, int width, int height, float u, float v, float umax, float vmax) {
-        cleanup();
-        drawTexture(texture, left, top, width, height, u, v, umax, vmax);
+    public static void beginItems() {
+        GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
+        GlStateManager.enableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableDepth();
+        GlStateManager.depthMask(true);
+        GlStateManager.depthFunc(GL11.GL_LEQUAL);
+        RenderHelper.enableGUIStandardItemLighting();
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, 0, 100);
+    }
+
+    public static void endItems() {
+        GlStateManager.popMatrix();
+
+        GlStateManager.disableDepth();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.clearColor(1, 1, 1, 1);
+    }
+
+    public static void beginSlot(int xPos, int yPos, float scale) {
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(xPos, yPos, 1);
+        GlStateManager.scale(scale, scale, scale);
+        GlStateManager.alphaFunc(GL11.GL_NOTEQUAL, 0);
+    }
+
+    public static void endSlot() {
+        GlStateManager.popMatrix();
     }
 
     public static void drawTexture(ResourceLocation texture, int left, int top, int width, int height, float u, float v, float umax, float vwidth) {
@@ -62,29 +89,12 @@ public class Render {
         Gui.drawModalRectWithCustomSizedTexture(left, top, u, v, width, height, umax, vwidth);
     }
 
-    public static void drawRect(int width, int height, float r, float g, float b, float a) {
-        GlStateManager.disableTexture2D();
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0F);
-        GlStateManager.color(r, g, b, a);
-        Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        buffer.pos(0, height, 0).endVertex();
-        buffer.pos(width, height, 0).endVertex();
-        buffer.pos(width, 0, 0).endVertex();
-        buffer.pos(0, 0, 0).endVertex();
-        tessellator.draw();
-        GlStateManager.enableTexture2D();
-    }
-
     public static void drawItemStack(ItemStack stack, int x, int y) {
         if (stack == null) {
             return;
         }
 
-        GlStateManager.enableBlend();
         Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, x, y);
-        GlStateManager.disableBlend();
     }
 
     public static void drawOverlays(ItemStack stack, int x, int y) {
@@ -97,8 +107,7 @@ public class Render {
         }
 
         GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-        GlStateManager.translate(x, y, 100F);
+        GlStateManager.translate(x, y, 100);
         GlStateManager.scale(scale, scale, scale);
         GlStateManager.enableOutlineMode(color);
         Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, -8, -8);
@@ -106,20 +115,8 @@ public class Render {
         GlStateManager.popMatrix();
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, 300F);
+        GlStateManager.translate(x, y, 200);
         Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, -8, -8);
-        GlStateManager.disableBlend();
         GlStateManager.popMatrix();
-    }
-
-    public static void beginItems() {
-        GlStateManager.enableDepth();
-        RenderHelper.enableGUIStandardItemLighting();
-    }
-
-    public static void endItems() {
-        GlStateManager.disableDepth();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.clearColor(1, 1, 1, 1);
     }
 }

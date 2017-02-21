@@ -8,8 +8,6 @@ import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.CreativeCrafting;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -98,28 +96,22 @@ public class Palette {
         int left = centerX - rad;
         int top = centerY - rad;
 
-        Render.cleanDrawTexture(WHEEL, left, top, dim, dim, 0, 0, dim, dim);
+        Render.cleanup();
+        Render.drawTexture(WHEEL, left, top, dim, dim, 0, 0, dim, dim);
 
         if (!Config.match_textures) {
-            RenderHelper.disableStandardItemLighting();
             Render.beginMask(MASK0, left, top, dim, dim, 0, 0, dim, dim);
-            GlStateManager.disableTexture2D();
             for (Slot slot : slots) {
                 slot.drawBounds();
             }
-            GlStateManager.enableTexture2D();
             Render.endMask();
 
             Render.beginMask(MASK1, left, top, dim, dim, 0, 0, dim, dim);
-            GlStateManager.disableTexture2D();
             center.drawBounds();
-            GlStateManager.enableTexture2D();
             Render.endMask();
-            RenderHelper.enableGUIStandardItemLighting();
         }
 
         Render.beginItems();
-
         for (Slot slot : allSlots) {
             slot.setHighlight(highlightColor, selectedColor, highlightRadius);
             slot.draw();
@@ -129,7 +121,6 @@ public class Palette {
         if (display != null) {
             display.drawDisplayString(centerX, centerY + radius + 25);
         }
-
         Render.endItems();
     }
 

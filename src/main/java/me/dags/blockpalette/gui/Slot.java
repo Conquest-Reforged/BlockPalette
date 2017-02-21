@@ -5,7 +5,6 @@ import me.dags.blockpalette.util.Config;
 import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -90,25 +89,15 @@ public class Slot {
 
     public void draw() {
         if (!isEmpty()) {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(xPos, yPos, 0);
-            GlStateManager.scale(scale, scale, scale);
-
-            GlStateManager.enableAlpha();
-            GlStateManager.enableBlend();
-            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            Render.beginSlot(xPos, yPos, scale);
             Render.drawTexture(SLOT, -11, -11, 22, 22, 0, 0, 22, 22);
-
             if (hovered || selected) {
                 int color = selected ? invertColor : highlightColor;
                 Render.drawHighlightedItemStack(item.getItemStack(), 0, 0, highlightSize, color);
             } else {
                 Render.drawItemStack(item.getItemStack(), -8, -8);
             }
-
-            GlStateManager.disableAlpha();
-            GlStateManager.disableBlend();
-            GlStateManager.popMatrix();
+            Render.endSlot();
         }
     }
 

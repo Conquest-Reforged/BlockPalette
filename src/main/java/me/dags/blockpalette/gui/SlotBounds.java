@@ -1,5 +1,6 @@
 package me.dags.blockpalette.gui;
 
+import me.dags.blockpalette.util.Config;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -28,7 +29,7 @@ public class SlotBounds {
     }
 
     public void draw(float red, float green, float blue, float derp) {
-        GlStateManager.color(red, green, blue, 0.2F);
+        GlStateManager.color(red, green, blue, Config.color_opacity);
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer buffer = tessellator.getBuffer();
         for (List<Point> points : bounds) {

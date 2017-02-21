@@ -37,6 +37,7 @@ public class PaletteScreen extends GuiScreen {
     private final Pointer<Float> highlightScale = Pointer.instant(Config.highlight_scale);
 
     private final Pointer<ColorMode> colorMode = Pointer.of(Config.color_mode);
+    private final Pointer<Float> colorOpacity = Pointer.instant(Config.color_opacity);
     private final Pointer<Integer> colorAngle = Pointer.of(Config.angle);
     private final Pointer<Integer> colorGroupSize = Pointer.of(Config.group_size);
     private final Pointer<Float> colorLeniency = Pointer.of(Config.leniency);
@@ -77,6 +78,7 @@ public class PaletteScreen extends GuiScreen {
 
         this.colorSettings.add(new UI.Label("Color Mode:", 0xFFFFFF));
         this.colorSettings.add(new UI.Cycler<>(colorMode, ColorMode.values()));
+        this.colorSettings.add(new UI.FloatSlider("Opacity",0F, 1F, colorOpacity));
 
         this.colorSettings.add(new UI.Label("Picker Settings:", 0xFFFFFF));
         this.colorSettings.add(new UI.IntSlider("Angle", 0, 120, colorAngle));
@@ -146,6 +148,7 @@ public class PaletteScreen extends GuiScreen {
     @Override
     public void keyTyped(char key, int code) throws IOException {
         super.keyTyped(key, code);
+        hotbar.keyTyped(key, code);
         if (Config.pick_mode == PickMode.MOUSE && !isCreativeOverlay && code == main.show.getKeyCode()) {
             minecraft.setIngameFocus();
         }
@@ -251,6 +254,7 @@ public class PaletteScreen extends GuiScreen {
 
     private void init() {
         main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
+        hotbar.setColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
 
         if (Config.show_settings && !paletteSettings.onScreen(width, height)) {
             paletteSettings.open();
@@ -302,6 +306,7 @@ public class PaletteScreen extends GuiScreen {
             @Override
             public void onUpdate(Integer value) {
                 main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
+                hotbar.setColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
                 Config.highlight_red = highlightRed.get();
                 Config.highlight_green = highlightGreen.get();
                 Config.highlight_blue = highlightBlue.get();
@@ -317,6 +322,13 @@ public class PaletteScreen extends GuiScreen {
             public void onUpdate(Float value) {
                 main.getPalette().setHighlightRadius(highlightScale.get());
                 Config.highlight_scale = value;
+            }
+        });
+
+        colorOpacity.setListener(new Pointer.Listener<Float>() {
+            @Override
+            public void onUpdate(Float value) {
+                Config.color_opacity = value;
             }
         });
 
