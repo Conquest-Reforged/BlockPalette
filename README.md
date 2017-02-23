@@ -1,8 +1,7 @@
 # BlockPalette
-
 ![](http://i.imgur.com/iEtBnSG.gif)
 
-## Accessing the Wheel
+## Accessing the Palette
 #### Keyboard Mode
 - **ingame** - whilst holding an item, press and hold the blockpalette keybind (`c` by default)
 - **creative menu** - whilst hovering the mouse over an itemstack, press and hold the blockpalette keybind
@@ -29,7 +28,7 @@
 |Group Size|Controls the number of variations of a single color to be presented|
 |Leniency|Controls how accurately the saturation of colors should be matched|
 
-### Color Modes
+## Color Modes
 The `Color Mode` determines a set of points on the color wheel from which colors/textures are looked up.  
 The `Angle` setting determines how far from these starting points to actually look up on the color wheel.
 
