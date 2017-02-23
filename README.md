@@ -1,3 +1,3 @@
 # BlockPalette
 
-![](http://i.imgur.com/t2gEfoF.gif)
+![](http://i.imgur.com/iEtBnSG.gif)
