@@ -87,7 +87,7 @@ public class PaletteScreen extends GuiScreen {
         this.colorSettings.add(new UI.IntSlider("Group Size", 1, 5, colorGroupSize));
         this.colorSettings.add(new UI.FloatSlider("Leniency", 0F, 1F, colorLeniency));
         this.colorSettings.add(new UI.FloatSlider("Gray Point", 0F, 1F, grayPoint));
-        this.colorSettings.add(new UI.FloatSlider("Min Opacity", 0F, 1F, alphaPoint));
+        this.colorSettings.add(new UI.FloatSlider("Min Alpha", 0F, 1F, alphaPoint));
         this.colorSettings.add(new UI.Label("", 0xFFFFFF));
         this.colorSettings.add(new UI.Button("Refresh", refresh));
 
