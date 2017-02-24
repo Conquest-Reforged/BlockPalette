@@ -27,6 +27,8 @@
 |Angle|Controls the portion of the color wheel that a given color will be picked from|
 |Group Size|Controls the number of variations of a single color to be presented|
 |Leniency|Controls how accurately the saturation of colors should be matched|
+|Gray Point|Controls the average saturation level at which a texture should be considered 'gray'|
+|Min Alpha|Controls the minimum average alpha/opacity allowed in the texture|
 
 ## Color Modes
 The `Color Mode` determines a set of points on the color wheel from which colors/textures are looked up.  
