@@ -23,7 +23,7 @@
 |Highlight Scale|Set how large the highlight should be|
 | | |
 |Color Mode|Toggle between the various color-picking modes|
-|Opacity|Adjust the transparency of the background color shown on the Palette|
+|Opacity|Adjust the opacity of the background color shown on the Palette|
 |Angle|Controls the portion of the color wheel that a given color will be picked from|
 |Group Size|Controls the number of variations of a single color to be presented|
 |Leniency|Controls how accurately the saturation of colors should be matched|
