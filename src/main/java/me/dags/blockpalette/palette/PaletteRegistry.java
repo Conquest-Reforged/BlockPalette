@@ -1,5 +1,6 @@
 package me.dags.blockpalette.palette;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.color.ColorWheel;
@@ -29,26 +30,34 @@ public class PaletteRegistry {
     private final Map<String, List<Mapping>> textureVariants = new HashMap<>();
     private final Map<String, Mapping> mappings = new HashMap<>();
     private final ColorWheel colorWheel = new ColorWheel();
-    private final PaletteMain main;
+    private final Set<Block> blacklist;
 
-    public PaletteRegistry(PaletteMain mod) {
-        this.main = mod;
+    public PaletteRegistry() {
+        this.blacklist = ImmutableSet.of(
+                Blocks.COMMAND_BLOCK,
+                Blocks.CHAIN_COMMAND_BLOCK,
+                Blocks.REPEATING_COMMAND_BLOCK,
+                Blocks.STRUCTURE_BLOCK,
+                Blocks.STRUCTURE_VOID
+        );
     }
 
     public void buildPalettes() {
         for (Block block : Block.REGISTRY) {
-            Item item = Item.getItemFromBlock(block);
-            if (item != null) {
-                List<ItemStack> items = new ArrayList<>();
-                block.getSubBlocks(item, CreativeTabs.SEARCH, items);
-                for (ItemStack stack : items) {
-                    register(stack);
+            if (!blacklist.contains(block)) {
+                Item item = Item.getItemFromBlock(block);
+                if (item != null) {
+                    List<ItemStack> items = new ArrayList<>();
+                    block.getSubBlocks(item, CreativeTabs.SEARCH, items);
+                    for (ItemStack stack : items) {
+                        register(stack);
+                    }
                 }
             }
         }
     }
 
-    public Palette getPalette0(ItemStack itemStack) {
+    public Palette getPalette(ItemStack itemStack) {
         if (itemStack == null || Block.getBlockFromItem(itemStack.getItem()) == null) {
             return Palette.EMPTY;
         }
@@ -62,6 +71,9 @@ public class PaletteRegistry {
 
         colorWheel.setAngle(Config.angle);
         colorWheel.setLeniency(Config.leniency);
+        colorWheel.setGrayPoint(Config.gray_point);
+        colorWheel.setAlphaPoint(Config.alpha_point);
+        colorWheel.refresh();
 
         switch (Config.color_mode) {
             case COMPLIMENTARY:

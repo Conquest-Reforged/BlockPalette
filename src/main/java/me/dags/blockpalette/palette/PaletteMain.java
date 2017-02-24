@@ -18,7 +18,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
     public static final int switchKeyID = Keyboard.KEY_LSHIFT;
 
     public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.getKeyIndex("C"), "Block Palette");
-    private PaletteRegistry registry = new PaletteRegistry(this);
+    private PaletteRegistry registry = new PaletteRegistry();
     private Palette palette = Palette.EMPTY;
 
     public PaletteRegistry getRegistry() {
@@ -36,7 +36,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
     }
 
     public void newPalette(ItemStack itemStack) {
-        palette = registry.getPalette0(itemStack);
+        palette = registry.getPalette(itemStack);
     }
 
     public boolean isInventoryKey(int keyCode) {
@@ -45,7 +45,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
-        registry = new PaletteRegistry(this);
+        registry = new PaletteRegistry();
         registry.buildPalettes();
         palette = Palette.EMPTY;
     }

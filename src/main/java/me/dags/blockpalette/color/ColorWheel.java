@@ -22,6 +22,8 @@ public class ColorWheel {
     private float leniency = 0.95F;
     // Controls at what point a color should be determined to be gray
     private float grayPoint = 0.15F;
+    // Controls the minimum allowed average alpha value
+    private float alphaPoint = 0.5F;
 
     public ColorWheel() {
         this(24);
@@ -58,11 +60,15 @@ public class ColorWheel {
 
     public void setGrayPoint(float grayPoint) {
         this.grayPoint = Math.min(1F, Math.max(0F, grayPoint));
-        refresh();
+    }
+
+    public void setAlphaPoint(float alphaPoint) {
+        this.alphaPoint = Math.min(1F, Math.max(0F, alphaPoint));
     }
 
     public void refresh() {
         getGrays().clear();
+
         for (ColorHue hue : hues) {
             hue.clear();
         }
@@ -79,10 +85,12 @@ public class ColorWheel {
 
         textureMap.put(texture.name, texture);
 
-        if (isGray(texture)) {
-            grays.addTexture(texture);
-        } else {
-            getHue(texture).addTexture(texture);
+        if (texture.alpha >= alphaPoint) {
+            if (isGray(texture)) {
+                grays.addTexture(texture);
+            } else {
+                getHue(texture).addTexture(texture);
+            }
         }
     }
 
@@ -352,7 +360,7 @@ public class ColorWheel {
         return new Comparator<Texture>() {
             @Override
             public int compare(Texture t1, Texture t2) {
-                return t2.luminosity.compareTo(t1.luminosity);
+                return Float.compare(t2.luminosity, t1.luminosity);
             }
         };
     }
@@ -362,12 +370,12 @@ public class ColorWheel {
             @Override
             public int compare(Texture t1, Texture t2) {
                 if (Math.abs(t2.strength - t1.strength) < 0.05F) {
-                    return t2.luminosity.compareTo(t1.luminosity);
+                    return Float.compare(t2.luminosity, t1.luminosity);
                 }
                 if (Math.abs(t2.saturation - t1.saturation) < 0.1F) {
-                    return t2.brightness.compareTo(t1.brightness);
+                    return Float.compare(t2.brightness, t1.brightness);
                 }
-                return t2.strength.compareTo(t1.strength);
+                return Float.compare(t2.strength, t1.strength);
             }
         };
     }

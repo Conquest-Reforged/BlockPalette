@@ -41,6 +41,8 @@ public class PaletteScreen extends GuiScreen {
     private final Pointer<Integer> colorAngle = Pointer.of(Config.angle);
     private final Pointer<Integer> colorGroupSize = Pointer.of(Config.group_size);
     private final Pointer<Float> colorLeniency = Pointer.of(Config.leniency);
+    private final Pointer<Float> grayPoint = Pointer.of(Config.gray_point);
+    private final Pointer<Float> alphaPoint = Pointer.of(Config.alpha_point);
 
     private final UI.AreaCycler<Boolean> toggleMode = new UI.AreaCycler<>(matchMode, new Boolean[]{true, false}, BUTTON);
     private final UI.AreaCycler<Boolean> toggleSettings = new UI.AreaCycler<>(showSettings, new Boolean[]{true, false}, BUTTON);
@@ -84,6 +86,8 @@ public class PaletteScreen extends GuiScreen {
         this.colorSettings.add(new UI.IntSlider("Angle", 0, 120, colorAngle));
         this.colorSettings.add(new UI.IntSlider("Group Size", 1, 5, colorGroupSize));
         this.colorSettings.add(new UI.FloatSlider("Leniency", 0F, 1F, colorLeniency));
+        this.colorSettings.add(new UI.FloatSlider("Gray Point", 0F, 1F, grayPoint));
+        this.colorSettings.add(new UI.FloatSlider("Min Opacity", 0F, 1F, alphaPoint));
         this.colorSettings.add(new UI.Label("", 0xFFFFFF));
         this.colorSettings.add(new UI.Button("Refresh", refresh));
 
@@ -360,6 +364,22 @@ public class PaletteScreen extends GuiScreen {
             @Override
             public void onUpdate(Float value) {
                 Config.leniency = value;
+                refresh.run();
+            }
+        });
+
+        grayPoint.setListener(new Pointer.Listener<Float>() {
+            @Override
+            public void onUpdate(Float value) {
+                Config.gray_point = value;
+                refresh.run();
+            }
+        });
+
+        alphaPoint.setListener(new Pointer.Listener<Float>() {
+            @Override
+            public void onUpdate(Float value) {
+                Config.alpha_point = value;
                 refresh.run();
             }
         });

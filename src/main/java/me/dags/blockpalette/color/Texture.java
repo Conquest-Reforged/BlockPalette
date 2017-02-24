@@ -12,10 +12,11 @@ public class Texture {
     final float red;
     final float green;
     final float blue;
-    final Float saturation;
-    final Float brightness;
-    final Float luminosity;
-    final Float strength;
+    final float alpha;
+    final float saturation;
+    final float brightness;
+    final float luminosity;
+    final float strength;
 
     private Texture() {
         this.name = "EMPTY";
@@ -23,6 +24,7 @@ public class Texture {
         this.red = 0F;
         this.green = 0F;
         this.blue = 0F;
+        this.alpha = 0F;
         this.saturation = 0F;
         this.brightness = 0F;
         this.luminosity = 0F;
@@ -31,28 +33,32 @@ public class Texture {
 
 
     public Texture(String name, int width, int height, int[] data) {
-        int r = 0, g = 0, b = 0, size = width * height;
+        int r = 0, g = 0, b = 0, a = 0, size = width * height, colorSize = size;
+
 
         for (int i = 0; i < size; i++) {
             int c = data[i];
             int alpha = (c >> 24) & 0xff;
             if (alpha == 0) {
-                size--;
+                colorSize--;
             } else {
                 r += c >> 16 & 0xFF;
                 g += c >> 8 & 0xFF;
                 b += c & 0xFF;
+                a += alpha;
             }
         }
 
-        size = Math.max(size, 1);
-        r /= size;
-        g /= size;
-        b /= size;
+        colorSize = Math.max(colorSize, 1);
+        r /= colorSize;
+        g /= colorSize;
+        b /= colorSize;
+        a /= size;
 
         this.red = r / 255F;
         this.green = g / 255F;
         this.blue = b / 255F;
+        this.alpha = a / 255F;
 
         float[] hsb = RGBtoHSB(red, green, blue);
 
@@ -74,7 +80,7 @@ public class Texture {
 
     @Override
     public String toString() {
-        return String.format("%s rgb(%s,%s,%s) hue(%s) hsb(%s,%s,%s)", name, red, green, blue, hue, hue, saturation, brightness);
+        return String.format("%s rgba(%s,%s,%s,%s) hue(%s) hsb(%s,%s,%s)", name, red, green, blue, alpha, hue, hue, saturation, brightness);
     }
 
     // com.sun.javafx.util.Utils.RGBtoHSB(..)

@@ -24,6 +24,8 @@ public class Config {
     public static int group_size = 3;
     public static int angle = 30;
     public static float leniency = 0.25F;
+    public static float gray_point = 0.15F;
+    public static float alpha_point = 0.5F;
 
     private static Configuration cfg = new Configuration();
 
@@ -45,6 +47,8 @@ public class Config {
         angle = cfg.get("color", "angle", angle).getInt();
         group_size = cfg.get("color", "group_size", group_size).getInt();
         leniency = (float) cfg.get("color", "leniency", leniency).getDouble();
+        gray_point = (float) cfg.get("color", "gray_point", gray_point).getDouble();
+        alpha_point = (float) cfg.get("color", "alpha_point", alpha_point).getDouble();
         cfg.save();
     }
 
@@ -61,6 +65,8 @@ public class Config {
         cfg.get("color", "angle", angle).set(angle);
         cfg.get("color", "group_size", group_size).set(group_size);
         cfg.get("color", "leniency", leniency).set(leniency);
+        cfg.get("color", "gray_point", gray_point).set(gray_point);
+        cfg.get("color", "alpha_point", alpha_point).set(alpha_point);
         cfg.save();
     }
 }
