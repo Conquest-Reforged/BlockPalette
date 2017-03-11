@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiPageButtonList;
 import net.minecraft.client.gui.GuiSlider;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -23,7 +24,7 @@ public class UI {
         private final int color;
 
         public Label(String text, int color) {
-            super(0, 0, 0, text);
+            super(0, 0, 0, I18n.format(text));
             this.color = color;
         }
 
@@ -61,7 +62,7 @@ public class UI {
         private final Runnable action;
 
         public Button(String display, Runnable action) {
-            super(0, 0, 0, display);
+            super(0, 0, 0, I18n.format(display));
             this.action = action;
         }
 
@@ -89,7 +90,7 @@ public class UI {
         }
 
         public Cycler(Pointer<T> value, T[] options, String format) {
-            super(0, 0, 0, String.format(format, value.get()));
+            super(0, 0, 0, I18n.format(format, value.get()));
             this.options = options;
             this.format = format;
             this.value = value;
@@ -114,7 +115,7 @@ public class UI {
                 pos = pos + 1 < options.length ? pos + 1 : 0;
                 if (pos < options.length) {
                     value.set(options[pos]);
-                    this.displayString = String.format(format, value.get());
+                    this.displayString = I18n.format(format, value.get());
                 }
             }
             return pressed;
@@ -163,7 +164,7 @@ public class UI {
         return new GuiSlider.FormatHelper() {
             @Override
             public String getText(int id, String name, float value) {
-                return String.format("%s: %.2f", name, value);
+                return I18n.format("%s: %.2f", name, value);
             }
         };
     }
@@ -172,7 +173,7 @@ public class UI {
         return new GuiSlider.FormatHelper() {
             @Override
             public String getText(int id, String name, float value) {
-                return String.format("%s: %.0f", name, value);
+                return I18n.format("%s: %.0f", name, value);
             }
         };
     }

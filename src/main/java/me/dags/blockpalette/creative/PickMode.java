@@ -1,11 +1,13 @@
 package me.dags.blockpalette.creative;
 
+import net.minecraft.client.resources.I18n;
+
 /**
  * @author dags <dags@dags.me>
  */
 public enum PickMode {
-    KEYBOARD("Keyboard"),
-    MOUSE("Mouse"),
+    KEYBOARD("palette.pickmode.keyboard"),
+    MOUSE("palette.pickmode.mouse"),
     ;
 
     public final String display;
@@ -16,7 +18,7 @@ public enum PickMode {
 
     @Override
     public String toString() {
-        return display;
+        return I18n.format(display);
     }
 
     public PickMode next() {

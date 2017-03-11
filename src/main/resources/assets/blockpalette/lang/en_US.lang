@@ -1,1 +1,27 @@
 key.blockpalette.open=Open Palette
+
+palette.pickmode.keyboard=Keyboard
+palette.pickmode.mouse=Mouse
+
+palette.colormode.adjacent=Adjacent
+palette.colormode.complimentary=Complimentary
+palette.colormode.triad=Triad
+palette.colormode.tetrad=Tetrad
+
+palette.control.pickmode=Pick Mode: %s
+palette.control.highlight.color.label=Highlight Color
+palette.control.highlight.red=Red
+palette.control.highlight.green=Green
+palette.control.highlight.blue=Blue
+palette.control.highlight.scale.label=Highlight Scale:
+palette.control.highlight.scale=Scale
+
+palette.control.mode.label=Color Mode:
+palette.control.opacity=Opacity
+palette.control.settings.label=Pick Settings:
+palette.control.angle=Angle
+palette.control.groups=Group Size
+palette.control.leniency=Leniency
+palette.control.gray=Gray Point
+palette.control.alpha=Min Alpha
+palette.control.refresh=Refresh

@@ -1,14 +1,16 @@
 package me.dags.blockpalette.color;
 
+import net.minecraft.client.resources.I18n;
+
 /**
  * @author dags <dags@dags.me>
  */
 public enum ColorMode {
 
-    COMPLIMENTARY("Complimentary"),
-    ADJACENT("Adjacent"),
-    TRIAD("Triad"),
-    TETRAD("Tetrad"),
+    COMPLIMENTARY("palette.colormode.complimentary"),
+    ADJACENT("palette.colormode.adjacent"),
+    TRIAD("palette.colormode.triad"),
+    TETRAD("palette.colormode.tetrad"),
     ;
 
     public final String display;
@@ -19,7 +21,7 @@ public enum ColorMode {
 
     @Override
     public String toString() {
-        return display;
+        return I18n.format(display);
     }
 
     public static int maxId() {

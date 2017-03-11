@@ -70,26 +70,26 @@ public class PaletteScreen extends GuiScreen {
 
         this.minecraft = Minecraft.getMinecraft();
 
-        this.paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "Pick Mode: %s"));
-        this.paletteSettings.add(new UI.Label("Highlight Color:", ColorF.rgb(255, 255, 255)));
-        this.paletteSettings.add(new UI.IntSlider("Red", 0, 255, highlightRed));
-        this.paletteSettings.add(new UI.IntSlider("Green", 0, 255, highlightGreen));
-        this.paletteSettings.add(new UI.IntSlider("Blue", 0, 255, highlightBlue));
-        this.paletteSettings.add(new UI.Label("Highlight Scale:", ColorF.rgb(255, 255, 255)));
-        this.paletteSettings.add(new UI.FloatSlider("Scale", 1F, 1.5F, highlightScale));
+        this.paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "palette.control.pickmode"));
+        this.paletteSettings.add(new UI.Label("palette.control.highlight.color.label", ColorF.rgb(255, 255, 255)));
+        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.red", 0, 255, highlightRed));
+        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.green", 0, 255, highlightGreen));
+        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.blue", 0, 255, highlightBlue));
+        this.paletteSettings.add(new UI.Label("palette.control.highlight.scale.label", ColorF.rgb(255, 255, 255)));
+        this.paletteSettings.add(new UI.FloatSlider("palette.control.highlight.scale", 1F, 1.5F, highlightScale));
 
-        this.colorSettings.add(new UI.Label("Color Mode:", 0xFFFFFF));
+        this.colorSettings.add(new UI.Label("palette.control.mode.label", 0xFFFFFF));
         this.colorSettings.add(new UI.Cycler<>(colorMode, ColorMode.values()));
-        this.colorSettings.add(new UI.FloatSlider("Opacity",0F, 1F, colorOpacity));
+        this.colorSettings.add(new UI.FloatSlider("palette.control.opacity",0F, 1F, colorOpacity));
 
-        this.colorSettings.add(new UI.Label("Picker Settings:", 0xFFFFFF));
-        this.colorSettings.add(new UI.IntSlider("Angle", 0, 120, colorAngle));
-        this.colorSettings.add(new UI.IntSlider("Group Size", 1, 5, colorGroupSize));
-        this.colorSettings.add(new UI.FloatSlider("Leniency", 0F, 1F, colorLeniency));
-        this.colorSettings.add(new UI.FloatSlider("Gray Point", 0F, 1F, grayPoint));
-        this.colorSettings.add(new UI.FloatSlider("Min Alpha", 0F, 1F, alphaPoint));
+        this.colorSettings.add(new UI.Label("palette.control.settings.label", 0xFFFFFF));
+        this.colorSettings.add(new UI.IntSlider("palette.control.angle", 0, 120, colorAngle));
+        this.colorSettings.add(new UI.IntSlider("palette.control.groups", 1, 5, colorGroupSize));
+        this.colorSettings.add(new UI.FloatSlider("palette.control.leniency", 0F, 1F, colorLeniency));
+        this.colorSettings.add(new UI.FloatSlider("palette.control.gray", 0F, 1F, grayPoint));
+        this.colorSettings.add(new UI.FloatSlider("palette.control.alpha", 0F, 1F, alphaPoint));
         this.colorSettings.add(new UI.Label("", 0xFFFFFF));
-        this.colorSettings.add(new UI.Button("Refresh", refresh));
+        this.colorSettings.add(new UI.Button("palette.control.refresh", refresh));
 
         this.buttons.add(toggleMode);
         this.buttons.add(toggleSettings);
