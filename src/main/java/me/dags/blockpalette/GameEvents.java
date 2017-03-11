@@ -7,6 +7,7 @@ import me.dags.blockpalette.creative.PickMode;
 import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -41,9 +42,11 @@ public class GameEvents {
     @SubscribeEvent
     public void onDrawScreen(GuiScreenEvent.DrawScreenEvent.Pre event) {
         if (event.getGui() instanceof GuiContainerCreative) {
-            inCreativeInventory = true;
             GuiContainerCreative inventory = (GuiContainerCreative) event.getGui();
-            creativeEvents.onDrawScreen(inventory, event.getMouseX(), event.getMouseY(), event);
+            inCreativeInventory = inventory.getSelectedTabIndex() != CreativeTabs.SEARCH.getTabIndex();
+            if (inCreativeInventory) {
+                creativeEvents.onDrawScreen(inventory, event.getMouseX(), event.getMouseY(), event);
+            }
         } else if (inCreativeInventory) {
             inCreativeInventory = false;
         }
