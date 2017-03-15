@@ -1,24 +1,32 @@
 package me.dags.blockpalette.creative;
 
+import me.dags.blockpalette.gui.Tooltip;
 import net.minecraft.client.resources.I18n;
 
 /**
  * @author dags <dags@dags.me>
  */
-public enum PickMode {
-    KEYBOARD("palette.pickmode.keyboard"),
-    MOUSE("palette.pickmode.mouse"),
+public enum PickMode implements Tooltip.Provider {
+    KEYBOARD("palette.pickmode.keyboard", "palette.tooltip.pickmode.keyboard"),
+    MOUSE("palette.pickmode.mouse", "palette.tooltip.pickmode.mouse"),
     ;
 
     public final String display;
+    private final String tooltip;
 
-    PickMode(String in) {
+    PickMode(String in, String tip) {
         this.display = in;
+        this.tooltip = tip;
     }
 
     @Override
     public String toString() {
         return I18n.format(display);
+    }
+
+    @Override
+    public String getUnlocalized() {
+        return tooltip;
     }
 
     public PickMode next() {

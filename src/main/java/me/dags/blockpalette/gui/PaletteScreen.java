@@ -32,6 +32,7 @@ public class PaletteScreen extends GuiScreen {
     private final Pointer<Boolean> showSettings = Pointer.of(Config.show_settings);
     private final Pointer<Boolean> matchMode = Pointer.of(Config.match_textures);
     private final Pointer<PickMode> pickMode = Pointer.of(Config.pick_mode);
+    private final Pointer<Boolean> tooltips = Pointer.of(Config.show_tooltips);
     private final Pointer<Integer> highlightRed = Pointer.instant(Config.highlight_red);
     private final Pointer<Integer> highlightGreen = Pointer.instant(Config.highlight_green);
     private final Pointer<Integer> highlightBlue = Pointer.instant(Config.highlight_blue);
@@ -71,7 +72,8 @@ public class PaletteScreen extends GuiScreen {
 
         this.minecraft = Minecraft.getMinecraft();
 
-        this.paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "palette.control.pickmode"), "palette.tooltip.pickmode");
+        this.paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "palette.control.pickmode"), pickMode);
+        this.paletteSettings.add(new UI.Cycler<>(tooltips, new Boolean[]{true, false}, "palette.control.tooltips"), "palette.tooltip.tooltips");
         this.paletteSettings.add(new UI.Label("palette.control.highlight.color.label", ColorF.rgb(255, 255, 255)));
         this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.red", 0, 255, highlightRed),"palette.tooltip.highlight.color");
         this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.green", 0, 255, highlightGreen), "palette.tooltip.highlight.color");
@@ -183,10 +185,13 @@ public class PaletteScreen extends GuiScreen {
             button.drawButton(minecraft, mouseX, mouseY);
         }
 
-        Render.beginTooltips();
-        paletteSettings.drawTooltips(mouseX, mouseY);
-        colorSettings.drawTooltips(mouseX, mouseY);
-        Render.endTooltips();
+        if (Config.show_tooltips) {
+            Render.cleanup();
+            Render.beginTooltips();
+            paletteSettings.drawTooltips(mouseX, mouseY);
+            colorSettings.drawTooltips(mouseX, mouseY);
+            Render.endTooltips();
+        }
 
         if (Config.pick_mode == PickMode.KEYBOARD && !isCreativeOverlay && !Keyboard.isKeyDown(main.show.getKeyCode())) {
             minecraft.setIngameFocus();
@@ -309,6 +314,13 @@ public class PaletteScreen extends GuiScreen {
                     GuiContainerCreative creative = new GuiContainerCreative(minecraft.thePlayer);
                     minecraft.displayGuiScreen(creative);
                 }
+            }
+        });
+
+        tooltips.setListener(new Pointer.Listener<Boolean>() {
+            @Override
+            public void onUpdate(Boolean value) {
+                Config.show_tooltips = value;
             }
         });
 

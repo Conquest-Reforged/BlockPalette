@@ -15,7 +15,7 @@ public class Tooltip {
     private final FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
     private final Provider tooltip;
     private final int width;
-    private final int pad = 2;
+    private final int pad = 5;
     private final int offsetX;
     private final GuiButton button;
 
@@ -31,19 +31,20 @@ public class Tooltip {
             String message = I18n.format(tooltip.getUnlocalized());
 
             int stringWidth = fontRenderer.getStringWidth(message);
-            int height = 10 * (stringWidth / width);
-            int offsetY = height + pad;
+            int lines = 2 + (stringWidth / width);
+            int height = (fontRenderer.FONT_HEIGHT * lines);
+            int offsetY = height + pad + pad;
 
             int left = x - offsetX - pad;
             int top = y - offsetY - pad;
 
             int right = left + width + pad + pad;
             int bottom = top + height + pad + pad;
-            Gui.drawRect(left, top, right, bottom, 0x33000000);
+            Gui.drawRect(left, top, right, bottom, 0xDD000000);
 
             int textLeft = left + pad;
             int textTop = top + pad;
-            fontRenderer.drawSplitString(message, textLeft, textTop, width, 0xFFFFFFFF);
+            fontRenderer.drawSplitString(message, textLeft, textTop, width, 0xFFFFFF);
         }
     }
 
