@@ -119,4 +119,13 @@ public class Render {
         Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, -8, -8);
         GlStateManager.popMatrix();
     }
+
+    public static void beginTooltips() {
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, 0, 300);
+    }
+
+    public static void endTooltips() {
+        GlStateManager.popMatrix();
+    }
 }

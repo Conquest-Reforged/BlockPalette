@@ -6,6 +6,7 @@ import me.dags.blockpalette.creative.PickMode;
 import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.util.Config;
 import me.dags.blockpalette.util.Pointer;
+import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
@@ -70,24 +71,24 @@ public class PaletteScreen extends GuiScreen {
 
         this.minecraft = Minecraft.getMinecraft();
 
-        this.paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "palette.control.pickmode"));
+        this.paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "palette.control.pickmode"), "palette.tooltip.pickmode");
         this.paletteSettings.add(new UI.Label("palette.control.highlight.color.label", ColorF.rgb(255, 255, 255)));
-        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.red", 0, 255, highlightRed));
-        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.green", 0, 255, highlightGreen));
-        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.blue", 0, 255, highlightBlue));
+        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.red", 0, 255, highlightRed),"palette.tooltip.highlight.color");
+        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.green", 0, 255, highlightGreen), "palette.tooltip.highlight.color");
+        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.blue", 0, 255, highlightBlue), "palette.tooltip.highlight.color");
         this.paletteSettings.add(new UI.Label("palette.control.highlight.scale.label", ColorF.rgb(255, 255, 255)));
-        this.paletteSettings.add(new UI.FloatSlider("palette.control.highlight.scale", 1F, 1.5F, highlightScale));
+        this.paletteSettings.add(new UI.FloatSlider("palette.control.highlight.scale", 1F, 1.5F, highlightScale), "palette.tooltip.highlight.scale");
 
         this.colorSettings.add(new UI.Label("palette.control.mode.label", 0xFFFFFF));
-        this.colorSettings.add(new UI.Cycler<>(colorMode, ColorMode.values()));
+        this.colorSettings.add(new UI.Cycler<>(colorMode, ColorMode.values()), colorMode);
         this.colorSettings.add(new UI.FloatSlider("palette.control.opacity",0F, 1F, colorOpacity));
 
         this.colorSettings.add(new UI.Label("palette.control.settings.label", 0xFFFFFF));
-        this.colorSettings.add(new UI.IntSlider("palette.control.angle", 0, 120, colorAngle));
-        this.colorSettings.add(new UI.IntSlider("palette.control.groups", 1, 5, colorGroupSize));
-        this.colorSettings.add(new UI.FloatSlider("palette.control.leniency", 0F, 1F, colorLeniency));
-        this.colorSettings.add(new UI.FloatSlider("palette.control.gray", 0F, 1F, grayPoint));
-        this.colorSettings.add(new UI.FloatSlider("palette.control.alpha", 0F, 1F, alphaPoint));
+        this.colorSettings.add(new UI.IntSlider("palette.control.angle", 0, 120, colorAngle), "palette.tooltip.angle");
+        this.colorSettings.add(new UI.IntSlider("palette.control.groups", 1, 5, colorGroupSize), "palette.tooltip.groups");
+        this.colorSettings.add(new UI.FloatSlider("palette.control.leniency", 0F, 1F, colorLeniency), "palette.tooltip.leniency");
+        this.colorSettings.add(new UI.FloatSlider("palette.control.gray", 0F, 1F, grayPoint), "palette.tooltip.gray");
+        this.colorSettings.add(new UI.FloatSlider("palette.control.alpha", 0F, 1F, alphaPoint), "palette.tooltip.alpha");
         this.colorSettings.add(new UI.Label("", 0xFFFFFF));
         this.colorSettings.add(new UI.Button("palette.control.refresh", refresh));
 
@@ -181,6 +182,11 @@ public class PaletteScreen extends GuiScreen {
         for (GuiButton button : buttons) {
             button.drawButton(minecraft, mouseX, mouseY);
         }
+
+        Render.beginTooltips();
+        paletteSettings.drawTooltips(mouseX, mouseY);
+        colorSettings.drawTooltips(mouseX, mouseY);
+        Render.endTooltips();
 
         if (Config.pick_mode == PickMode.KEYBOARD && !isCreativeOverlay && !Keyboard.isKeyDown(main.show.getKeyCode())) {
             minecraft.setIngameFocus();

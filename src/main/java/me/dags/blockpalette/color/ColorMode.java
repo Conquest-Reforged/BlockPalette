@@ -1,22 +1,30 @@
 package me.dags.blockpalette.color;
 
+import me.dags.blockpalette.gui.Tooltip;
 import net.minecraft.client.resources.I18n;
 
 /**
  * @author dags <dags@dags.me>
  */
-public enum ColorMode {
+public enum ColorMode implements Tooltip.Provider {
 
-    COMPLIMENTARY("palette.colormode.complimentary"),
-    ADJACENT("palette.colormode.adjacent"),
-    TRIAD("palette.colormode.triad"),
-    TETRAD("palette.colormode.tetrad"),
+    COMPLIMENTARY("palette.colormode.complimentary", "palette.tooltip.mode.complimentary"),
+    ADJACENT("palette.colormode.adjacent", "palette.tooltip.mode.adjacent"),
+    TRIAD("palette.colormode.triad", "palette.tooltip.mode.triad"),
+    TETRAD("palette.colormode.tetrad", "palette.tooltip.mode.tetrad"),
     ;
 
     public final String display;
+    public final String tooltip;
 
-    ColorMode(String in) {
+    ColorMode(String in, String tip) {
         this.display = in;
+        this.tooltip = tip;
+    }
+
+    @Override
+    public String getUnlocalized() {
+        return tooltip;
     }
 
     @Override

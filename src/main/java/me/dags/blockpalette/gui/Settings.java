@@ -1,5 +1,6 @@
 package me.dags.blockpalette.gui;
 
+import me.dags.blockpalette.util.Pointer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
@@ -13,6 +14,7 @@ import java.util.List;
 public class Settings implements Positional {
 
     private final List<GuiButton> buttons = new ArrayList<>();
+    private final List<Tooltip> tooltips = new ArrayList<>();
     private boolean centreVertically = true;
     private boolean centerHorizontally = true;
     private int buttonMaxWidth = 250;
@@ -55,6 +57,16 @@ public class Settings implements Positional {
 
     public void add(GuiButton button) {
         this.buttons.add(button);
+    }
+
+    public void add(GuiButton button, String tooltip) {
+        this.buttons.add(button);
+        this.tooltips.add(Tooltip.of(button, new Tooltip.Simple(tooltip)));
+    }
+
+    public void add(GuiButton button, Pointer<? extends Tooltip.Provider> pointer) {
+        this.buttons.add(button);
+        this.tooltips.add(Tooltip.of(button, new Tooltip.PointerTip<>(pointer)));
     }
 
     public void setCentreVertically(boolean centreVertically) {
@@ -121,6 +133,12 @@ public class Settings implements Positional {
             button.height = buttonHeight;
             button.drawButton(minecraft, mouseX, mouseY);
             top += buttonHeight + buttonSeparator;
+        }
+    }
+
+    public void drawTooltips(int mouseX, int mouseY) {
+        for (Tooltip tooltip : tooltips) {
+            tooltip.draw(mouseX, mouseY);
         }
     }
 
