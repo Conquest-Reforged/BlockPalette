@@ -1,30 +1,23 @@
 package me.dags.blockpalette.color;
 
-import me.dags.blockpalette.gui.Tooltip;
 import net.minecraft.client.resources.I18n;
 
 /**
  * @author dags <dags@dags.me>
  */
-public enum ColorMode implements Tooltip.Provider {
+public enum ColorMode {
 
-    COMPLIMENTARY("palette.colormode.complimentary", "palette.tooltip.mode.complimentary"),
-    ADJACENT("palette.colormode.adjacent", "palette.tooltip.mode.adjacent"),
-    TRIAD("palette.colormode.triad", "palette.tooltip.mode.triad"),
-    TETRAD("palette.colormode.tetrad", "palette.tooltip.mode.tetrad"),
+    COMPLIMENTARY("palette.colormode.complimentary"),
+    ADJACENT("palette.colormode.adjacent"),
+    TRIAD("palette.colormode.triad"),
+    TETRAD("palette.colormode.tetrad"),
+    RAINBOW("palette.colormode.rainbow"),
     ;
 
     public final String display;
-    public final String tooltip;
 
-    ColorMode(String in, String tip) {
+    ColorMode(String in) {
         this.display = in;
-        this.tooltip = tip;
-    }
-
-    @Override
-    public String getUnlocalized() {
-        return tooltip;
     }
 
     @Override
@@ -44,6 +37,8 @@ public enum ColorMode implements Tooltip.Provider {
                 return 2;
             case TETRAD:
                 return 3;
+            case RAINBOW:
+                return 4;
             default:
                 return 0;
         }
@@ -57,6 +52,8 @@ public enum ColorMode implements Tooltip.Provider {
                 return TRIAD;
             case 3:
                 return TETRAD;
+            case 4:
+                return RAINBOW;
             default:
                 return COMPLIMENTARY;
         }
@@ -69,9 +66,9 @@ public enum ColorMode implements Tooltip.Provider {
             case TRIAD:
                 return TETRAD;
             case TETRAD:
-                return COMPLIMENTARY;
+                return RAINBOW;
             default:
-                return ADJACENT;
+                return COMPLIMENTARY;
         }
     }
 }

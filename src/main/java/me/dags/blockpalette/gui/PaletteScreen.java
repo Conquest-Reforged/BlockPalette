@@ -82,7 +82,7 @@ public class PaletteScreen extends GuiScreen {
         this.paletteSettings.add(new UI.FloatSlider("palette.control.highlight.scale", 1F, 1.5F, highlightScale), "palette.tooltip.highlight.scale");
 
         this.colorSettings.add(new UI.Label("palette.control.mode.label", 0xFFFFFF));
-        this.colorSettings.add(new UI.Cycler<>(colorMode, ColorMode.values()), colorMode);
+        this.colorSettings.add(new UI.Cycler<>(colorMode, ColorMode.values(), "%s"));
         this.colorSettings.add(new UI.FloatSlider("palette.control.opacity",0F, 1F, colorOpacity));
 
         this.colorSettings.add(new UI.Label("palette.control.settings.label", 0xFFFFFF));

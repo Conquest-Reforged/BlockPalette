@@ -163,6 +163,24 @@ public class ColorWheel {
         }
     }
 
+    public List<Texture> getRainbow(Texture texture, int groupSize) {
+        if (!texture.isPresent()) {
+            return Collections.emptyList();
+        }
+
+        if (isGray(texture)) {
+            return Collections.emptyList();
+        } else {
+            List<Texture> textures = new ArrayList<>();
+            int distance = 360 / 8;
+            for (int i = 0; i < 12; i ++) {
+                int hue = texture.hue + (i * distance);
+                textures.addAll(matchColor(hue, texture.strength, groupSize));
+            }
+            return textures;
+        }
+    }
+
     private List<Texture> getAdjacentHues(Texture texture, int groupSize) {
         int h1 = texture.hue;
         int h2 = clampHue(texture.hue - angle);

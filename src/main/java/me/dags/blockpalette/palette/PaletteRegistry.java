@@ -82,6 +82,8 @@ public class PaletteRegistry {
                 return getTriadPalette(itemStack);
             case TETRAD:
                 return getTetradPalette(itemStack);
+            case RAINBOW:
+                return getRainbowPalette(itemStack);
             default:
                 return getAdjacentPalette(itemStack);
         }
@@ -144,6 +146,17 @@ public class PaletteRegistry {
         Texture texture = getTextureForStack(stack);
         List<Texture> tetrad = colorWheel.getTetrad(texture, Config.group_size);
         List<PaletteItem> entries = texturesToVariants(tetrad, filter);
+        return getColorPalette(stack, entries);
+    }
+
+    public Palette getRainbowPalette(ItemStack stack) {
+        return getRainbowPalette(stack, Sets.newHashSet(new Mapping(stack)));
+    }
+
+    public Palette getRainbowPalette(ItemStack stack, Set<Mapping> filter) {
+        Texture texture = getTextureForStack(stack);
+        List<Texture> rainbow = colorWheel.getRainbow(texture, Config.group_size);
+        List<PaletteItem> entries = texturesToVariants(rainbow, filter);
         return getColorPalette(stack, entries);
     }
 

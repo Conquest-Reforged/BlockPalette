@@ -7,6 +7,7 @@ palette.colormode.adjacent=Adjacent
 palette.colormode.complimentary=Complimentary
 palette.colormode.triad=Triad
 palette.colormode.tetrad=Tetrad
+palette.colormode.rainbow=Rainbow
 
 palette.control.pickmode=Pick Mode: %s
 palette.control.tooltips=Show Tooltips: %s
