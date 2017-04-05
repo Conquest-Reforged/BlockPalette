@@ -32,6 +32,7 @@ public class PaletteScreen extends GuiScreen {
     private final Pointer<Boolean> showSettings = Pointer.of(Config.show_settings);
     private final Pointer<Boolean> matchMode = Pointer.of(Config.match_textures);
     private final Pointer<PickMode> pickMode = Pointer.of(Config.pick_mode);
+    private final Pointer<Boolean> holdKey = Pointer.of(Config.hold_key);
     private final Pointer<Boolean> tooltips = Pointer.of(Config.show_tooltips);
     private final Pointer<Integer> highlightRed = Pointer.instant(Config.highlight_red);
     private final Pointer<Integer> highlightGreen = Pointer.instant(Config.highlight_green);
@@ -73,6 +74,7 @@ public class PaletteScreen extends GuiScreen {
         this.minecraft = Minecraft.getMinecraft();
 
         this.paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "palette.control.pickmode"), pickMode);
+        this.paletteSettings.add(new UI.Cycler<>(holdKey, new Boolean[]{true, false}, "palette.control.hold"), "palette.tooltip.hold");
         this.paletteSettings.add(new UI.Cycler<>(tooltips, new Boolean[]{true, false}, "palette.control.tooltips"), "palette.tooltip.tooltips");
         this.paletteSettings.add(new UI.Label("palette.control.highlight.color.label", ColorF.rgb(255, 255, 255)));
         this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.red", 0, 255, highlightRed),"palette.tooltip.highlight.color");
@@ -156,8 +158,10 @@ public class PaletteScreen extends GuiScreen {
     public void keyTyped(char key, int code) throws IOException {
         super.keyTyped(key, code);
         hotbar.keyTyped(key, code);
-        if (Config.pick_mode == PickMode.MOUSE && !isCreativeOverlay && code == main.show.getKeyCode()) {
-            minecraft.setIngameFocus();
+        if (!isCreativeOverlay && code == main.show.getKeyCode()) {
+            if (Config.pick_mode == PickMode.MOUSE || !Config.hold_key) {
+                minecraft.setIngameFocus();
+            }
         }
     }
 
@@ -193,9 +197,17 @@ public class PaletteScreen extends GuiScreen {
             Render.endTooltips();
         }
 
-        if (Config.pick_mode == PickMode.KEYBOARD && !isCreativeOverlay && !Keyboard.isKeyDown(main.show.getKeyCode())) {
+        if (!isCreativeOverlay && listeningToKeyRelease() && keybindReleased()) {
             minecraft.setIngameFocus();
         }
+    }
+
+    private boolean listeningToKeyRelease() {
+        return Config.pick_mode == PickMode.KEYBOARD && Config.hold_key;
+    }
+
+    private boolean keybindReleased() {
+        return !Keyboard.isKeyDown(main.show.getKeyCode());
     }
 
     public void setCreativeOverlay(boolean overlay) {
@@ -314,6 +326,13 @@ public class PaletteScreen extends GuiScreen {
                     GuiContainerCreative creative = new GuiContainerCreative(minecraft.thePlayer);
                     minecraft.displayGuiScreen(creative);
                 }
+            }
+        });
+
+        holdKey.setListener(new Pointer.Listener<Boolean>() {
+            @Override
+            public void onUpdate(Boolean value) {
+                Config.hold_key = value;
             }
         });
 

@@ -15,6 +15,7 @@ public class Config {
     public static boolean match_textures = true;
     public static boolean show_tooltips = true;
     public static PickMode pick_mode = PickMode.MOUSE;
+    public static boolean hold_key = false;
     public static int highlight_red = 185;
     public static int highlight_green = 185;
     public static int highlight_blue = 185;
@@ -37,6 +38,7 @@ public class Config {
         match_textures = cfg.get("general", "match_textures", true).getBoolean();
         show_tooltips = cfg.get("general", "show_tooltips", true).getBoolean();
         pick_mode = PickMode.fromId(cfg.get("general", "pick_mode", 0).getInt());
+        hold_key = cfg.get("general", "hold_key", true).getBoolean();
 
         highlight_red = cfg.get("general", "highlight_red", highlight_red).getInt();
         highlight_green = cfg.get("general", "highlight_green", highlight_green).getInt();
@@ -59,6 +61,7 @@ public class Config {
         cfg.get("general", "match_textures", match_textures).set(match_textures);
         cfg.get("general", "show_tooltips", show_tooltips).set(show_tooltips);
         cfg.get("general", "pick_mode", 0).set(PickMode.toId(pick_mode));
+        cfg.get("general", "hold_key", true).set(hold_key);
         cfg.get("general", "highlight_red", highlight_red).set(highlight_red);
         cfg.get("general", "highlight_green", highlight_green).set(highlight_green);
         cfg.get("general", "highlight_blue", highlight_blue).set(highlight_blue);

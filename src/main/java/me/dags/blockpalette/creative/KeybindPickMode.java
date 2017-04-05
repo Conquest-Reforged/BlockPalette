@@ -2,7 +2,9 @@ package me.dags.blockpalette.creative;
 
 import me.dags.blockpalette.gui.PaletteScreen;
 import me.dags.blockpalette.palette.PaletteMain;
+import me.dags.blockpalette.util.Config;
 import net.minecraftforge.fml.common.eventhandler.Event;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 
@@ -52,6 +54,12 @@ public class KeybindPickMode extends CreativePickMode {
     void pressKey(Event event, int keyCode) {
         if (main.getPalette().isPresent()) {
             event.setCanceled(true);
+            if (Config.pick_mode == PickMode.KEYBOARD && !Config.hold_key) {
+                if (keyCode == Keyboard.KEY_ESCAPE || keyCode == main.show.getKeyCode() || main.isInventoryKey(keyCode)) {
+                    screen.onGuiClosed();
+                    main.newPalette(null);
+                }
+            }
         } else if (keyCode == main.show.getKeyCode() && stackUnderMouse != null) {
             main.newPalette(stackUnderMouse);
             screen = new PaletteScreen(main);
@@ -63,9 +71,13 @@ public class KeybindPickMode extends CreativePickMode {
 
     @Override
     void releaseKey(Event event, int keyCode) {
-        if (main.getPalette().isPresent() && keyCode == main.show.getKeyCode()) {
-            screen.onGuiClosed();
-            event.setCanceled(true);
+        if (main.getPalette().isPresent()) {
+            if (Config.hold_key) {
+                if (keyCode == main.show.getKeyCode()) {
+                    screen.onGuiClosed();
+                    event.setCanceled(true);
+                }
+            }
         }
     }
 }

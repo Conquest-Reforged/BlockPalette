@@ -10,6 +10,7 @@ palette.colormode.tetrad=Tetrad
 palette.colormode.rainbow=Rainbow
 
 palette.control.pickmode=Pick Mode: %s
+palette.control.hold=Hold Key: %s
 palette.control.tooltips=Show Tooltips: %s
 palette.control.highlight.color.label=Highlight Color
 palette.control.highlight.red=Red
@@ -30,6 +31,7 @@ palette.control.refresh=Refresh
 
 palette.tooltip.pickmode.keyboard=Show the palette GUI by holding down the palette key
 palette.tooltip.pickmode.mouse=Show the palette GUI by clicking on itemstacks in the inventory (hold the palette key to pick up items normally)
+palette.tooltip.hold=Hold the blockpalette keybind to keep the palette open
 palette.tooltip.tooltips=Enable or disable tooltips like this in the palette GUI
 palette.tooltip.highlight.color=Adjust the color of the highlight around items in the GUI
 palette.tooltip.highlight.scale=Adjust the size of the highlight around items in the GUI
