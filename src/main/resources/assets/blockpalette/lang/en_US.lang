@@ -39,6 +39,7 @@ palette.tooltip.mode.adjacent=3 colors - finds the color 'x' degrees either side
 palette.tooltip.mode.complimentary=2 colors - finds the color on the opposite side of the color wheel to the selected block
 palette.tooltip.mode.triad=3 colors - finds two colors 'x' degrees either side of the selected block's complimentary
 palette.tooltip.mode.tetrad=4 colors - finds one color 'x' degrees from the selected block, and the complimentary colors of each
+palette.tooltip.mode.rainbow=Pick colors evenly spaced around the color wheel from the given blocks
 palette.tooltip.angle=Controls the distance between the colors used in the 4 different color modes
 palette.tooltip.groups=Controls the max number of variants of a single color that will be suggested
 palette.tooltip.leniency=Controls how accurately the palette matches the saturation levels of textures

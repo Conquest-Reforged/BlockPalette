@@ -195,68 +195,79 @@ public class PaletteRegistry {
     }
 
     private void register(ItemStack stack) {
-        IBakedModel model = getModel(stack);
+        try {
+            IBakedModel model = getModel(stack);
 
-        if (model == missingModel()) {
-            return;
+            if (model == missingModel()) {
+                return;
+            }
+
+            if (model.getParticleTexture().getIconName().equals("missingno")) {
+                return;
+            }
+
+            String iconName = model.getParticleTexture().getIconName();
+            Mapping mapping = new Mapping(stack);
+            Mapping current = mappings.get(iconName);
+
+            if (mapping.overrides(current)) {
+                mappings.put(iconName, mapping);
+            }
+
+            List<Mapping> variants = textureVariants.get(iconName);
+            if (variants == null) {
+                textureVariants.put(iconName, variants = new ArrayList<>());
+            }
+
+            variants.add(mapping);
+
+            if (colorWheel.hasTexture(iconName)) {
+                return;
+            }
+
+            Texture texture = PaletteRegistry.fromSprite(model.getParticleTexture());
+            if (texture != null) {
+                colorWheel.addTexture(texture);
+            }
+        } catch (Throwable t) {
+            String warning = String.format("Unable to register invalid block model for itemstack: %s", stack.getUnlocalizedName());
+            new UnsupportedOperationException(warning, t).printStackTrace();
         }
-
-        if (model.getParticleTexture().getIconName().equals("missingno")) {
-            return;
-        }
-
-        String iconName = model.getParticleTexture().getIconName();
-        Mapping mapping = new Mapping(stack);
-        Mapping current = mappings.get(iconName);
-
-        if (mapping.overrides(current)) {
-            mappings.put(iconName, mapping);
-        }
-
-        List<Mapping> variants = textureVariants.get(iconName);
-        if (variants == null) {
-            textureVariants.put(iconName, variants = new ArrayList<>());
-        }
-
-        variants.add(mapping);
-
-        if (colorWheel.hasTexture(iconName)) {
-            return;
-        }
-
-        Texture texture = PaletteRegistry.fromSprite(model.getParticleTexture());
-        if (texture != null) {
-            colorWheel.addTexture(texture);
-        }
-    }
-
-    private static String getParticleTex(ItemStack itemStack) {
-        return getModel(itemStack).getParticleTexture().getIconName();
     }
 
     private static IBakedModel getModel(ItemStack itemStack) {
         IBakedModel blockModel = getBlockModel(itemStack);
         IBakedModel itemModel = getItemModel(itemStack);
+
         if (blockModel == missingModel()) {
             return itemModel;
         }
+
         if (!blockModel.getParticleTexture().getIconName().equals(itemModel.getParticleTexture().getIconName())) {
             return itemModel;
         }
+
         return blockModel;
     }
 
     private static IBakedModel getBlockModel(ItemStack itemStack) {
         if (itemStack.getItem() instanceof ItemBlock) {
             IBlockState state = ((ItemBlock) itemStack.getItem()).getBlock().getStateFromMeta(itemStack.getMetadata());
-            return Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
+            return ensure(Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state), missingModel());
         }
         return missingModel();
     }
 
     private static IBakedModel getItemModel(ItemStack itemStack) {
         IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(itemStack);
-        return model != null && model.getParticleTexture() != null ? model : missingModel();
+        return ensure(model, missingModel());
+    }
+
+    private static IBakedModel ensure(IBakedModel model, IBakedModel missing) {
+        if (model != null && model.getParticleTexture() != null && model.getParticleTexture().getIconName() != null) {
+            return model;
+        }
+        return missing;
     }
 
     private static Texture fromSprite(TextureAtlasSprite sprite) {
