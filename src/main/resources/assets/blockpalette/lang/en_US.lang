@@ -9,9 +9,9 @@ palette.colormode.triad=Triad
 palette.colormode.tetrad=Tetrad
 palette.colormode.rainbow=Rainbow
 
-palette.control.pickmode=Pick Mode: %s
+palette.control.pickmode=%s Mode
 palette.control.hold=Hold Key: %s
-palette.control.tooltips=Show Tooltips: %s
+palette.control.tooltips=Tooltips: %s
 palette.control.highlight.color.label=Highlight Color
 palette.control.highlight.red=Red
 palette.control.highlight.green=Green
