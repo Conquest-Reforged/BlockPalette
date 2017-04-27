@@ -47,14 +47,23 @@ public class MousePickMode extends CreativePickMode {
             screen.setCreativeOverlay(true);
             screen.initGui();
             event.setCanceled(true);
+        } else if (isMouseBind(button)) {
+            showDown = true;
         }
     }
 
     @Override
     void releaseMouse(Event event, int button) {
         if (main.getPalette().isPresent()) {
-            screen.mouseReleased(mouseX, mouseY, button);
             event.setCanceled(true);
+            if (isMouseBind(button)) {
+                screen.onGuiClosed();
+                main.newPalette(null);
+            } else {
+                screen.mouseReleased(mouseX, mouseY, button);
+            }
+        } else if (isMouseBind(button)) {
+            showDown = false;
         }
     }
 
@@ -94,5 +103,9 @@ public class MousePickMode extends CreativePickMode {
 
     private boolean modifierKey() {
         return lCtrlDown || lShiftDown || showDown;
+    }
+
+    private boolean isMouseBind(int code) {
+        return code - 100 == main.show.getKeyCode();
     }
 }

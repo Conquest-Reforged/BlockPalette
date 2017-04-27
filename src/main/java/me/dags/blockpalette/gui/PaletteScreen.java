@@ -13,6 +13,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 
@@ -104,6 +105,7 @@ public class PaletteScreen extends GuiScreen {
     public void initGui() {
         resize();
         init();
+        KeyBinding.setKeyBindState(main.show.getKeyCode(), true);
     }
 
     @Override
@@ -116,6 +118,11 @@ public class PaletteScreen extends GuiScreen {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        if (!listeningToKeyRelease() && !isCreativeOverlay && isMouseBind(mouseButton)) {
+            minecraft.setIngameFocus();
+            return;
+        }
+
         Slot underMouse = main.getPalette().getUnderMouse();
         main.getPalette().setSelected(null);
 
@@ -145,6 +152,15 @@ public class PaletteScreen extends GuiScreen {
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int mouseButton) {
+        super.mouseReleased(mouseX, mouseY, mouseButton);
+
+        if (isMouseBind(mouseButton)) {
+            if (listeningToKeyRelease()) {
+                KeyBinding.setKeyBindState(main.show.getKeyCode(), false);
+                return;
+            }
+        }
+
         paletteSettings.mouseReleased(mouseX, mouseY);
         colorSettings.mouseReleased(mouseX, mouseY);
         main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
@@ -158,6 +174,7 @@ public class PaletteScreen extends GuiScreen {
     public void keyTyped(char key, int code) throws IOException {
         super.keyTyped(key, code);
         hotbar.keyTyped(key, code);
+
         if (!isCreativeOverlay && code == main.show.getKeyCode()) {
             if (Config.pick_mode == PickMode.MOUSE || !Config.hold_key) {
                 minecraft.setIngameFocus();
@@ -176,6 +193,8 @@ public class PaletteScreen extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        KeyBinding.updateKeyBindState();
+
         drawGradientRect(0, 0, this.width, this.height, 0x777777, -804253680);
         Gui.drawRect(0, 0, width, height, 0x88000000);
 
@@ -197,17 +216,21 @@ public class PaletteScreen extends GuiScreen {
             Render.endTooltips();
         }
 
-        if (!isCreativeOverlay && listeningToKeyRelease() && keybindReleased()) {
+        if (listeningToKeyRelease() && keybindReleased()) {
             minecraft.setIngameFocus();
         }
     }
 
     private boolean listeningToKeyRelease() {
-        return Config.pick_mode == PickMode.KEYBOARD && Config.hold_key;
+        return !isCreativeOverlay && Config.hold_key;
     }
 
     private boolean keybindReleased() {
-        return !Keyboard.isKeyDown(main.show.getKeyCode());
+        return !main.show.isKeyDown();
+    }
+
+    private boolean isMouseBind(int code) {
+        return code - 100 == main.show.getKeyCode();
     }
 
     public void setCreativeOverlay(boolean overlay) {

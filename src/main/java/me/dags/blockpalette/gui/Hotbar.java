@@ -136,11 +136,13 @@ public class Hotbar {
 
     public void keyTyped(char c, int keyCode) {
         Slot hovered = main.getPalette().getUnderMouse();
-        if (hovered != null) {
+        if (hovered != null && !hovered.isEmpty()) {
             // char typed 1 to 9 -> translate to int value and subtract 1 so in range 0 to 8
             int id = (c - '0') - 1;
             if (id >= 0 && id < slots.length) {
+                Slot current = slots[id];
                 slots[id] = new Slot(hovered.getItem());
+                slots[id].setPosition(current.xPos(), current.yPos());
             }
         }
     }

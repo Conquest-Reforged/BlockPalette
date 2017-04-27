@@ -33,20 +33,38 @@ public class KeybindPickMode extends CreativePickMode {
     @Override
     void pressMouse(Event event, int button) {
         if (main.getPalette().isPresent()) {
-            try {
-                screen.mouseClicked(mouseX, mouseY, button);
+            if (button - 100 == main.show.getKeyCode()) {
+                screen.onGuiClosed();
                 event.setCanceled(true);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else {
+                try {
+                    screen.mouseClicked(mouseX, mouseY, button);
+                    event.setCanceled(true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        } else if (button - 100 == main.show.getKeyCode() && stackUnderMouse != null) {
+            main.newPalette(stackUnderMouse);
+            screen = new PaletteScreen(main);
+            screen.setCreativeOverlay(true);
+            screen.initGui();
+            event.setCanceled(true);
         }
     }
 
     @Override
     void releaseMouse(Event event, int button) {
         if (main.getPalette().isPresent()) {
-            screen.mouseReleased(mouseX, mouseY, button);
-            event.setCanceled(true);
+            if (button - 100 == main.show.getKeyCode()) {
+                if (Config.hold_key && button - 100 == main.show.getKeyCode()) {
+                    screen.onGuiClosed();
+                    event.setCanceled(true);
+                }
+            } else {
+                screen.mouseReleased(mouseX, mouseY, button);
+                event.setCanceled(true);
+            }
         }
     }
 

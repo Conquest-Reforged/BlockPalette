@@ -1,7 +1,7 @@
 key.blockpalette.open=Open Palette
 
-palette.pickmode.keyboard=Keyboard
-palette.pickmode.mouse=Mouse
+palette.pickmode.keyboard=Keybind
+palette.pickmode.mouse=Click
 
 palette.colormode.adjacent=Adjacent
 palette.colormode.complimentary=Complimentary
@@ -9,7 +9,7 @@ palette.colormode.triad=Triad
 palette.colormode.tetrad=Tetrad
 palette.colormode.rainbow=Rainbow
 
-palette.control.pickmode=%s Mode
+palette.control.pickmode=Mode: %s
 palette.control.hold=Hold Key: %s
 palette.control.tooltips=Tooltips: %s
 palette.control.highlight.color.label=Highlight Color
@@ -29,9 +29,9 @@ palette.control.gray=Gray Point
 palette.control.alpha=Min Alpha
 palette.control.refresh=Refresh
 
-palette.tooltip.pickmode.keyboard=Show the palette GUI by holding down the palette key
-palette.tooltip.pickmode.mouse=Show the palette GUI by clicking on itemstacks in the inventory (hold the palette key to pick up items normally)
-palette.tooltip.hold=Hold the blockpalette keybind to keep the palette open
+palette.tooltip.pickmode.keyboard=Use the keybind to open the palette GUI from the Creative Inventory
+palette.tooltip.pickmode.mouse=Click itemstacks to open the palette GUI from the Creative Inventory
+palette.tooltip.hold=Hold the keybind to keep the palette open
 palette.tooltip.tooltips=Enable or disable tooltips like this in the palette GUI
 palette.tooltip.highlight.color=Adjust the color of the highlight around items in the GUI
 palette.tooltip.highlight.scale=Adjust the size of the highlight around items in the GUI
