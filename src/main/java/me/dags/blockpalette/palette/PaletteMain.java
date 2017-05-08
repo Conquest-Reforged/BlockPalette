@@ -2,6 +2,7 @@ package me.dags.blockpalette.palette;
 
 import me.dags.blockpalette.gui.Palette;
 import me.dags.blockpalette.gui.PaletteScreen;
+import me.dags.blockpalette.search.Spotlight;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -18,6 +19,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
     public static final int switchKeyID = Keyboard.KEY_LSHIFT;
 
     public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.getKeyIndex("C"), "Block Palette");
+    public final KeyBinding search = new KeyBinding("key.blockpalette.search", Keyboard.getKeyIndex("V"), "Block Palette");
     private PaletteRegistry registry = new PaletteRegistry();
     private Palette palette = Palette.EMPTY;
 
@@ -36,7 +38,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
     }
 
     public void newPalette(ItemStack itemStack) {
-        palette = registry.getPalette(itemStack);
+        palette = getRegistry().getPalette(itemStack);
     }
 
     public boolean isInventoryKey(int keyCode) {
@@ -46,7 +48,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
         registry = new PaletteRegistry();
-        registry.buildPalettes();
+        getRegistry().buildPalettes();
         palette = Palette.EMPTY;
     }
 
@@ -64,6 +66,11 @@ public class PaletteMain implements IResourceManagerReloadListener {
             if (!getPalette().isPresent() && show.isPressed()) {
                 newPalette(minecraft.thePlayer.getHeldItemMainhand());
                 showPaletteScreen();
+                return;
+            }
+
+            if (search.isPressed()) {
+                Minecraft.getMinecraft().displayGuiScreen(new Spotlight());
             }
         }
     }

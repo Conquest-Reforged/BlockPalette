@@ -28,7 +28,7 @@ public class Slot {
 
     private SlotBounds bounds = new SlotBounds();
 
-    Slot(PaletteItem item) {
+    public Slot(PaletteItem item) {
         this.item = item;
     }
 

@@ -28,8 +28,17 @@ public class Pointer<T> {
         return reference;
     }
 
+    public void setNullable(T value) {
+        reference = value;
+        changed = true;
+
+        if (instant) {
+            markUpdated();
+        }
+    }
+
     public void set(T value) {
-        if (value != reference && !reference.equals(value)) {
+        if (reference != value && !reference.equals(value)) {
             this.reference = value;
             this.changed = true;
 

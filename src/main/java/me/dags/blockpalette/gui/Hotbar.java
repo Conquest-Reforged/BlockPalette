@@ -2,12 +2,10 @@ package me.dags.blockpalette.gui;
 
 import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.palette.PaletteItem;
-import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.util.Config;
 import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
@@ -21,17 +19,14 @@ public class Hotbar {
 
     protected static final ResourceLocation WIDGETS_TEX_PATH = new ResourceLocation("textures/gui/widgets.png");
 
-    private final PaletteMain main;
-    private final FontRenderer fontRenderer;
     private final Slot[] slots = new Slot[9];
 
+    private Slot underMouse = null;
     private PaletteItem selected = PaletteItem.EMPTY;
     private int left = 0, top = 0;
     private int color = 0xFFFFFF;
 
-    public Hotbar(PaletteMain main) {
-        this.main = main;
-        this.fontRenderer = Minecraft.getMinecraft().fontRendererObj;
+    public Hotbar() {
         initSlots(new ScaledResolution(Minecraft.getMinecraft()));
     }
 
@@ -56,6 +51,9 @@ public class Hotbar {
         }
     }
 
+    public void setUnderMouse(Slot slot) {
+        this.underMouse = slot;
+    }
 
     public void draw(int mouseX, int mouseY) {
         // hotbar
@@ -92,10 +90,9 @@ public class Hotbar {
             return;
         }
 
-        Slot underMouse = main.getPalette().getUnderMouse();
-        boolean shift = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
-
         if (underMouse == null) {
+            boolean shift = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
+
             for (int i = 0; i < 9; i++) {
                 Slot slot = slots[i];
 
@@ -135,7 +132,8 @@ public class Hotbar {
 
 
     public void keyTyped(char c, int keyCode) {
-        Slot hovered = main.getPalette().getUnderMouse();
+        Slot hovered = underMouse;
+
         if (hovered != null && !hovered.isEmpty()) {
             // char typed 1 to 9 -> translate to int value and subtract 1 so in range 0 to 8
             int id = (c - '0') - 1;

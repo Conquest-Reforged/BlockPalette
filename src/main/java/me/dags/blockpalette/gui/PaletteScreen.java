@@ -70,7 +70,7 @@ public class PaletteScreen extends GuiScreen {
 
     public PaletteScreen(PaletteMain main) {
         this.main = main;
-        this.hotbar = new Hotbar(main);
+        this.hotbar = new Hotbar();
 
         this.minecraft = Minecraft.getMinecraft();
 
@@ -202,6 +202,7 @@ public class PaletteScreen extends GuiScreen {
         colorSettings.draw(minecraft, mouseX, mouseY);
 
         main.getPalette().drawScreen(mouseX, mouseY);
+        hotbar.setUnderMouse(main.getPalette().getUnderMouse());
         hotbar.draw(mouseX, mouseY);
 
         for (GuiButton button : buttons) {
