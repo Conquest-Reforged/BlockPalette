@@ -1,6 +1,7 @@
 package me.dags.blockpalette.search;
 
 import me.dags.blockpalette.util.Pointer;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
@@ -19,7 +20,10 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
-public class Spotlight extends GuiScreen {
+public class SearchScreen extends GuiScreen {
+
+    private static final String[] blockTags = {"slab", "stair", "vertical", "carpet", "plate", "door"};
+    private static final String[] itemTags = {"pick", "axe", "hoe", "sword", "shovel", "egg"};
 
     private final Pointer<ItemStack> selected = Pointer.of(null);
     private final Pointer<ItemStack> hovered = Pointer.of(null);
@@ -37,7 +41,7 @@ public class Spotlight extends GuiScreen {
     private int hoveredLeft = 0;
     private int hoveredTop = 0;
 
-    public Spotlight() {
+    public SearchScreen() {
         List<ItemStack> stacks = new LinkedList<>();
         for (Item item : Item.REGISTRY) {
             item.getSubItems(item, CreativeTabs.SEARCH, stacks);
@@ -45,9 +49,9 @@ public class Spotlight extends GuiScreen {
 
         Index.Builder<ItemStack> builder = Index.builder();
         for (ItemStack stack : stacks) {
-            String displayName = stack.getDisplayName();
-            if (displayName != null) {
-                builder.with(displayName, stack);
+            String name = stack.getDisplayName();
+            if (name != null) {
+                builder.with(stack, name, getTags(stack));
             }
         }
 
@@ -127,7 +131,7 @@ public class Spotlight extends GuiScreen {
 
     private void drawGridBackground(int columns) {
         if (!display.isEmpty()) {
-            int rows = display.size() / (columns + 1);
+            int rows = (int) Math.ceil(display.size() / columns);
             int height = (rows + 1) * slotSize;
             int left = displayLeft - 1;
             int top = displayTop - 1;
@@ -196,5 +200,29 @@ public class Spotlight extends GuiScreen {
 
     private static boolean contains(int x, int y, int left, int top, int right, int bottom) {
         return x > left && x < right && y > top && y < bottom;
+    }
+
+    private static List<Tag> getTags(ItemStack stack) {
+        List<Tag> tags = new LinkedList<>();
+        String name = stack.getDisplayName().toLowerCase();
+        for (Tag tag : Tag.TAGS) {
+            if (tag.test(name)) {
+                tags.add(tag);
+            }
+        }
+
+        Block block = Block.getBlockFromItem(stack.getItem());
+        if (block != null) {
+            if (block.getDefaultState().isBlockNormalCube()
+                || block.getDefaultState().isFullBlock()
+                || block.getDefaultState().isNormalCube()
+                || block.getDefaultState().isOpaqueCube()) {
+                tags.add(Tag.of("block"));
+            }
+        } else {
+            tags.add(Tag.of("item"));
+        }
+
+        return tags;
     }
 }

@@ -41,6 +41,7 @@ public class PaletteMod {
     public void init(FMLInitializationEvent event) {
         main.onInit();
         ClientRegistry.registerKeyBinding(main.show);
+        ClientRegistry.registerKeyBinding(main.search);
         MinecraftForge.EVENT_BUS.register(events);
     }
 }

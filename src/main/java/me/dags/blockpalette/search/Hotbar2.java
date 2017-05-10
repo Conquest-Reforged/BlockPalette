@@ -46,23 +46,24 @@ public class Hotbar2 {
     }
 
     public boolean mouseRelease(int mouseX, int mouseY) {
-        if (hoveredSlot != -1) {
-            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-                setSlotStack(hoveredSlot, null);
-                return true;
-            }
+        if (contains(mouseX, mouseY, left - 5, top - 5, left + (9 * slotSize) + 5, top + slotSize + 5)) {
+            if (hoveredSlot != -1) {
+                if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+                    setSlotStack(hoveredSlot, null);
+                    return true;
+                }
 
-            ItemStack current = getSlotStack(hoveredSlot);
+                ItemStack current = getSlotStack(hoveredSlot);
 
-            if (selected.isPresent()) {
-                setSlotStack(hoveredSlot, selected.get());
+                if (selected.isPresent()) {
+                    setSlotStack(hoveredSlot, selected.get());
+                    selected.setNullable(current);
+                } else {
+                    setSlotStack(hoveredSlot, null);
+                }
+
                 selected.setNullable(current);
-            } else {
-                setSlotStack(hoveredSlot, null);
             }
-
-            selected.setNullable(current);
-
             return true;
         }
         return false;

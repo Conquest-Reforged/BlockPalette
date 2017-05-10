@@ -1,10 +1,9 @@
 package me.dags.blockpalette.search;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,74 +13,40 @@ import java.util.stream.Stream;
 public class Index<T> {
 
     private final List<Entry<T>> entries;
+    private final float fuzz = 0.25F;
 
     private Index(List<Entry<T>> entries) {
         this.entries = entries;
     }
 
     public List<T> search(String input, int limit) {
+        return parallelSearch(input, limit).map(Result::getResult).collect(Collectors.toList());
+    }
+
+    public List<Result<T>> find(String input, int limit) {
         return parallelSearch(input, limit).collect(Collectors.toList());
     }
 
-    public Stream<T> parallelSearch(String input, int limit) {
+    public void parallelSearch(String input, int limit, Consumer<Result<T>> consumer) {
+        parallelSearch(input, limit).forEachOrdered(consumer);
+    }
+
+    public Stream<Result<T>> parallelSearch(String input, int limit) {
         if (input.isEmpty()) {
             return Stream.empty();
         }
 
-        String[] split = input.split(" ");
-
-        StringBuilder builder = new StringBuilder();
-        for (String token : split) {
-            builder.append("(?=.*").append(Pattern.quote(token)).append(")");
-        }
-
-        Pattern pattern = Pattern.compile(builder.toString());
-        Predicate<Entry> filter = entry -> pattern.matcher(entry.key).find();
-        Comparator<Entry> sorter = sorter(input.toLowerCase());
+        Query query = new Query(input);
+        int fuzzLimit = Math.round(limit * fuzz);
+        AtomicInteger fuzzCounter = new AtomicInteger(0);
+        Predicate<Result<?>> fuzzFilter = result -> result.getRank() < 2 || fuzzCounter.addAndGet(1) < fuzzLimit;
 
         return entries.parallelStream()
-                .filter(filter)
-                .sorted(sorter)
+                .map(query::test)
+                .filter(Result::isPresent)
+                .sorted()
                 .limit(limit)
-                .map(Entry::getValue);
-    }
-
-    private Comparator<Entry> sorter(String input) {
-        return (e1, e2) -> {
-            if (e1.getKey().startsWith(input)) {
-                if (e2.getKey().startsWith(input)) {
-                    int l1 = e1.getKey().length();
-                    int l2 = e2.getKey().length();
-                    return l1 == l2 ? 0 : l1 > l2 ? 1 : -1;
-                }
-                return -1;
-            }
-            return 0;
-        };
-    }
-
-    private static class Entry<T> implements Comparable<Entry<T>> {
-
-        private final T value;
-        private final String key;
-
-        private Entry(String key, T value) {
-            this.value = value;
-            this.key = key;
-        }
-
-        private String getKey() {
-            return key;
-        }
-
-        private T getValue() {
-            return value;
-        }
-
-        @Override
-        public int compareTo(Entry<T> t) {
-            return key.compareTo(t.key);
-        }
+                .filter(fuzzFilter);
     }
 
     public static <T> Builder<T> builder() {
@@ -90,23 +55,20 @@ public class Index<T> {
 
     public static class Builder<T> {
 
-        private final Map<String, T> mappings = new HashMap<>();
+        private final Map<String, Entry<T>> entries = new HashMap<>();
 
-        public Builder<T> with(T value) {
-            return with(value.toString(), value);
-        }
-
-        public Builder<T> with(String key, T value) {
-            mappings.put(key.toLowerCase(), value);
+        public Builder<T> with(T value, String key, List<Tag> tags) {
+            StringBuilder tagBuilder = new StringBuilder();
+            for (Tag tag : tags) {
+                tagBuilder.append('#').append(tag.getTag());
+            }
+            Entry<T> entry = new Entry<>(value, key, tagBuilder.toString());
+            entries.put(entry.getName(), entry);
             return this;
         }
 
         public Index<T> build() {
-            List<Entry<T>> list = new LinkedList<>();
-            for (Map.Entry<String, T> entry : mappings.entrySet()) {
-                list.add(new Entry<>(entry.getKey(), entry.getValue()));
-            }
-            return new Index<>(ImmutableList.copyOf(list));
+            return new Index<>(Collections.unmodifiableList(new LinkedList<>(entries.values())));
         }
     }
 }

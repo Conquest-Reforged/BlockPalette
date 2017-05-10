@@ -2,7 +2,7 @@ package me.dags.blockpalette.palette;
 
 import me.dags.blockpalette.gui.Palette;
 import me.dags.blockpalette.gui.PaletteScreen;
-import me.dags.blockpalette.search.Spotlight;
+import me.dags.blockpalette.search.SearchScreen;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -70,7 +70,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
             }
 
             if (search.isPressed()) {
-                Minecraft.getMinecraft().displayGuiScreen(new Spotlight());
+                Minecraft.getMinecraft().displayGuiScreen(new SearchScreen());
             }
         }
     }
