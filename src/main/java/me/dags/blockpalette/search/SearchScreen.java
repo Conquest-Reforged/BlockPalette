@@ -88,8 +88,12 @@ public class SearchScreen extends GuiScreen {
             return;
         }
 
+        String current = input.getText();
         input.textboxKeyTyped(typedChar, keyCode);
-        display = index.search(input.getText(), 40);
+
+        if (!current.equals(input.getText())) {
+            display = index.search(input.getText(), 40);
+        }
     }
 
     @Override
@@ -131,8 +135,8 @@ public class SearchScreen extends GuiScreen {
 
     private void drawGridBackground(int columns) {
         if (!display.isEmpty()) {
-            int rows = (int) Math.ceil(display.size() / columns);
-            int height = (rows + 1) * slotSize;
+            int rows = (int) Math.ceil(display.size() / (double) columns);
+            int height = rows * slotSize;
             int left = displayLeft - 1;
             int top = displayTop - 1;
             int right = displayLeft + input.width + 1;
