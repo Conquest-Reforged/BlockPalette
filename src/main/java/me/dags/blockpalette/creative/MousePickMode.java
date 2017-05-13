@@ -1,7 +1,7 @@
 package me.dags.blockpalette.creative;
 
-import me.dags.blockpalette.gui.PaletteScreen;
 import me.dags.blockpalette.palette.PaletteMain;
+import me.dags.blockpalette.palette.PaletteScreen;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import org.lwjgl.input.Keyboard;
 

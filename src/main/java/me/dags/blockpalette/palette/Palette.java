@@ -1,13 +1,17 @@
-package me.dags.blockpalette.gui;
+package me.dags.blockpalette.palette;
 
 import me.dags.blockpalette.color.ColorF;
-import me.dags.blockpalette.palette.PaletteItem;
+import me.dags.blockpalette.gui.Slot;
+import me.dags.blockpalette.gui.SlotBounds;
 import me.dags.blockpalette.shape.Polygon;
 import me.dags.blockpalette.util.Config;
+import me.dags.blockpalette.util.Pointer;
 import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.CreativeCrafting;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -44,8 +48,8 @@ public class Palette {
     private int centerX = 0;
     private int centerY = 0;
 
-    private Slot underMouse = null;
-    private Slot selected = null;
+    private Pointer<ItemStack> stackUnderMouse = Pointer.of(null);
+    private Pointer<ItemStack> selectedStack = Pointer.of(null);
 
     private Palette(Slot center, List<Slot> slots, float scale) {
         this.center = center;
@@ -63,16 +67,16 @@ public class Palette {
         return center.getStack();
     }
 
-    public Slot getUnderMouse() {
-        return underMouse;
+    public Pointer<ItemStack> getSelectedStack() {
+        return selectedStack;
+    }
+
+    public Pointer<ItemStack> getStackUnderMouse() {
+        return stackUnderMouse;
     }
 
     public int getWidth() {
         return radius + 40;
-    }
-
-    public void setSelected(Slot slot) {
-        this.selected = slot;
     }
 
     public void setHighlightColor(int r, int g, int b) {
@@ -117,18 +121,55 @@ public class Palette {
             slot.draw();
         }
 
-        Slot display = underMouse != null ? underMouse : selected;
-        if (display != null) {
-            display.drawDisplayString(centerX, centerY + radius + 25);
+        if (selectedStack.isPresent()) {
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0, 0, 500);
+            Render.drawHighlightedItemStack(selectedStack.get(), mouseX, mouseY, highlightRadius, selectedColor);
+            Render.drawOverlays(selectedStack.get(), mouseX, mouseY);
+            GlStateManager.popMatrix();
         }
+
         Render.endItems();
+
+        if (stackUnderMouse.isPresent()) {
+            FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
+            String text = stackUnderMouse.get().getDisplayName();
+            int length = renderer.getStringWidth(text);
+            int half = length / 2;
+            int cy = centerY + rad - 15;
+            renderer.drawStringWithShadow(text, centerX - half, cy, 0xFFFFFF);
+        }
+    }
+
+    public void mouseRelease(int mouseX, int mouseY, int button) {
+        Slot hovered = null;
+
+        for (Slot slot : allSlots) {
+            if (!slot.isEmpty() && slot.mouseOver(mouseX, mouseY)) {
+                hovered = slot;
+                break;
+            }
+        }
+
+        if (hovered == null) {
+            getSelectedStack().setNullable(null);
+            return;
+        }
+
+        if (button == 0) {
+            getSelectedStack().setNullable(hovered.getStack());
+        } else if (button == 1) {
+            hovered.setSelected(!hovered.isSelected());
+        }
     }
 
     private void handleMouse(int mouseX, int mouseY) {
-        underMouse = null;
+        stackUnderMouse.setNullable(null);
 
         float radsq = radius * radius;
         float distance = radsq;
+
+        Slot hovered = null;
 
         for (Slot slot : allSlots) {
             int dx = mouseX - slot.xPos();
@@ -138,6 +179,7 @@ public class Palette {
             float scale = this.scale;
 
             if (ds > 0.5) {
+                // voodoo
                 scale += Math.min(Math.max(ds * ds * 1.05F, 0), 2F);
             }
 
@@ -145,13 +187,15 @@ public class Palette {
             slot.setScale(slot == center ? CENTER_SCALE : scale);
 
             if (!slot.isEmpty() && slot.mouseOver(mouseX, mouseY) && dsq < distance) {
-                underMouse = slot;
+                hovered = slot;
                 distance = dsq;
             }
         }
 
-        if (underMouse != null) {
-            underMouse.setHovered(true);
+        if (hovered != null && !hovered.isEmpty()) {
+            hovered.setHovered(true);
+            stackUnderMouse.setNullable(hovered.getStack());
+            // todo underMouse.setHovered(true);
         }
     }
 

@@ -98,7 +98,10 @@ public class Render {
     }
 
     public static void drawOverlays(ItemStack stack, int x, int y) {
-        Minecraft.getMinecraft().getRenderItem().renderItemOverlays(Minecraft.getMinecraft().fontRendererObj, stack, x, y);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, 0);
+        Minecraft.getMinecraft().getRenderItem().renderItemOverlays(Minecraft.getMinecraft().fontRendererObj, stack, -8, -8);
+        GlStateManager.popMatrix();
     }
 
     public static void drawHighlightedItemStack(ItemStack stack, int x, int y, float scale, int color) {
@@ -107,15 +110,16 @@ public class Render {
         }
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, 100);
+        GlStateManager.translate(x, y, 50);
         GlStateManager.scale(scale, scale, scale);
         GlStateManager.enableOutlineMode(color);
+        GlStateManager.disableBlend();
         Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, -8, -8);
         GlStateManager.disableOutlineMode();
         GlStateManager.popMatrix();
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, 200);
+        GlStateManager.translate(x, y, 100);
         Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, -8, -8);
         GlStateManager.popMatrix();
     }

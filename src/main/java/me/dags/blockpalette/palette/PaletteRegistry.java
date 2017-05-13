@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.color.ColorWheel;
 import me.dags.blockpalette.color.Texture;
-import me.dags.blockpalette.gui.Palette;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

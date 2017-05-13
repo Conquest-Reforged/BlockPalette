@@ -3,8 +3,6 @@ package me.dags.blockpalette.gui;
 import me.dags.blockpalette.palette.PaletteItem;
 import me.dags.blockpalette.util.Config;
 import me.dags.blockpalette.util.Render;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -32,19 +30,19 @@ public class Slot {
         this.item = item;
     }
 
-    int xPos() {
+    public int xPos() {
         return xPos;
     }
 
-    int yPos() {
+    public int yPos() {
         return yPos;
     }
 
-    boolean isSelected() {
+    public boolean isSelected() {
         return selected;
     }
 
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return item.isEmpty();
     }
 
@@ -52,38 +50,38 @@ public class Slot {
         return item;
     }
 
-    ItemStack getStack() {
+    public ItemStack getStack() {
         return item.isEmpty() ? null : item.getItemStack();
     }
 
-    boolean mouseOver(int x, int y) {
+    public boolean mouseOver(int x, int y) {
         return x >= xPos - 11 && x <= xPos + 11 && y >= yPos - 11 && y <= yPos + 11;
     }
 
-    void setBounds(SlotBounds bounds) {
+    public void setBounds(SlotBounds bounds) {
         this.bounds = bounds;
     }
 
-    void setHighlight(int color, int invert, float size) {
+    public void setHighlight(int color, int invert, float size) {
         this.highlightColor = color;
         this.highlightSize = size;
         this.invertColor = invert;
     }
 
-    void setPosition(int x, int y) {
+    public void setPosition(int x, int y) {
         this.xPos = x;
         this.yPos = y;
     }
 
-    void setScale(float f) {
+    public void setScale(float f) {
         this.scale = f;
     }
 
-    void setHovered(boolean hovered) {
+    public void setHovered(boolean hovered) {
         this.hovered = hovered;
     }
 
-    void setSelected(boolean selected) {
+    public void setSelected(boolean selected) {
         this.selected = selected;
     }
 
@@ -104,16 +102,6 @@ public class Slot {
     public void drawBounds() {
         if (!isEmpty() && !Config.match_textures) {
             bounds.draw(item.getColor().red, item.getColor().green, item.getColor().blue, 1F);
-        }
-    }
-
-    void drawDisplayString(int cx, int yPos) {
-        if (!item.isEmpty()) {
-            FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
-            String text = item.getItemStack().getDisplayName();
-            int length = renderer.getStringWidth(text);
-            int half = length / 2;
-            renderer.drawStringWithShadow(text, cx - half, yPos, 0xFFFFFF);
         }
     }
 }

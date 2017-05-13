@@ -1,15 +1,11 @@
 package me.dags.blockpalette.gui;
 
-import me.dags.blockpalette.color.ColorF;
-import me.dags.blockpalette.palette.PaletteItem;
-import me.dags.blockpalette.util.Config;
-import me.dags.blockpalette.util.Render;
+import me.dags.blockpalette.util.Pointer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.inventory.CreativeCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 
 /**
@@ -17,131 +13,100 @@ import org.lwjgl.input.Keyboard;
  */
 public class Hotbar {
 
-    protected static final ResourceLocation WIDGETS_TEX_PATH = new ResourceLocation("textures/gui/widgets.png");
+    private final Pointer<ItemStack> hovered;
+    private final Pointer<ItemStack> selected;
+    private final int padding = 4;
+    private final int slotSize = 16;
 
-    private final Slot[] slots = new Slot[9];
+    private int left = 0;
+    private int top = 0;
+    private int hoveredSlot = -1;
 
-    private Slot underMouse = null;
-    private PaletteItem selected = PaletteItem.EMPTY;
-    private int left = 0, top = 0;
-    private int color = 0xFFFFFF;
-
-    public Hotbar() {
-        initSlots(new ScaledResolution(Minecraft.getMinecraft()));
+    public Hotbar(Pointer<ItemStack> hovered, Pointer<ItemStack> selected) {
+        this.hovered = hovered;
+        this.selected = selected;
     }
 
-    public void setColor(int r, int g, int b) {
-        this.color = ColorF.rgb(r, g, b);
-    }
-
-    public void initSlots(ScaledResolution resolution) {
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-
-        int slotWidth = 20, slotHeight = 20;
-        int hotbarLength = (9 * slotWidth) + 2;
-        int hCenter = resolution.getScaledWidth() / 2;
-
-        left = hCenter - (hotbarLength / 2);
-        top = resolution.getScaledHeight() - slotHeight - 2;
-
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.inventory.getStackInSlot(i);
-            slots[i] = new Slot(PaletteItem.of(stack));
-            slots[i].setPosition(1 + left + (i * slotWidth), 1 + top);
-        }
-    }
-
-    public void setUnderMouse(Slot slot) {
-        this.underMouse = slot;
+    public void init(int width, int height) {
+        int barWidth = 9 * (slotSize + 4);
+        left = (width / 2) - (barWidth / 2) + (padding / 2);
+        top = height - slotSize - 3;
     }
 
     public void draw(int mouseX, int mouseY) {
-        // hotbar
-        Render.cleanup();
-        Render.drawTexture(WIDGETS_TEX_PATH, left, top, 182, 22, 0, 0, 256, 256);
-        Render.beginItems();
+        hoveredSlot = -1;
 
-        // draw slot items
         for (int i = 0; i < 9; i++) {
-            Slot slot = slots[i];
-            if (!slot.isEmpty()) {
-                int x = slot.xPos() + 2;
-                int y = slot.yPos() + 2;
-                ItemStack stack = slot.getStack();
-                Render.drawItemStack(stack, x, y);
-                Render.drawOverlays(stack, x, y);
+            int left = this.left + (i * (slotSize + padding));
+            if (contains(mouseX, mouseY, left, top, left + slotSize, top + slotSize)) {
+                hoveredSlot = i;
+                Gui.drawRect(left, top, left + slotSize, top + slotSize, 0x22FFFFFF);
             }
         }
-
-        if (!selected.isEmpty()) {
-            ItemStack stack = selected.getItemStack();
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(0, 0, 200F);
-            Render.drawHighlightedItemStack(stack, mouseX, mouseY, Config.highlight_scale, color);
-            Render.drawOverlays(stack, mouseX - 8, mouseY - 8);
-            GlStateManager.popMatrix();
-        }
-
-        Render.endItems();
     }
 
-    public void mouseClick(int mouseX, int mouseY, int button) {
-        if (button == 1) {
-            return;
-        }
-
-        if (underMouse == null) {
-            boolean shift = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
-
-            for (int i = 0; i < 9; i++) {
-                Slot slot = slots[i];
-
-                if (mouseX >= slot.xPos() && mouseX <= slot.xPos() + 20 && mouseY >= slot.yPos() && mouseY <= slot.yPos() + 20) {
-                    if (shift) {
-                        slots[i] = new Slot(PaletteItem.EMPTY);
-                        slots[i].setPosition(slot.xPos(), slot.yPos());
-                        return;
-                    } else {
-                        PaletteItem item = slot.getItem();
-                        slots[i] = new Slot(selected);
-                        slots[i].setPosition(slot.xPos(), slot.yPos());
-                        selected = item;
-                        return;
-                    }
+    public boolean mouseRelease(int mouseX, int mouseY) {
+        if (contains(mouseX, mouseY, left - 5, top - 5, left + (9 * slotSize) + 5, top + slotSize + 5)) {
+            if (hoveredSlot != -1) {
+                if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+                    setSlotStack(hoveredSlot, null);
+                    return true;
                 }
+
+                ItemStack current = getSlotStack(hoveredSlot);
+
+                if (selected.isPresent()) {
+                    if (current != null && current.isItemEqual(selected.get())) {
+                        ItemStack copy = selected.get().copy();
+                        copy.stackSize += copy.stackSize;
+                        setSlotStack(hoveredSlot, copy);
+                        current = null;
+                    } else {
+                        setSlotStack(hoveredSlot, selected.get().copy());
+                    }
+                } else {
+                    setSlotStack(hoveredSlot, null);
+                }
+
+                selected.setNullable(current);
             }
-            selected = PaletteItem.EMPTY;
-        } else {
-            selected = underMouse.getItem();
+            return true;
         }
+        return false;
     }
 
-    public void close() {
+    public boolean keyTyped(char typedChar, int keyCode) {
+        if (hovered.isPresent()) {
+            int index = typedChar - '0' - 1;
+            if (index >= 0 && index <= 8) {
+                setSlotStack(index, hovered.get());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void onClose() {
         EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+        CreativeCrafting crafting = new CreativeCrafting(Minecraft.getMinecraft());
+        player.inventoryContainer.addListener(crafting);
 
-        if (!player.capabilities.isCreativeMode) {
-            return;
+        if (player.capabilities.isCreativeMode) {
+            player.inventoryContainer.detectAndSendChanges();
         }
 
-        // Update slots
-        for (int i = 0; i < slots.length; i++) {
-            ItemStack stack = slots[i].getStack();
-            player.inventory.setInventorySlotContents(i, stack);
-        }
+        player.inventoryContainer.removeListener(crafting);
     }
 
+    private ItemStack getSlotStack(int index) {
+        return Minecraft.getMinecraft().thePlayer.inventory.getStackInSlot(index);
+    }
 
-    public void keyTyped(char c, int keyCode) {
-        Slot hovered = underMouse;
+    private void setSlotStack(int index, ItemStack stack) {
+        Minecraft.getMinecraft().thePlayer.inventory.setInventorySlotContents(index, stack);
+    }
 
-        if (hovered != null && !hovered.isEmpty()) {
-            // char typed 1 to 9 -> translate to int value and subtract 1 so in range 0 to 8
-            int id = (c - '0') - 1;
-            if (id >= 0 && id < slots.length) {
-                Slot current = slots[id];
-                slots[id] = new Slot(hovered.getItem());
-                slots[id].setPosition(current.xPos(), current.yPos());
-            }
-        }
+    private static boolean contains(int x, int y, int left, int top, int right, int bottom) {
+        return x > left && x < right && y > top && y < bottom;
     }
 }

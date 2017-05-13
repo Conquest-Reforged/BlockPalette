@@ -1,5 +1,6 @@
 package me.dags.blockpalette.search;
 
+import me.dags.blockpalette.gui.Hotbar;
 import me.dags.blockpalette.util.Pointer;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -31,7 +32,7 @@ public class SearchScreen extends GuiScreen {
     private final int slotSize = 24;
     private final Index<ItemStack> index;
     private final GuiTextField input;
-    private final Hotbar2 hotbar;
+    private final Hotbar hotbar;
 
     private List<ItemStack> display = Collections.emptyList();
 
@@ -56,7 +57,7 @@ public class SearchScreen extends GuiScreen {
         }
 
         this.fontRendererObj = Minecraft.getMinecraft().fontRendererObj;
-        this.hotbar = new Hotbar2(hovered, selected);
+        this.hotbar = new Hotbar(hovered, selected);
         this.index = builder.build();
         this.input = new GuiTextField(0, fontRendererObj, 0, 0, width, 20);
     }

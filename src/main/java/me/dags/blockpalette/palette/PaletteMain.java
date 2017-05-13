@@ -1,7 +1,5 @@
 package me.dags.blockpalette.palette;
 
-import me.dags.blockpalette.gui.Palette;
-import me.dags.blockpalette.gui.PaletteScreen;
 import me.dags.blockpalette.search.SearchScreen;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.client.Minecraft;

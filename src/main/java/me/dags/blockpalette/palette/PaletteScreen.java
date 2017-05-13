@@ -1,14 +1,16 @@
-package me.dags.blockpalette.gui;
+package me.dags.blockpalette.palette;
 
 import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.color.ColorMode;
 import me.dags.blockpalette.creative.PickMode;
-import me.dags.blockpalette.palette.PaletteMain;
+import me.dags.blockpalette.gui.Animation;
+import me.dags.blockpalette.gui.Hotbar;
+import me.dags.blockpalette.gui.Settings;
+import me.dags.blockpalette.gui.UI;
 import me.dags.blockpalette.util.Config;
 import me.dags.blockpalette.util.Pointer;
 import me.dags.blockpalette.util.Render;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -70,7 +72,7 @@ public class PaletteScreen extends GuiScreen {
 
     public PaletteScreen(PaletteMain main) {
         this.main = main;
-        this.hotbar = new Hotbar();
+        this.hotbar = new Hotbar(main.getPalette().getStackUnderMouse(), main.getPalette().getSelectedStack());
 
         this.minecraft = Minecraft.getMinecraft();
 
@@ -113,7 +115,6 @@ public class PaletteScreen extends GuiScreen {
         super.onResize(minecraft, w, h);
         resize();
         setupAnimations();
-        hotbar.initSlots(new ScaledResolution(minecraft));
     }
 
     @Override
@@ -122,25 +123,6 @@ public class PaletteScreen extends GuiScreen {
             minecraft.setIngameFocus();
             return;
         }
-
-        Slot underMouse = main.getPalette().getUnderMouse();
-        main.getPalette().setSelected(null);
-
-        if (underMouse != null) {
-            if (mouseButton == 0) {
-                if (Keyboard.isKeyDown(PaletteMain.switchKeyID)) {
-                    main.newPalette(underMouse.getStack());
-                    refresh.run();
-                    return;
-                } else {
-                    main.getPalette().setSelected(underMouse);
-                }
-            } else if (mouseButton == 1 && !underMouse.isEmpty()) {
-                underMouse.setSelected(!underMouse.isSelected());
-            }
-        }
-
-        hotbar.mouseClick(mouseX, mouseY, mouseButton);
 
         paletteSettings.mousePressed(minecraft, mouseX, mouseY);
         colorSettings.mousePressed(minecraft, mouseX, mouseY);
@@ -161,10 +143,23 @@ public class PaletteScreen extends GuiScreen {
             }
         }
 
+        if (mouseButton == 0 && Keyboard.isKeyDown(PaletteMain.switchKeyID) && main.getPalette().getStackUnderMouse().isPresent()) {
+            main.newPalette(main.getPalette().getStackUnderMouse().get());
+            refresh.run();
+            return;
+        }
+
+        if (hotbar.mouseRelease(mouseX, mouseY)) {
+            return;
+        }
+
+        main.getPalette().mouseRelease(mouseX, mouseY, mouseButton);
+
         paletteSettings.mouseReleased(mouseX, mouseY);
         colorSettings.mouseReleased(mouseX, mouseY);
         main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
         main.getPalette().setHighlightRadius(highlightScale.get());
+
         for (GuiButton button : buttons) {
             button.mouseReleased(mouseX, mouseY);
         }
@@ -185,7 +180,7 @@ public class PaletteScreen extends GuiScreen {
     @Override
     public void onGuiClosed() {
         super.onGuiClosed();
-        hotbar.close();
+        hotbar.onClose();
         main.getPalette().close();
         main.newPalette(null);
         Config.save();
@@ -195,15 +190,14 @@ public class PaletteScreen extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         KeyBinding.updateKeyBindState();
 
-        drawGradientRect(0, 0, this.width, this.height, 0x777777, -804253680);
-        Gui.drawRect(0, 0, width, height, 0x88000000);
+       // drawGradientRect(0, 0, this.width, this.height, 0x777777, -804253680);
+       // Gui.drawRect(0, 0, width, height, 0x88000000);
 
         paletteSettings.draw(minecraft, mouseX, mouseY);
         colorSettings.draw(minecraft, mouseX, mouseY);
 
-        main.getPalette().drawScreen(mouseX, mouseY);
-        hotbar.setUnderMouse(main.getPalette().getUnderMouse());
         hotbar.draw(mouseX, mouseY);
+        main.getPalette().drawScreen(mouseX, mouseY);
 
         for (GuiButton button : buttons) {
             button.drawButton(minecraft, mouseX, mouseY);
@@ -261,6 +255,7 @@ public class PaletteScreen extends GuiScreen {
         width = resolution.getScaledWidth();
         height = resolution.getScaledHeight();
         main.getPalette().resize(resolution.getScaledWidth(), resolution.getScaledHeight());
+        hotbar.init(width, height);
 
         int centerX = resolution.getScaledWidth() / 2;
         int centerY = resolution.getScaledHeight() / 2;
@@ -305,7 +300,7 @@ public class PaletteScreen extends GuiScreen {
 
     private void init() {
         main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
-        hotbar.setColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
+        // todo hotbar.setColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
 
         if (Config.show_settings && !paletteSettings.onScreen(width, height)) {
             paletteSettings.open();
@@ -371,7 +366,7 @@ public class PaletteScreen extends GuiScreen {
             @Override
             public void onUpdate(Integer value) {
                 main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
-                hotbar.setColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
+                // todo hotbar.setColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
                 Config.highlight_red = highlightRed.get();
                 Config.highlight_green = highlightGreen.get();
                 Config.highlight_blue = highlightBlue.get();
