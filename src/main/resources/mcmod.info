@@ -5,7 +5,7 @@
   "description": "A creative-mode block picker and colour wheel",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://blockpalette.dags.me",
   "updateUrl": "",
   "authorList": ["dags"],
   "credits": "Textures by Monsterfish_",
