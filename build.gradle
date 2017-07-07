@@ -11,14 +11,14 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.4.1-mc1.10.2"
+version = "1.4.0-mc1.10.2"
 group= "me.dags.blockpalette"
 archivesBaseName = "blockpalette"
 
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
-    version = "1.10.2-12.18.3.2185"
+    version = "1.10.2-12.18.3.2316"
     runDir = "run"
     mappings = "snapshot_20161111"
 }
