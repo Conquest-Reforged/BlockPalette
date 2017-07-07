@@ -20,8 +20,8 @@
 
 ## Palette GUI Settings
 | Setting | Description |
-|:----|:----|
-|PickMode|Toggle between `Mouse Pickmode` & `Keyboard Pickmode`|
+|:----|:-----|
+|PickMode|Toggle between `Mouse Pickmode` and `Keyboard Pickmode`|
 |Highlight Color|Adjust the RGB colouring of the highlight when hovering over itemsacks|
 |Highlight Scale|Set how large the highlight should be|
 |Color Mode|Toggle between the various color-picking modes|
