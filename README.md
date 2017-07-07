@@ -19,6 +19,7 @@
 - **Right-click** items on the wheel to select multiple stacks that will be added to you inventory when you close the gui
 
 ## Palette GUI Settings
+
 | Setting | Description |
 |:----|:-----|
 |PickMode|Toggle between `Mouse Pickmode` and `Keyboard Pickmode`|
