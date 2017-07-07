@@ -24,7 +24,6 @@
 |PickMode|Toggle between `Mouse Pickmode` & `Keyboard Pickmode`|
 |Highlight Color|Adjust the RGB colouring of the highlight when hovering over itemsacks|
 |Highlight Scale|Set how large the highlight should be|
-| | |
 |Color Mode|Toggle between the various color-picking modes|
 |Opacity|Adjust the opacity of the background color shown on the Palette|
 |Angle|Controls the portion of the color wheel that a given color will be picked from|
