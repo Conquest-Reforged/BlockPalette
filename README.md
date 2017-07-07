@@ -1,6 +1,9 @@
 # BlockPalette
 ![](http://i.imgur.com/iEtBnSG.gif)
 
+[![Github All Releases](https://img.shields.io/github/downloads/dags-/BlockPalette/total.svg)](https://github.com/dags-/BlockPalette/releases)
+[![GitHub issues](https://img.shields.io/github/issues/dags-/BlockPalette.svg)](https://github.com/dags-/BlockPalette/issues)
+
 ## Accessing the Palette
 #### Keyboard Mode
 - **ingame** - whilst holding an item, press and hold the blockpalette keybind (`c` by default)
@@ -16,12 +19,12 @@
 - **Right-click** items on the wheel to select multiple stacks that will be added to you inventory when you close the gui
 
 ## Palette GUI Settings
+
 | Setting | Description |
-|:----|:----|
-|PickMode|Toggle between `Mouse Pickmode` & `Keyboard Pickmode`|
+|:----|:-----|
+|PickMode|Toggle between `Mouse Pickmode` and `Keyboard Pickmode`|
 |Highlight Color|Adjust the RGB colouring of the highlight when hovering over itemsacks|
 |Highlight Scale|Set how large the highlight should be|
-| | |
 |Color Mode|Toggle between the various color-picking modes|
 |Opacity|Adjust the opacity of the background color shown on the Palette|
 |Angle|Controls the portion of the color wheel that a given color will be picked from|
