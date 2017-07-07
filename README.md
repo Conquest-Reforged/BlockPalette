@@ -1,6 +1,9 @@
 # BlockPalette
 ![](http://i.imgur.com/iEtBnSG.gif)
 
+[![Github All Releases](https://img.shields.io/github/downloads/dags-/BlockPalette/total.svg)](https://github.com/dags-/BlockPalette/releases)
+[![GitHub issues](https://img.shields.io/github/issues/dags-/BlockPalette.svg)](https://github.com/dags-/BlockPalette/issues)
+
 ## Accessing the Palette
 #### Keyboard Mode
 - **ingame** - whilst holding an item, press and hold the blockpalette keybind (`c` by default)
