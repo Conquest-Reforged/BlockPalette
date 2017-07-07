@@ -69,13 +69,19 @@ public class KeybindPickMode extends CreativePickMode {
     }
 
     @Override
-    void pressKey(Event event, int keyCode) {
+    void pressKey(Event event, char c, int keyCode) {
         if (main.getPalette().isPresent()) {
             event.setCanceled(true);
             if (Config.pick_mode == PickMode.KEYBOARD && !Config.hold_key) {
                 if (keyCode == Keyboard.KEY_ESCAPE || keyCode == main.show.getKeyCode() || main.isInventoryKey(keyCode)) {
                     screen.onGuiClosed();
                     main.newPalette(null);
+                } else {
+                    try {
+                        screen.keyTyped(c, keyCode);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } else if (keyCode == main.show.getKeyCode() && stackUnderMouse != null) {
@@ -88,7 +94,7 @@ public class KeybindPickMode extends CreativePickMode {
     }
 
     @Override
-    void releaseKey(Event event, int keyCode) {
+    void releaseKey(Event event, char c, int keyCode) {
         if (main.getPalette().isPresent()) {
             if (Config.hold_key) {
                 if (keyCode == main.show.getKeyCode()) {

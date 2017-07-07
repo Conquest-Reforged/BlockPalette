@@ -46,7 +46,13 @@ public class Hotbar {
     }
 
     public boolean mouseRelease(int mouseX, int mouseY) {
-        if (contains(mouseX, mouseY, left - 5, top - 5, left + (9 * slotSize) + 5, top + slotSize + 5)) {
+        int left = this.left - 5;
+        int top = this.top - 5;
+        int right = this.left + (9 * (slotSize + 4));
+        int bottom = this.top + slotSize + 4 + 5;
+
+
+        if (contains(mouseX, mouseY, left, top, right, bottom)) {
             if (hoveredSlot != -1) {
                 if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
                     setSlotStack(hoveredSlot, null);

@@ -56,11 +56,12 @@ public abstract class CreativePickMode {
     }
 
     public void onKeyAction(Event event) {
+        char c = Keyboard.getEventCharacter();
         int key = Keyboard.getEventKey();
         if (Keyboard.getEventKeyState()) {
-            pressKey(event, key);
+            pressKey(event, c, key);
         } else if (key != -1) {
-            releaseKey(event, key);
+            releaseKey(event, c, key);
         }
     }
 
@@ -70,7 +71,7 @@ public abstract class CreativePickMode {
 
     abstract void releaseMouse(Event event, int button);
 
-    abstract void pressKey(Event event, int keyCode);
+    abstract void pressKey(Event event, char c, int keyCode);
 
-    abstract void releaseKey(Event event, int keyCode);
+    abstract void releaseKey(Event event, char c, int keyCode);
 }

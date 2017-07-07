@@ -68,7 +68,7 @@ public class MousePickMode extends CreativePickMode {
     }
 
     @Override
-    void pressKey(Event event, int keyCode) {
+    void pressKey(Event event, char c, int keyCode) {
         if (keyCode == Keyboard.KEY_LCONTROL) {
             lCtrlDown = true;
         } else if (keyCode == Keyboard.KEY_LSHIFT) {
@@ -79,11 +79,16 @@ public class MousePickMode extends CreativePickMode {
 
         if (main.getPalette().isPresent()) {
             event.setCanceled(true);
+            try {
+                screen.keyTyped(c, keyCode);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
-    void releaseKey(Event event, int keyCode) {
+    void releaseKey(Event event, char c, int keyCode) {
         if (keyCode == Keyboard.KEY_LCONTROL) {
             lCtrlDown = false;
         } else if (keyCode == Keyboard.KEY_LSHIFT) {

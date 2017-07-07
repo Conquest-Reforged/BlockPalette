@@ -149,6 +149,10 @@ public class SearchScreen extends GuiScreen {
     private void drawSlots(int mouseX, int mouseY, int columns, int padding) {
         int pos = 0;
         RenderHelper.enableGUIStandardItemLighting();
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, 0, 250);
+        GlStateManager.enableDepth();
         for (ItemStack stack : display) {
             int col = pos % columns;
             int row = pos / columns;
@@ -164,6 +168,9 @@ public class SearchScreen extends GuiScreen {
 
             pos++;
         }
+        GlStateManager.disableDepth();
+        GlStateManager.popMatrix();
+
         RenderHelper.disableStandardItemLighting();
     }
 
@@ -181,13 +188,15 @@ public class SearchScreen extends GuiScreen {
     private void drawSelected(int mouseX, int mouseY) {
         if (selected.isPresent()) {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0F, 0F, 10F);
+            GlStateManager.enableDepth();
+            GlStateManager.translate(0F, 0F, 300F);
             int left = mouseX - (slotSize / 2) + 4;
             int top = mouseY - (slotSize / 2) + 4;
             RenderHelper.enableGUIStandardItemLighting();
             Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(selected.get(), left, top);
             Minecraft.getMinecraft().getRenderItem().renderItemOverlays(fontRendererObj, selected.get(), left, top);
             RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableDepth();
             GlStateManager.popMatrix();
         }
     }

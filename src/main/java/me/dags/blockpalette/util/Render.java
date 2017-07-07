@@ -17,6 +17,7 @@ public class Render {
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
         GlStateManager.enableAlpha();
+        GlStateManager.enableBlend();
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager.clearColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
