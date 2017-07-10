@@ -9,7 +9,7 @@
   "updateUrl": "",
   "authorList": ["dags"],
   "credits": "Textures by Monsterfish_",
-  "logoFile": "",
+  "logoFile": "assets/blockpalette/logo.png",
   "screenshots": [],
   "dependencies": []
 }
