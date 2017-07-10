@@ -17,7 +17,7 @@ import java.util.Collections;
 public class PaletteMod {
 
     public static final String MOD_ID = "blockpalette";
-    public static final String VERSION = "1.4.0";
+    public static final String VERSION = "1.4.1";
 
     private final PaletteMain main = new PaletteMain();
     private final GameEvents events = new GameEvents(main);
@@ -32,7 +32,7 @@ public class PaletteMod {
         modMetadata.name = "BlockPalette";
         modMetadata.credits = "Textures by Monsterfish_";
         modMetadata.logoFile = "assets/blockpalette/logo.png";
-        modMetadata.url = "https://github.com/dags-/BlockPalette";
+        modMetadata.url = "https://blockpalette.dags.me";
         modMetadata.authorList = Collections.singletonList("dags");
         modMetadata.description = "A creative-mode block picker and colour wheel";
     }
