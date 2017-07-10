@@ -101,7 +101,7 @@ public interface Tag {
             .add(Tag.of("helmet"))
             .add(Tag.of("chestplate"))
             .add(Tag.of("leggings"))
-            .add(Tag.or("boots"))
+            .add(Tag.of("boots"))
             .add(Tag.or("food", "apple", "stew", "bread", "pork", "beef", "steak", "mutton", "chicken", "rabbit", "fish", "carrot", "potato", "pumpkin", "melon"))
             .add(Tag.or("tool", "axe", "pick", "shovel", "hoe", "shear", "compass", "clock", "fishing rod"))
             .add(Tag.or("weapon", "sword", "bow", "splash", "arrow"))
