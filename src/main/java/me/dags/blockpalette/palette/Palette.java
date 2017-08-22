@@ -5,8 +5,8 @@ import me.dags.blockpalette.gui.Slot;
 import me.dags.blockpalette.gui.SlotBounds;
 import me.dags.blockpalette.shape.Polygon;
 import me.dags.blockpalette.util.Config;
-import me.dags.blockpalette.util.Pointer;
 import me.dags.blockpalette.util.Render;
+import me.dags.blockpalette.util.Value;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -14,6 +14,8 @@ import net.minecraft.client.gui.inventory.CreativeCrafting;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class Palette {
 
     public static final Palette EMPTY = new Palette(new Slot(PaletteItem.EMPTY), Collections.<Slot>emptyList(), 0F);
@@ -48,8 +51,8 @@ public class Palette {
     private int centerX = 0;
     private int centerY = 0;
 
-    private Pointer<ItemStack> stackUnderMouse = Pointer.of(null);
-    private Pointer<ItemStack> selectedStack = Pointer.of(null);
+    private Value<ItemStack> stackUnderMouse = Value.of(null);
+    private Value<ItemStack> selectedStack = Value.of(null);
 
     private Palette(Slot center, List<Slot> slots, float scale) {
         this.center = center;
@@ -67,11 +70,11 @@ public class Palette {
         return center.getStack();
     }
 
-    public Pointer<ItemStack> getSelectedStack() {
+    public Value<ItemStack> getSelectedStack() {
         return selectedStack;
     }
 
-    public Pointer<ItemStack> getStackUnderMouse() {
+    public Value<ItemStack> getStackUnderMouse() {
         return stackUnderMouse;
     }
 
@@ -88,7 +91,7 @@ public class Palette {
         this.highlightRadius = highlightRadius;
     }
 
-    public void drawScreen(int mouseX, int mouseY) {
+    public void drawScreen(int mouseX, int mouseY, float ticks) {
         if (!isPresent()) {
             return;
         }
@@ -132,7 +135,7 @@ public class Palette {
         Render.endItems();
 
         if (stackUnderMouse.isPresent()) {
-            FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
+            FontRenderer renderer = Minecraft.getMinecraft().fontRenderer;
             String text = stackUnderMouse.get().getDisplayName();
             int length = renderer.getStringWidth(text);
             int half = length / 2;
@@ -233,7 +236,7 @@ public class Palette {
             return;
         }
 
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
         CreativeCrafting crafting = new CreativeCrafting(Minecraft.getMinecraft());
         player.inventoryContainer.addListener(crafting);
 

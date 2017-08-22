@@ -3,12 +3,15 @@ package me.dags.blockpalette.util;
 import me.dags.blockpalette.color.ColorMode;
 import me.dags.blockpalette.creative.PickMode;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class Config {
 
     public static boolean show_settings = true;

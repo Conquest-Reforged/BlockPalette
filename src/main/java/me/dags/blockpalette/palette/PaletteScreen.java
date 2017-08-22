@@ -8,8 +8,8 @@ import me.dags.blockpalette.gui.Hotbar;
 import me.dags.blockpalette.gui.Settings;
 import me.dags.blockpalette.gui.UI;
 import me.dags.blockpalette.util.Config;
-import me.dags.blockpalette.util.Pointer;
 import me.dags.blockpalette.util.Render;
+import me.dags.blockpalette.util.Value;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -17,6 +17,8 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -26,29 +28,30 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class PaletteScreen extends GuiScreen {
 
     private static final ResourceLocation BUTTON = new ResourceLocation("blockpalette", "textures/gui/button_mask.png");
 
     private final Settings paletteSettings = new Settings();
     private final Settings colorSettings = new Settings();
-    private final Pointer<Boolean> showSettings = Pointer.of(Config.show_settings);
-    private final Pointer<Boolean> matchMode = Pointer.of(Config.match_textures);
-    private final Pointer<PickMode> pickMode = Pointer.of(Config.pick_mode);
-    private final Pointer<Boolean> holdKey = Pointer.of(Config.hold_key);
-    private final Pointer<Boolean> tooltips = Pointer.of(Config.show_tooltips);
-    private final Pointer<Integer> highlightRed = Pointer.instant(Config.highlight_red);
-    private final Pointer<Integer> highlightGreen = Pointer.instant(Config.highlight_green);
-    private final Pointer<Integer> highlightBlue = Pointer.instant(Config.highlight_blue);
-    private final Pointer<Float> highlightScale = Pointer.instant(Config.highlight_scale);
+    private final Value<Boolean> showSettings = Value.of(Config.show_settings);
+    private final Value<Boolean> matchMode = Value.of(Config.match_textures);
+    private final Value<PickMode> pickMode = Value.of(Config.pick_mode);
+    private final Value<Boolean> holdKey = Value.of(Config.hold_key);
+    private final Value<Boolean> tooltips = Value.of(Config.show_tooltips);
+    private final Value<Integer> highlightRed = Value.instant(Config.highlight_red);
+    private final Value<Integer> highlightGreen = Value.instant(Config.highlight_green);
+    private final Value<Integer> highlightBlue = Value.instant(Config.highlight_blue);
+    private final Value<Float> highlightScale = Value.instant(Config.highlight_scale);
 
-    private final Pointer<ColorMode> colorMode = Pointer.of(Config.color_mode);
-    private final Pointer<Float> colorOpacity = Pointer.instant(Config.color_opacity);
-    private final Pointer<Integer> colorAngle = Pointer.of(Config.angle);
-    private final Pointer<Integer> colorGroupSize = Pointer.of(Config.group_size);
-    private final Pointer<Float> colorLeniency = Pointer.of(Config.leniency);
-    private final Pointer<Float> grayPoint = Pointer.of(Config.gray_point);
-    private final Pointer<Float> alphaPoint = Pointer.of(Config.alpha_point);
+    private final Value<ColorMode> colorMode = Value.of(Config.color_mode);
+    private final Value<Float> colorOpacity = Value.instant(Config.color_opacity);
+    private final Value<Integer> colorAngle = Value.of(Config.angle);
+    private final Value<Integer> colorGroupSize = Value.of(Config.group_size);
+    private final Value<Float> colorLeniency = Value.of(Config.leniency);
+    private final Value<Float> grayPoint = Value.of(Config.gray_point);
+    private final Value<Float> alphaPoint = Value.of(Config.alpha_point);
 
     private final UI.AreaCycler<Boolean> toggleMode = new UI.AreaCycler<>(matchMode, new Boolean[]{true, false}, BUTTON);
     private final UI.AreaCycler<Boolean> toggleSettings = new UI.AreaCycler<>(showSettings, new Boolean[]{true, false}, BUTTON);
@@ -56,12 +59,9 @@ public class PaletteScreen extends GuiScreen {
 
     private final Hotbar hotbar;
 
-    private final Runnable refresh = new Runnable() {
-        @Override
-        public void run() {
-            PaletteScreen.this.main.newPalette(PaletteScreen.this.main.getPalette().getCenter());
-            refreshScreen();
-        }
+    private final Runnable refresh = () -> {
+        PaletteScreen.this.main.newPalette(PaletteScreen.this.main.getPalette().getCenter());
+        refreshScreen();
     };
 
     private final PaletteMain main;
@@ -72,35 +72,35 @@ public class PaletteScreen extends GuiScreen {
 
     public PaletteScreen(PaletteMain main) {
         this.main = main;
-        this.hotbar = new Hotbar(main.getPalette().getStackUnderMouse(), main.getPalette().getSelectedStack());
+        hotbar = new Hotbar(main.getPalette().getStackUnderMouse(), main.getPalette().getSelectedStack());
 
-        this.minecraft = Minecraft.getMinecraft();
+        minecraft = Minecraft.getMinecraft();
 
-        this.paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "palette.control.pickmode"), pickMode);
-        this.paletteSettings.add(new UI.Cycler<>(holdKey, new Boolean[]{true, false}, "palette.control.hold"), "palette.tooltip.hold");
-        this.paletteSettings.add(new UI.Cycler<>(tooltips, new Boolean[]{true, false}, "palette.control.tooltips"), "palette.tooltip.tooltips");
-        this.paletteSettings.add(new UI.Label("palette.control.highlight.color.label", ColorF.rgb(255, 255, 255)));
-        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.red", 0, 255, highlightRed),"palette.tooltip.highlight.color");
-        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.green", 0, 255, highlightGreen), "palette.tooltip.highlight.color");
-        this.paletteSettings.add(new UI.IntSlider("palette.control.highlight.blue", 0, 255, highlightBlue), "palette.tooltip.highlight.color");
-        this.paletteSettings.add(new UI.Label("palette.control.highlight.scale.label", ColorF.rgb(255, 255, 255)));
-        this.paletteSettings.add(new UI.FloatSlider("palette.control.highlight.scale", 1F, 1.5F, highlightScale), "palette.tooltip.highlight.scale");
+        paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "palette.control.pickmode"), pickMode);
+        paletteSettings.add(new UI.Cycler<>(holdKey, new Boolean[]{true, false}, "palette.control.hold"), "palette.tooltip.hold");
+        paletteSettings.add(new UI.Cycler<>(tooltips, new Boolean[]{true, false}, "palette.control.tooltips"), "palette.tooltip.tooltips");
+        paletteSettings.add(new UI.Label("palette.control.highlight.color.label", ColorF.rgb(255, 255, 255)));
+        paletteSettings.add(new UI.IntSlider("palette.control.highlight.red", 0, 255, highlightRed),"palette.tooltip.highlight.color");
+        paletteSettings.add(new UI.IntSlider("palette.control.highlight.green", 0, 255, highlightGreen), "palette.tooltip.highlight.color");
+        paletteSettings.add(new UI.IntSlider("palette.control.highlight.blue", 0, 255, highlightBlue), "palette.tooltip.highlight.color");
+        paletteSettings.add(new UI.Label("palette.control.highlight.scale.label", ColorF.rgb(255, 255, 255)));
+        paletteSettings.add(new UI.FloatSlider("palette.control.highlight.scale", 1F, 1.5F, highlightScale), "palette.tooltip.highlight.scale");
 
-        this.colorSettings.add(new UI.Label("palette.control.mode.label", 0xFFFFFF));
-        this.colorSettings.add(new UI.Cycler<>(colorMode, ColorMode.values(), "%s"));
-        this.colorSettings.add(new UI.FloatSlider("palette.control.opacity",0F, 1F, colorOpacity));
+        colorSettings.add(new UI.Label("palette.control.mode.label", 0xFFFFFF));
+        colorSettings.add(new UI.Cycler<>(colorMode, ColorMode.values(), "%s"));
+        colorSettings.add(new UI.FloatSlider("palette.control.opacity",0F, 1F, colorOpacity));
 
-        this.colorSettings.add(new UI.Label("palette.control.settings.label", 0xFFFFFF));
-        this.colorSettings.add(new UI.IntSlider("palette.control.angle", 0, 120, colorAngle), "palette.tooltip.angle");
-        this.colorSettings.add(new UI.IntSlider("palette.control.groups", 1, 5, colorGroupSize), "palette.tooltip.groups");
-        this.colorSettings.add(new UI.FloatSlider("palette.control.leniency", 0F, 1F, colorLeniency), "palette.tooltip.leniency");
-        this.colorSettings.add(new UI.FloatSlider("palette.control.gray", 0F, 1F, grayPoint), "palette.tooltip.gray");
-        this.colorSettings.add(new UI.FloatSlider("palette.control.alpha", 0F, 1F, alphaPoint), "palette.tooltip.alpha");
-        this.colorSettings.add(new UI.Label("", 0xFFFFFF));
-        this.colorSettings.add(new UI.Button("palette.control.refresh", refresh));
+        colorSettings.add(new UI.Label("palette.control.settings.label", 0xFFFFFF));
+        colorSettings.add(new UI.IntSlider("palette.control.angle", 0, 120, colorAngle), "palette.tooltip.angle");
+        colorSettings.add(new UI.IntSlider("palette.control.groups", 1, 5, colorGroupSize), "palette.tooltip.groups");
+        colorSettings.add(new UI.FloatSlider("palette.control.leniency", 0F, 1F, colorLeniency), "palette.tooltip.leniency");
+        colorSettings.add(new UI.FloatSlider("palette.control.gray", 0F, 1F, grayPoint), "palette.tooltip.gray");
+        colorSettings.add(new UI.FloatSlider("palette.control.alpha", 0F, 1F, alphaPoint), "palette.tooltip.alpha");
+        colorSettings.add(new UI.Label("", 0xFFFFFF));
+        colorSettings.add(new UI.Button("palette.control.refresh", refresh));
 
-        this.buttons.add(toggleMode);
-        this.buttons.add(toggleSettings);
+        buttons.add(toggleMode);
+        buttons.add(toggleSettings);
     }
 
     @Override
@@ -193,27 +193,35 @@ public class PaletteScreen extends GuiScreen {
        // drawGradientRect(0, 0, this.width, this.height, 0x777777, -804253680);
        // Gui.drawRect(0, 0, width, height, 0x88000000);
 
-        paletteSettings.draw(minecraft, mouseX, mouseY);
-        colorSettings.draw(minecraft, mouseX, mouseY);
+        paletteSettings.draw(minecraft, mouseX, mouseY, partialTicks);
+        colorSettings.draw(minecraft, mouseX, mouseY, partialTicks);
 
-        hotbar.draw(mouseX, mouseY);
-        main.getPalette().drawScreen(mouseX, mouseY);
+        hotbar.draw(mouseX, mouseY, partialTicks);
+        main.getPalette().drawScreen(mouseX, mouseY, partialTicks);
 
         for (GuiButton button : buttons) {
-            button.drawButton(minecraft, mouseX, mouseY);
+            button.drawButton(minecraft, mouseX, mouseY, partialTicks);
         }
 
         if (Config.show_tooltips) {
             Render.cleanup();
             Render.beginTooltips();
-            paletteSettings.drawTooltips(mouseX, mouseY);
-            colorSettings.drawTooltips(mouseX, mouseY);
+            paletteSettings.drawTooltips(mouseX, mouseY, partialTicks);
+            colorSettings.drawTooltips(mouseX, mouseY, partialTicks);
             Render.endTooltips();
         }
 
         if (listeningToKeyRelease() && keybindReleased()) {
             minecraft.setIngameFocus();
         }
+    }
+
+    private void addOption(GuiButton button) {
+        paletteSettings.add(button);
+    }
+
+    private void addColor(GuiButton button) {
+        colorSettings.add(button);
     }
 
     private boolean listeningToKeyRelease() {
@@ -267,13 +275,13 @@ public class PaletteScreen extends GuiScreen {
         colorSettings.setPosition(width, 0);
         colorSettings.setSize(settingsWidth, height);
 
-        toggleSettings.xPosition = centerX - 80 - 12;
-        toggleSettings.yPosition = centerY - 78 - 12;
+        toggleSettings.x = centerX - 80 - 12;
+        toggleSettings.y = centerY - 78 - 12;
         toggleSettings.width = 24;
         toggleSettings.height = 24;
 
-        toggleMode.xPosition = centerX - 30 - 12;
-        toggleMode.yPosition = centerY - 106 - 12;
+        toggleMode.x = centerX - 30 - 12;
+        toggleMode.y = centerY - 106 - 12;
         toggleMode.width = 24;
         toggleMode.height = 24;
 
@@ -310,134 +318,86 @@ public class PaletteScreen extends GuiScreen {
             colorSettings.open();
         }
 
-        showSettings.setListener(new Pointer.Listener<Boolean>() {
-            @Override
-            public void onUpdate(Boolean value) {
-                Config.show_settings = value;
-                if (value && !paletteSettings.onScreen(width, height)) {
-                    paletteSettings.open();
-                } else if (!value && paletteSettings.onScreen(width, height)) {
-                    paletteSettings.close();
+        showSettings.setListener(value -> {
+            Config.show_settings = value;
+            if (value && !paletteSettings.onScreen(width, height)) {
+                paletteSettings.open();
+            } else if (!value && paletteSettings.onScreen(width, height)) {
+                paletteSettings.close();
+            }
+        });
+
+        matchMode.setListener(value -> {
+            Config.match_textures = value;
+            refresh.run();
+            if (Config.match_textures) {
+                if (colorSettings.onScreen(width, height)) {
+                    colorSettings.close();
                 }
+            } else {
+                colorSettings.open();
             }
         });
 
-        matchMode.setListener(new Pointer.Listener<Boolean>() {
-            @Override
-            public void onUpdate(Boolean value) {
-                Config.match_textures = value;
-                refresh.run();
-                if (Config.match_textures) {
-                    if (colorSettings.onScreen(width, height)) {
-                        colorSettings.close();
-                    }
-                } else {
-                    colorSettings.open();
-                }
+        pickMode.setListener(value -> {
+            Config.pick_mode = value;
+            if (isCreativeOverlay) {
+                GuiContainerCreative creative = new GuiContainerCreative(minecraft.player);
+                minecraft.displayGuiScreen(creative);
             }
         });
 
-        pickMode.setListener(new Pointer.Listener<PickMode>() {
-            @Override
-            public void onUpdate(PickMode value) {
-                Config.pick_mode = value;
-                if (isCreativeOverlay) {
-                    GuiContainerCreative creative = new GuiContainerCreative(minecraft.thePlayer);
-                    minecraft.displayGuiScreen(creative);
-                }
-            }
-        });
+        holdKey.setListener(value -> Config.hold_key = value);
 
-        holdKey.setListener(new Pointer.Listener<Boolean>() {
-            @Override
-            public void onUpdate(Boolean value) {
-                Config.hold_key = value;
-            }
-        });
+        tooltips.setListener(value -> Config.show_tooltips = value);
 
-        tooltips.setListener(new Pointer.Listener<Boolean>() {
-            @Override
-            public void onUpdate(Boolean value) {
-                Config.show_tooltips = value;
-            }
-        });
-
-        Pointer.Listener<Integer> colorListener = new Pointer.Listener<Integer>() {
-            @Override
-            public void onUpdate(Integer value) {
-                main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
-                // todo hotbar.setColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
-                Config.highlight_red = highlightRed.get();
-                Config.highlight_green = highlightGreen.get();
-                Config.highlight_blue = highlightBlue.get();
-            }
+        Value.Listener<Integer> colorListener = value -> {
+            main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
+            // todo hotbar.setColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
+            Config.highlight_red = highlightRed.get();
+            Config.highlight_green = highlightGreen.get();
+            Config.highlight_blue = highlightBlue.get();
         };
 
         highlightRed.setListener(colorListener);
         highlightGreen.setListener(colorListener);
         highlightBlue.setListener(colorListener);
 
-        highlightScale.setListener(new Pointer.Listener<Float>() {
-            @Override
-            public void onUpdate(Float value) {
-                main.getPalette().setHighlightRadius(highlightScale.get());
-                Config.highlight_scale = value;
-            }
+        highlightScale.setListener(value -> {
+            main.getPalette().setHighlightRadius(highlightScale.get());
+            Config.highlight_scale = value;
         });
 
-        colorOpacity.setListener(new Pointer.Listener<Float>() {
-            @Override
-            public void onUpdate(Float value) {
-                Config.color_opacity = value;
-            }
+        colorOpacity.setListener(value -> Config.color_opacity = value);
+
+        colorMode.setListener(value -> {
+            Config.color_mode = value;
+            refresh.run();
         });
 
-        colorMode.setListener(new Pointer.Listener<ColorMode>() {
-            @Override
-            public void onUpdate(ColorMode value) {
-                Config.color_mode = value;
-                refresh.run();
-            }
+        colorAngle.setListener(value -> {
+            Config.angle = value;
+            refresh.run();
         });
 
-        colorAngle.setListener(new Pointer.Listener<Integer>() {
-            @Override
-            public void onUpdate(Integer value) {
-                Config.angle = value;
-                refresh.run();
-            }
+        colorGroupSize.setListener(value -> {
+            Config.group_size = value;
+            refresh.run();
         });
 
-        colorGroupSize.setListener(new Pointer.Listener<Integer>() {
-            @Override
-            public void onUpdate(Integer value) {
-                Config.group_size = value;
-                refresh.run();
-            }
+        colorLeniency.setListener(value -> {
+            Config.leniency = value;
+            refresh.run();
         });
 
-        colorLeniency.setListener(new Pointer.Listener<Float>() {
-            @Override
-            public void onUpdate(Float value) {
-                Config.leniency = value;
-                refresh.run();
-            }
+        grayPoint.setListener(value -> {
+            Config.gray_point = value;
+            refresh.run();
         });
 
-        grayPoint.setListener(new Pointer.Listener<Float>() {
-            @Override
-            public void onUpdate(Float value) {
-                Config.gray_point = value;
-                refresh.run();
-            }
-        });
-
-        alphaPoint.setListener(new Pointer.Listener<Float>() {
-            @Override
-            public void onUpdate(Float value) {
-                Config.alpha_point = value;
-                refresh.run();
-            }
+        alphaPoint.setListener(value -> {
+            Config.alpha_point = value;
+            refresh.run();
         });
     }
 }

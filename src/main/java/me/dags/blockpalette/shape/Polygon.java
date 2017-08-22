@@ -1,6 +1,8 @@
 package me.dags.blockpalette.shape;
 
 import me.dags.blockpalette.gui.SlotBounds;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class Polygon {
 
     private final List<Edge> edges = new ArrayList<>();

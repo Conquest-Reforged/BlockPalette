@@ -7,17 +7,20 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Collections;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 @Mod(modid = PaletteMod.MOD_ID, version = PaletteMod.VERSION, clientSideOnly = true)
 public class PaletteMod {
 
     public static final String MOD_ID = "blockpalette";
-    public static final String VERSION = "1.4.1";
+    public static final String VERSION = "1.5.0";
 
     private final PaletteMain main = new PaletteMain();
     private final GameEvents events = new GameEvents(main);

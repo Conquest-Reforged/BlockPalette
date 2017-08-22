@@ -1,18 +1,21 @@
 package me.dags.blockpalette.gui;
 
-import me.dags.blockpalette.util.Pointer;
+import me.dags.blockpalette.util.Value;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class Tooltip {
 
-    private final FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
+    private final FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
     private final Provider tooltip;
     private final int width;
     private final int pad = 5;
@@ -26,7 +29,7 @@ public class Tooltip {
         this.offsetX = width / 2;
     }
 
-    public void draw(int x, int y) {
+    public void draw(int x, int y, float ticks) {
         if (button.isMouseOver()) {
             String message = I18n.format(tooltip.getUnlocalized());
 
@@ -73,9 +76,9 @@ public class Tooltip {
 
     static class PointerTip<T extends Provider> implements Provider {
 
-        private final Pointer<T> option;
+        private final Value<T> option;
 
-        PointerTip(Pointer<T> option) {
+        PointerTip(Value<T> option) {
             this.option = option;
         }
 

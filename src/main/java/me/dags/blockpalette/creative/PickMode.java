@@ -2,10 +2,13 @@ package me.dags.blockpalette.creative;
 
 import me.dags.blockpalette.gui.Tooltip;
 import net.minecraft.client.resources.I18n;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public enum PickMode implements Tooltip.Provider {
     KEYBOARD("palette.pickmode.keyboard", "palette.tooltip.pickmode.keyboard"),
     MOUSE("palette.pickmode.mouse", "palette.tooltip.pickmode.mouse"),

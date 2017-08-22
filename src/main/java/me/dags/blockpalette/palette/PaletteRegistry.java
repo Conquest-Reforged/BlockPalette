@@ -13,15 +13,18 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class PaletteRegistry {
 
     private static final IBlockState EMPTY_STATE = Blocks.AIR.getDefaultState();
@@ -44,20 +47,17 @@ public class PaletteRegistry {
     public void buildPalettes() {
         for (Block block : Block.REGISTRY) {
             if (!blacklist.contains(block)) {
-                Item item = Item.getItemFromBlock(block);
-                if (item != null) {
-                    List<ItemStack> items = new ArrayList<>();
-                    block.getSubBlocks(item, CreativeTabs.SEARCH, items);
-                    for (ItemStack stack : items) {
-                        register(stack);
-                    }
+                NonNullList<ItemStack> items = NonNullList.create();
+                block.getSubBlocks(CreativeTabs.SEARCH, items);
+                for (ItemStack stack : items) {
+                    register(stack);
                 }
             }
         }
     }
 
     public Palette getPalette(ItemStack itemStack) {
-        if (itemStack == null || Block.getBlockFromItem(itemStack.getItem()) == null) {
+        if (itemStack == null || Block.getBlockFromItem(itemStack.getItem()) == Blocks.AIR) {
             return Palette.EMPTY;
         }
 
@@ -66,7 +66,7 @@ public class PaletteRegistry {
         }
 
         itemStack = itemStack.copy();
-        itemStack.stackSize = 1;
+        itemStack.setCount(1);
 
         colorWheel.setAngle(Config.angle);
         colorWheel.setLeniency(Config.leniency);

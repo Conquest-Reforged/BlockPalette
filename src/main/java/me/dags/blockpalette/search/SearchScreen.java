@@ -1,7 +1,7 @@
 package me.dags.blockpalette.search;
 
 import me.dags.blockpalette.gui.Hotbar;
-import me.dags.blockpalette.util.Pointer;
+import me.dags.blockpalette.util.Value;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -10,8 +10,12 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -21,13 +25,11 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class SearchScreen extends GuiScreen {
 
-    private static final String[] blockTags = {"slab", "stair", "vertical", "carpet", "plate", "door"};
-    private static final String[] itemTags = {"pick", "axe", "hoe", "sword", "shovel", "egg"};
-
-    private final Pointer<ItemStack> selected = Pointer.of(null);
-    private final Pointer<ItemStack> hovered = Pointer.of(null);
+    private final Value<ItemStack> selected = Value.of(null);
+    private final Value<ItemStack> hovered = Value.of(null);
     private final int width = 200;
     private final int slotSize = 24;
     private final Index<ItemStack> index;
@@ -43,38 +45,36 @@ public class SearchScreen extends GuiScreen {
     private int hoveredTop = 0;
 
     public SearchScreen() {
-        List<ItemStack> stacks = new LinkedList<>();
+        NonNullList<ItemStack> stacks = NonNullList.create();
         for (Item item : Item.REGISTRY) {
-            item.getSubItems(item, CreativeTabs.SEARCH, stacks);
+            item.getSubItems(CreativeTabs.SEARCH, stacks);
         }
 
         Index.Builder<ItemStack> builder = Index.builder();
         for (ItemStack stack : stacks) {
             String name = stack.getDisplayName();
-            if (name != null) {
-                builder.with(stack, name, getTags(stack));
-            }
+            builder.with(stack, name, getTags(stack));
         }
 
-        this.fontRendererObj = Minecraft.getMinecraft().fontRendererObj;
+        this.fontRenderer = Minecraft.getMinecraft().fontRenderer;
         this.hotbar = new Hotbar(hovered, selected);
         this.index = builder.build();
-        this.input = new GuiTextField(0, fontRendererObj, 0, 0, width, 20);
+        this.input = new GuiTextField(0, fontRenderer, 0, 0, width, 20);
     }
 
     @Override
     public void setWorldAndResolution(Minecraft mc, int width, int height) {
         super.setWorldAndResolution(mc, width, height);
         hotbar.init(width, height);
-        input.xPosition = (width / 2) - (input.width / 2);
-        input.yPosition = (height / 2) - (4 * input.height);
+        input.x = (width / 2) - (input.width / 2);
+        input.y = (height / 2) - (4 * input.height);
         windowWidth = width;
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
-        hotbar.draw(mouseX, mouseY);
+        hotbar.draw(mouseX, mouseY, partialTicks);
         input.setFocused(true);
         input.drawTextBox();
         drawGrid(mouseX, mouseY);
@@ -122,8 +122,8 @@ public class SearchScreen extends GuiScreen {
 
     private void drawGrid(int mouseX, int mouseY) {
         hovered.setNullable(null);
-        displayLeft = input.xPosition;
-        displayTop = input.yPosition + (input.height / 2) + 15;
+        displayLeft = input.x;
+        displayTop = input.y + (input.height / 2) + 15;
 
         int columns = input.width / slotSize;
         int padding = (input.width - (slotSize * columns)) / 2;
@@ -194,7 +194,7 @@ public class SearchScreen extends GuiScreen {
             int top = mouseY - (slotSize / 2) + 4;
             RenderHelper.enableGUIStandardItemLighting();
             Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(selected.get(), left, top);
-            Minecraft.getMinecraft().getRenderItem().renderItemOverlays(fontRendererObj, selected.get(), left, top);
+            Minecraft.getMinecraft().getRenderItem().renderItemOverlays(fontRenderer, selected.get(), left, top);
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableDepth();
             GlStateManager.popMatrix();
@@ -204,11 +204,11 @@ public class SearchScreen extends GuiScreen {
     private void drawTooltip(int columns) {
         if (hovered.isPresent()) {
             String text = hovered.get().getDisplayName();
-            int left = (windowWidth / 2) - (fontRendererObj.getStringWidth(text) / 2);
+            int left = (windowWidth / 2) - (fontRenderer.getStringWidth(text) / 2);
             int rows = display.size() / columns;
             int height = (1 + rows) * slotSize;
             int top = displayTop + height + 10;
-            fontRendererObj.drawStringWithShadow(text, left, top, 0xFFFFFF);
+            fontRenderer.drawStringWithShadow(text, left, top, 0xFFFFFF);
         }
     }
 
@@ -226,7 +226,7 @@ public class SearchScreen extends GuiScreen {
         }
 
         Block block = Block.getBlockFromItem(stack.getItem());
-        if (block != null) {
+        if (block != Blocks.AIR) {
             if (block.getDefaultState().isBlockNormalCube()
                 || block.getDefaultState().isFullBlock()
                 || block.getDefaultState().isNormalCube()

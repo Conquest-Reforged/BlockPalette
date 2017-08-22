@@ -2,10 +2,13 @@ package me.dags.blockpalette.palette;
 
 import me.dags.blockpalette.color.ColorF;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public final class PaletteItem {
 
     public static final PaletteItem EMPTY = new PaletteItem();

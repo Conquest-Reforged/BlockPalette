@@ -5,10 +5,13 @@ import me.dags.blockpalette.util.Config;
 import me.dags.blockpalette.util.Render;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class Slot {
 
     private static final ResourceLocation SLOT = new ResourceLocation("blockpalette", "textures/gui/slot.png");

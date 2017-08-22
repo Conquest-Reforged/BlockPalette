@@ -1,10 +1,12 @@
 package me.dags.blockpalette.gui;
 
 import me.dags.blockpalette.util.Config;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -14,6 +16,7 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class SlotBounds {
 
     private final List<List<Point>> bounds = new ArrayList<>();
@@ -28,10 +31,10 @@ public class SlotBounds {
         points.add(point);
     }
 
-    public void draw(float red, float green, float blue, float derp) {
+    public void draw(float red, float green, float blue, float ticks) {
         GlStateManager.color(red, green, blue, Config.color_opacity);
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.getBuffer();
         for (List<Point> points : bounds) {
             buffer.begin(GL11.GL_POLYGON, DefaultVertexFormats.POSITION);
             for (Point point : points) {

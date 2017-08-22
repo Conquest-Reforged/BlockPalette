@@ -5,22 +5,21 @@ buildscript {
     }
     
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.4.1-mc1.10.2"
+version = "1.5.0-mc1.10.2"
 group= "me.dags.blockpalette"
 archivesBaseName = "blockpalette"
-
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
-    version = "1.10.2-12.18.3.2316"
+    version = "1.12.1-14.22.0.2459"
     runDir = "run"
-    mappings = "snapshot_20161111"
+    mappings = "snapshot_20170624"
 }
 
 processResources {

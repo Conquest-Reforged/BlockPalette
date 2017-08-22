@@ -1,9 +1,11 @@
 package me.dags.blockpalette.gui;
 
-import me.dags.blockpalette.util.Pointer;
+import me.dags.blockpalette.util.Value;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class Settings implements Positional {
 
     private final List<GuiButton> buttons = new ArrayList<>();
@@ -64,9 +67,9 @@ public class Settings implements Positional {
         this.tooltips.add(Tooltip.of(button, new Tooltip.Simple(tooltip)));
     }
 
-    public void add(GuiButton button, Pointer<? extends Tooltip.Provider> pointer) {
+    public void add(GuiButton button, Value<? extends Tooltip.Provider> value) {
         this.buttons.add(button);
-        this.tooltips.add(Tooltip.of(button, new Tooltip.PointerTip<>(pointer)));
+        this.tooltips.add(Tooltip.of(button, new Tooltip.PointerTip<>(value)));
     }
 
     public void setCentreVertically(boolean centreVertically) {
@@ -96,7 +99,7 @@ public class Settings implements Positional {
         }
     }
 
-    public void draw(Minecraft minecraft, int mouseX, int mouseY) {
+    public void draw(Minecraft minecraft, int mouseX, int mouseY, float ticks) {
         if (animation != null && !animation.isComplete()) {
             animation.tick();
         }
@@ -127,18 +130,18 @@ public class Settings implements Positional {
         drawBackground();
 
         for (GuiButton button : buttons) {
-            button.yPosition = top;
-            button.xPosition = left;
+            button.y = top;
+            button.x = left;
             button.width = buttonWidth;
             button.height = buttonHeight;
-            button.drawButton(minecraft, mouseX, mouseY);
+            button.drawButton(minecraft, mouseX, mouseY, ticks);
             top += buttonHeight + buttonSeparator;
         }
     }
 
-    public void drawTooltips(int mouseX, int mouseY) {
+    public void drawTooltips(int mouseX, int mouseY, float ticks) {
         for (Tooltip tooltip : tooltips) {
-            tooltip.draw(mouseX, mouseY);
+            tooltip.draw(mouseX, mouseY, ticks);
         }
     }
 

@@ -6,11 +6,14 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class Render {
 
     public static void cleanup() {
@@ -101,7 +104,7 @@ public class Render {
     public static void drawOverlays(ItemStack stack, int x, int y) {
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, 0);
-        Minecraft.getMinecraft().getRenderItem().renderItemOverlays(Minecraft.getMinecraft().fontRendererObj, stack, -8, -8);
+        Minecraft.getMinecraft().getRenderItem().renderItemOverlays(Minecraft.getMinecraft().fontRenderer, stack, -8, -8);
         GlStateManager.popMatrix();
     }
 

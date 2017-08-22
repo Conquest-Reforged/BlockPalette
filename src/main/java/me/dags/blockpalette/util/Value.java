@@ -3,19 +3,19 @@ package me.dags.blockpalette.util;
 /**
  * @author dags <dags@dags.me>
  */
-public class Pointer<T> {
+public class Value<T> {
 
     private final boolean instant;
     private Listener<T> listener;
     private T reference = null;
-    private boolean changed = false;
+    private boolean dirty = false;
 
-    private Pointer(T value) {
+    private Value(T value) {
         this.reference = value;
         this.instant = false;
     }
 
-    private Pointer(T value, boolean instant) {
+    private Value(T value, boolean instant) {
         this.reference = value;
         this.instant = instant;
     }
@@ -30,7 +30,7 @@ public class Pointer<T> {
 
     public void setNullable(T value) {
         reference = value;
-        changed = true;
+        dirty = true;
 
         if (instant) {
             markUpdated();
@@ -40,7 +40,7 @@ public class Pointer<T> {
     public void set(T value) {
         if (reference != value && !reference.equals(value)) {
             this.reference = value;
-            this.changed = true;
+            this.dirty = true;
 
             if (instant) {
                 markUpdated();
@@ -49,11 +49,11 @@ public class Pointer<T> {
     }
 
     public void markUpdated() {
-        if (changed && listener != null && reference != null) {
+        if (dirty && listener != null && reference != null) {
             listener.onUpdate(reference);
         }
 
-        this.changed = false;
+        this.dirty = false;
     }
 
     public void setListener(Listener<T> listener) {
@@ -65,11 +65,11 @@ public class Pointer<T> {
         void onUpdate(T value);
     }
 
-    public static <T> Pointer<T> of(T value) {
-        return new Pointer<>(value);
+    public static <T> Value<T> of(T value) {
+        return new Value<>(value);
     }
 
-    public static <T> Pointer<T> instant(T value) {
-        return new Pointer<>(value, true);
+    public static <T> Value<T> instant(T value) {
+        return new Value<>(value, true);
     }
 }

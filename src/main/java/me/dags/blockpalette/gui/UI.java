@@ -1,7 +1,7 @@
 package me.dags.blockpalette.gui;
 
-import me.dags.blockpalette.util.Pointer;
 import me.dags.blockpalette.util.Render;
+import me.dags.blockpalette.util.Value;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -10,11 +10,14 @@ import net.minecraft.client.gui.GuiSlider;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class UI {
 
     static final Label DUMMY = new Label("", 0xFFFFFF);
@@ -29,9 +32,9 @@ public class UI {
         }
 
         @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY) {
-            FontRenderer renderer = mc.fontRendererObj;
-            renderer.drawStringWithShadow(displayString, xPosition, yPosition + 10, color);
+        public void drawButton(Minecraft mc, int mouseX, int mouseY, float ticks) {
+            FontRenderer renderer = mc.fontRenderer;
+            renderer.drawStringWithShadow(displayString, x, y + 10, color);
         }
     }
 
@@ -39,20 +42,20 @@ public class UI {
 
         private final ResourceLocation texture;
 
-        public AreaCycler(Pointer<T> value, T[] options, ResourceLocation texture) {
+        public AreaCycler(Value<T> value, T[] options, ResourceLocation texture) {
             super(value, options, "");
             this.texture = texture;
         }
 
         @Override
-        public void drawButton(Minecraft minecraft, int mouseX, int mouseY) {
-            hovered = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
+        public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float ticks) {
+            hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
 
             if (hovered) {
                 Render.cleanup();
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                Render.drawTexture(texture, xPosition, yPosition, width, height, 0, 0, width, height);
+                Render.drawTexture(texture, x, y, width, height, 0, 0, width, height);
             }
         }
     }
@@ -79,17 +82,17 @@ public class UI {
 
     public static class Cycler<T> extends GuiButton {
 
-        private final Pointer<T> value;
+        private final Value<T> value;
         private final String format;
         private final T[] options;
 
         private int pos = 0;
 
-        public Cycler(Pointer<T> value, T[] options) {
+        public Cycler(Value<T> value, T[] options) {
             this(value, options, "%s");
         }
 
-        public Cycler(Pointer<T> value, T[] options, String format) {
+        public Cycler(Value<T> value, T[] options, String format) {
             super(0, 0, 0, I18n.format(format, value.get()));
             this.options = options;
             this.format = format;
@@ -130,9 +133,9 @@ public class UI {
 
     public static class FloatSlider extends GuiSlider {
 
-        private final Pointer<Float> value;
+        private final Value<Float> value;
 
-        public FloatSlider(String name, float min, float max, Pointer<Float> value) {
+        public FloatSlider(String name, float min, float max, Value<Float> value) {
             super(floatResponder(value), 0, 0, 0, name, min, max, value.get(), floatFormat());
             this.value = value;
         }
@@ -146,9 +149,9 @@ public class UI {
 
     public static class IntSlider extends GuiSlider {
 
-        private final Pointer<Integer> value;
+        private final Value<Integer> value;
 
-        public IntSlider(String name, float min, float max, Pointer<Integer> value) {
+        public IntSlider(String name, float min, float max, Value<Integer> value) {
             super(intResponder(value), 0, 0, 0, name, min, max, value.get(), intFormat());
             this.value = value;
         }
@@ -161,24 +164,14 @@ public class UI {
     }
 
     private static GuiSlider.FormatHelper floatFormat() {
-        return new GuiSlider.FormatHelper() {
-            @Override
-            public String getText(int id, String name, float value) {
-                return I18n.format("%s: %.2f", name, value);
-            }
-        };
+        return (id, name, value) -> I18n.format("%s: %.2f", name, value);
     }
 
     private static GuiSlider.FormatHelper intFormat() {
-        return new GuiSlider.FormatHelper() {
-            @Override
-            public String getText(int id, String name, float value) {
-                return I18n.format("%s: %.0f", name, value);
-            }
-        };
+        return (id, name, value) -> I18n.format("%s: %.0f", name, value);
     }
 
-    private static GuiPageButtonList.GuiResponder floatResponder(final Pointer<Float> pointer) {
+    private static GuiPageButtonList.GuiResponder floatResponder(final Value<Float> pointer) {
         return new GuiPageButtonList.GuiResponder() {
             @Override
             public void setEntryValue(int id, boolean value) {
@@ -195,7 +188,7 @@ public class UI {
         };
     }
 
-    private static GuiPageButtonList.GuiResponder intResponder(final Pointer<Integer> pointer) {
+    private static GuiPageButtonList.GuiResponder intResponder(final Value<Integer> pointer) {
         return new GuiPageButtonList.GuiResponder() {
             @Override
             public void setEntryValue(int id, boolean value) {

@@ -3,6 +3,8 @@ package me.dags.blockpalette.creative;
 import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.palette.PaletteScreen;
 import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -10,6 +12,7 @@ import java.io.IOException;
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class MousePickMode extends CreativePickMode {
 
     private PaletteScreen screen;

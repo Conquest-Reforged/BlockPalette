@@ -1,8 +1,12 @@
 package me.dags.blockpalette.gui;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class Animation {
 
     private final Positional positional;

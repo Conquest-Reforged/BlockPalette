@@ -8,16 +8,19 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;
 
+@SideOnly(Side.CLIENT)
 public class PaletteMain implements IResourceManagerReloadListener {
 
     public static final int switchKeyID = Keyboard.KEY_LSHIFT;
 
-    public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.getKeyIndex("C"), "Block Palette");
-    public final KeyBinding search = new KeyBinding("key.blockpalette.search", Keyboard.getKeyIndex("V"), "Block Palette");
+    public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.KEY_C, "Block Palette");
+    public final KeyBinding search = new KeyBinding("key.blockpalette.search", Keyboard.KEY_V, "Block Palette");
     private PaletteRegistry registry = new PaletteRegistry();
     private Palette palette = Palette.EMPTY;
 
@@ -60,9 +63,9 @@ public class PaletteMain implements IResourceManagerReloadListener {
 
     public void onTick() {
         Minecraft minecraft = Minecraft.getMinecraft();
-        if (minecraft.thePlayer != null && minecraft.currentScreen == null && Minecraft.isGuiEnabled()) {
+        if (minecraft.player != null && minecraft.currentScreen == null && Minecraft.isGuiEnabled()) {
             if (!getPalette().isPresent() && show.isPressed()) {
-                newPalette(minecraft.thePlayer.getHeldItemMainhand());
+                newPalette(minecraft.player.getHeldItemMainhand());
                 showPaletteScreen();
                 return;
             }

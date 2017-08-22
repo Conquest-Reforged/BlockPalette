@@ -1,20 +1,23 @@
 package me.dags.blockpalette.gui;
 
-import me.dags.blockpalette.util.Pointer;
+import me.dags.blockpalette.util.Value;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.CreativeCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public class Hotbar {
 
-    private final Pointer<ItemStack> hovered;
-    private final Pointer<ItemStack> selected;
+    private final Value<ItemStack> hovered;
+    private final Value<ItemStack> selected;
     private final int padding = 4;
     private final int slotSize = 16;
 
@@ -22,7 +25,7 @@ public class Hotbar {
     private int top = 0;
     private int hoveredSlot = -1;
 
-    public Hotbar(Pointer<ItemStack> hovered, Pointer<ItemStack> selected) {
+    public Hotbar(Value<ItemStack> hovered, Value<ItemStack> selected) {
         this.hovered = hovered;
         this.selected = selected;
     }
@@ -33,7 +36,7 @@ public class Hotbar {
         top = height - slotSize - 3;
     }
 
-    public void draw(int mouseX, int mouseY) {
+    public void draw(int mouseX, int mouseY, float ticks) {
         hoveredSlot = -1;
 
         for (int i = 0; i < 9; i++) {
@@ -64,9 +67,19 @@ public class Hotbar {
                 if (selected.isPresent()) {
                     if (current != null && current.isItemEqual(selected.get())) {
                         ItemStack copy = selected.get().copy();
-                        copy.stackSize += copy.stackSize;
+                        int total = copy.getCount() + current.getCount();
+                        int count = Math.max(total, copy.getMaxStackSize());
+                        int remaining = Math.min(0, current.getCount() - count);
+
+                        copy.setCount(count);
                         setSlotStack(hoveredSlot, copy);
-                        current = null;
+
+                        // TODO test!
+                        if (remaining == 0) {
+                            current = null;
+                        } else {
+                            current.setCount(remaining);
+                        }
                     } else {
                         setSlotStack(hoveredSlot, selected.get().copy());
                     }
@@ -93,7 +106,7 @@ public class Hotbar {
     }
 
     public void onClose() {
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
         CreativeCrafting crafting = new CreativeCrafting(Minecraft.getMinecraft());
         player.inventoryContainer.addListener(crafting);
 
@@ -105,11 +118,11 @@ public class Hotbar {
     }
 
     private ItemStack getSlotStack(int index) {
-        return Minecraft.getMinecraft().thePlayer.inventory.getStackInSlot(index);
+        return Minecraft.getMinecraft().player.inventory.getStackInSlot(index);
     }
 
     private void setSlotStack(int index, ItemStack stack) {
-        Minecraft.getMinecraft().thePlayer.inventory.setInventorySlotContents(index, stack);
+        Minecraft.getMinecraft().player.inventory.setInventorySlotContents(index, stack);
     }
 
     private static boolean contains(int x, int y, int left, int top, int right, int bottom) {
