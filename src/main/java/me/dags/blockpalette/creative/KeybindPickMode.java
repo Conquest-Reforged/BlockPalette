@@ -3,6 +3,7 @@ package me.dags.blockpalette.creative;
 import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.palette.PaletteScreen;
 import me.dags.blockpalette.util.Config;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -22,7 +23,7 @@ public class KeybindPickMode extends CreativePickMode {
         super(main);
         this.screen = new PaletteScreen(main);
         this.screen.initGui();
-        this.main.newPalette(null);
+        this.main.newPalette(ItemStack.EMPTY);
     }
 
     @Override
@@ -47,7 +48,7 @@ public class KeybindPickMode extends CreativePickMode {
                     e.printStackTrace();
                 }
             }
-        } else if (button - 100 == main.show.getKeyCode() && stackUnderMouse != null) {
+        } else if (button - 100 == main.show.getKeyCode() && !stackUnderMouse.isEmpty()) {
             main.newPalette(stackUnderMouse);
             screen = new PaletteScreen(main);
             screen.setCreativeOverlay(true);
@@ -78,7 +79,7 @@ public class KeybindPickMode extends CreativePickMode {
             if (Config.pick_mode == PickMode.KEYBOARD && !Config.hold_key) {
                 if (keyCode == Keyboard.KEY_ESCAPE || keyCode == main.show.getKeyCode() || main.isInventoryKey(keyCode)) {
                     screen.onGuiClosed();
-                    main.newPalette(null);
+                    main.newPalette(ItemStack.EMPTY);
                 } else {
                     try {
                         screen.keyTyped(c, keyCode);
@@ -87,7 +88,7 @@ public class KeybindPickMode extends CreativePickMode {
                     }
                 }
             }
-        } else if (keyCode == main.show.getKeyCode() && stackUnderMouse != null) {
+        } else if (keyCode == main.show.getKeyCode() && !stackUnderMouse.isEmpty()) {
             main.newPalette(stackUnderMouse);
             screen = new PaletteScreen(main);
             screen.setCreativeOverlay(true);

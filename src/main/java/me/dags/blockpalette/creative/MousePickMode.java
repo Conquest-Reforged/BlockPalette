@@ -2,6 +2,7 @@ package me.dags.blockpalette.creative;
 
 import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.palette.PaletteScreen;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,7 +25,7 @@ public class MousePickMode extends CreativePickMode {
         super(main);
         this.screen = new PaletteScreen(main);
         this.screen.initGui();
-        this.main.newPalette(null);
+        this.main.newPalette(ItemStack.EMPTY);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class MousePickMode extends CreativePickMode {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (stackUnderMouse != null && button == 0 && !modifierKey()) {
+        } else if (!stackUnderMouse.isEmpty() && button == 0 && !modifierKey()) {
             main.newPalette(stackUnderMouse);
             screen = new PaletteScreen(main);
             screen.setCreativeOverlay(true);
@@ -61,7 +62,7 @@ public class MousePickMode extends CreativePickMode {
             event.setCanceled(true);
             if (isMouseBind(button)) {
                 screen.onGuiClosed();
-                main.newPalette(null);
+                main.newPalette(ItemStack.EMPTY);
             } else {
                 screen.mouseReleased(mouseX, mouseY, button);
             }
@@ -103,7 +104,7 @@ public class MousePickMode extends CreativePickMode {
         if (main.getPalette().isPresent()) {
             if (keyCode == Keyboard.KEY_ESCAPE || keyCode == main.show.getKeyCode() || main.isInventoryKey(keyCode)) {
                 screen.onGuiClosed();
-                main.newPalette(null);
+                main.newPalette(ItemStack.EMPTY);
             }
             event.setCanceled(true);
         }

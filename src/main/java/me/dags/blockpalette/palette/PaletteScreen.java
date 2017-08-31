@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -182,7 +183,7 @@ public class PaletteScreen extends GuiScreen {
         super.onGuiClosed();
         hotbar.onClose();
         main.getPalette().close();
-        main.newPalette(null);
+        main.newPalette(ItemStack.EMPTY);
         Config.save();
     }
 

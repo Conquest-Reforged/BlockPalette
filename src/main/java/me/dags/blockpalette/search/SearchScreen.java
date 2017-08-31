@@ -28,8 +28,8 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class SearchScreen extends GuiScreen {
 
-    private final Value<ItemStack> selected = Value.of(null);
-    private final Value<ItemStack> hovered = Value.of(null);
+    private final Value<ItemStack> selected = Value.of(ItemStack.EMPTY);
+    private final Value<ItemStack> hovered = Value.of(ItemStack.EMPTY);
     private final int width = 200;
     private final int slotSize = 24;
     private final Index<ItemStack> index;
@@ -104,13 +104,16 @@ public class SearchScreen extends GuiScreen {
             return;
         }
 
-        if (selected.isPresent()) {
-            selected.setNullable(null);
+        ItemStack select = selected.get();
+        ItemStack hover = hovered.get();
+
+        if (!select.isEmpty()) {
+            selected.setNullable(ItemStack.EMPTY);
             return;
         }
 
-        if (hovered.isPresent()) {
-            selected.setNullable(hovered.get());
+        if (!hover.isEmpty()) {
+            selected.setNullable(hover);
         }
     }
 
@@ -121,7 +124,7 @@ public class SearchScreen extends GuiScreen {
 
 
     private void drawGrid(int mouseX, int mouseY) {
-        hovered.setNullable(null);
+        hovered.setNullable(ItemStack.EMPTY);
         displayLeft = input.x;
         displayTop = input.y + (input.height / 2) + 15;
 
@@ -175,7 +178,7 @@ public class SearchScreen extends GuiScreen {
     }
 
     private void drawHovered() {
-        if (hovered.isPresent()) {
+        if (!hovered.get().isEmpty()) {
             int right = hoveredLeft + slotSize;
             int bottom = hoveredTop + slotSize;
             Gui.drawRect(hoveredLeft, hoveredTop, hoveredLeft + 1, bottom, 0xFFFFFFFF);
@@ -186,15 +189,16 @@ public class SearchScreen extends GuiScreen {
     }
 
     private void drawSelected(int mouseX, int mouseY) {
-        if (selected.isPresent()) {
+        ItemStack select = selected.get();
+        if (!select.isEmpty()) {
             GlStateManager.pushMatrix();
             GlStateManager.enableDepth();
             GlStateManager.translate(0F, 0F, 300F);
             int left = mouseX - (slotSize / 2) + 4;
             int top = mouseY - (slotSize / 2) + 4;
             RenderHelper.enableGUIStandardItemLighting();
-            Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(selected.get(), left, top);
-            Minecraft.getMinecraft().getRenderItem().renderItemOverlays(fontRenderer, selected.get(), left, top);
+            Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(select, left, top);
+            Minecraft.getMinecraft().getRenderItem().renderItemOverlays(fontRenderer, select, left, top);
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableDepth();
             GlStateManager.popMatrix();
@@ -202,8 +206,9 @@ public class SearchScreen extends GuiScreen {
     }
 
     private void drawTooltip(int columns) {
-        if (hovered.isPresent()) {
-            String text = hovered.get().getDisplayName();
+        ItemStack hover = hovered.get();
+        if (!hover.isEmpty()) {
+            String text = hover.getDisplayName();
             int left = (windowWidth / 2) - (fontRenderer.getStringWidth(text) / 2);
             int rows = display.size() / columns;
             int height = (1 + rows) * slotSize;

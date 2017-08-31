@@ -51,8 +51,8 @@ public class Palette {
     private int centerX = 0;
     private int centerY = 0;
 
-    private Value<ItemStack> stackUnderMouse = Value.of(null);
-    private Value<ItemStack> selectedStack = Value.of(null);
+    private Value<ItemStack> stackUnderMouse = Value.of(ItemStack.EMPTY);
+    private Value<ItemStack> selectedStack = Value.of(ItemStack.EMPTY);
 
     private Palette(Slot center, List<Slot> slots, float scale) {
         this.center = center;
@@ -124,19 +124,22 @@ public class Palette {
             slot.draw();
         }
 
-        if (selectedStack.isPresent()) {
+        ItemStack selected = selectedStack.get();
+        ItemStack underMouse = stackUnderMouse.get();
+
+        if (!selected.isEmpty()) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0, 0, 500);
-            Render.drawHighlightedItemStack(selectedStack.get(), mouseX, mouseY, highlightRadius, selectedColor);
-            Render.drawOverlays(selectedStack.get(), mouseX, mouseY);
+            Render.drawHighlightedItemStack(selected, mouseX, mouseY, highlightRadius, selectedColor);
+            Render.drawOverlays(selected, mouseX, mouseY);
             GlStateManager.popMatrix();
         }
 
         Render.endItems();
 
-        if (stackUnderMouse.isPresent()) {
+        if (!underMouse.isEmpty()) {
             FontRenderer renderer = Minecraft.getMinecraft().fontRenderer;
-            String text = stackUnderMouse.get().getDisplayName();
+            String text = underMouse.getDisplayName();
             int length = renderer.getStringWidth(text);
             int half = length / 2;
             int cy = centerY + rad - 15;
@@ -155,7 +158,7 @@ public class Palette {
         }
 
         if (hovered == null) {
-            getSelectedStack().setNullable(null);
+            getSelectedStack().setNullable(ItemStack.EMPTY);
             return;
         }
 
@@ -167,7 +170,7 @@ public class Palette {
     }
 
     private void handleMouse(int mouseX, int mouseY) {
-        stackUnderMouse.setNullable(null);
+        stackUnderMouse.setNullable(ItemStack.EMPTY);
 
         float radsq = radius * radius;
         float distance = radsq;
@@ -212,7 +215,7 @@ public class Palette {
         this.center.setPosition(centerX, centerY);
         this.center.setScale(CENTER_SCALE);
 
-        me.dags.blockpalette.shape.Polygon polygon = new me.dags.blockpalette.shape.Polygon(EDGES, radius, 40, 40);
+        Polygon polygon = new Polygon(EDGES, radius, 40, 40);
         polygon.init(centerX, centerY);
 
         float spacing = 360F / (float) slots.size();
