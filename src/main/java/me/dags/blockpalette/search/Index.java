@@ -55,15 +55,15 @@ public class Index<T> {
 
     public static class Builder<T> {
 
-        private final Map<String, Entry<T>> entries = new HashMap<>();
+        private final Map<Integer, Entry<T>> entries = new HashMap<>();
 
-        public Builder<T> with(T value, String key, List<Tag> tags) {
+        public Builder<T> with(T value, int uid, String text, List<Tag> tags) {
             StringBuilder tagBuilder = new StringBuilder();
             for (Tag tag : tags) {
                 tagBuilder.append('#').append(tag.getTag());
             }
-            Entry<T> entry = new Entry<>(value, key, tagBuilder.toString());
-            entries.put(entry.getName(), entry);
+            Entry<T> entry = new Entry<>(value, text, tagBuilder.toString());
+            entries.put(uid, entry);
             return this;
         }
 

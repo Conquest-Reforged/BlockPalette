@@ -1,6 +1,9 @@
 package me.dags.blockpalette.search;
 
+import me.dags.blockpalette.color.ColorConst;
+import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.gui.Hotbar;
+import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.util.Value;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -12,6 +15,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
@@ -30,11 +34,13 @@ public class SearchScreen extends GuiScreen {
 
     private final Value<ItemStack> selected = Value.of(ItemStack.EMPTY);
     private final Value<ItemStack> hovered = Value.of(ItemStack.EMPTY);
+    private final ColorF emptyColor = new ColorF(0.05F, 0.05F, 0.05F);
     private final int width = 200;
     private final int slotSize = 24;
     private final Index<ItemStack> index;
     private final GuiTextField input;
     private final Hotbar hotbar;
+    private final PaletteMain main;
 
     private List<ItemStack> display = Collections.emptyList();
 
@@ -44,18 +50,30 @@ public class SearchScreen extends GuiScreen {
     private int hoveredLeft = 0;
     private int hoveredTop = 0;
 
-    public SearchScreen() {
+    public SearchScreen(PaletteMain main) {
         NonNullList<ItemStack> stacks = NonNullList.create();
+        for (Block block : Block.REGISTRY) {
+            block.getSubBlocks(CreativeTabs.SEARCH, stacks);
+        }
+
         for (Item item : Item.REGISTRY) {
+            if (item instanceof ItemBlock) {
+                continue;
+            }
             item.getSubItems(CreativeTabs.SEARCH, stacks);
         }
 
         Index.Builder<ItemStack> builder = Index.builder();
         for (ItemStack stack : stacks) {
-            String name = stack.getDisplayName();
-            builder.with(stack, name, getTags(stack));
+            if (!stack.isEmpty()) {
+                int id = 31 * stack.getItem().hashCode() + stack.getMetadata();
+                String name = stack.getDisplayName();
+                List<Tag> tags = getTags(main, stack);
+                builder.with(stack, id, name, tags);
+            }
         }
 
+        this.main = main;
         this.fontRenderer = Minecraft.getMinecraft().fontRenderer;
         this.hotbar = new Hotbar(hovered, selected);
         this.index = builder.build();
@@ -156,11 +174,15 @@ public class SearchScreen extends GuiScreen {
         GlStateManager.pushMatrix();
         GlStateManager.translate(0, 0, 250);
         GlStateManager.enableDepth();
+
         for (ItemStack stack : display) {
             int col = pos % columns;
             int row = pos / columns;
             int x = displayLeft + padding + (slotSize * col);
             int y = displayTop + (slotSize * row);
+
+            ColorF color = main.getRegistry().getColor(stack, emptyColor);
+            drawRect(x + 1, y + 1, x + slotSize - 1, y + slotSize - 1, color.toARGB(0.25F));
 
             Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, x + 4, y + 4);
             if (contains(mouseX, mouseY, x, y, x + slotSize, y + slotSize)) {
@@ -217,11 +239,7 @@ public class SearchScreen extends GuiScreen {
         }
     }
 
-    private static boolean contains(int x, int y, int left, int top, int right, int bottom) {
-        return x > left && x < right && y > top && y < bottom;
-    }
-
-    private static List<Tag> getTags(ItemStack stack) {
+    private List<Tag> getTags(PaletteMain main, ItemStack stack) {
         List<Tag> tags = new LinkedList<>();
         String name = stack.getDisplayName().toLowerCase();
         for (Tag tag : Tag.TAGS) {
@@ -233,15 +251,26 @@ public class SearchScreen extends GuiScreen {
         Block block = Block.getBlockFromItem(stack.getItem());
         if (block != Blocks.AIR) {
             if (block.getDefaultState().isBlockNormalCube()
-                || block.getDefaultState().isFullBlock()
-                || block.getDefaultState().isNormalCube()
-                || block.getDefaultState().isOpaqueCube()) {
+                    || block.getDefaultState().isFullBlock()
+                    || block.getDefaultState().isNormalCube()
+                    || block.getDefaultState().isOpaqueCube()) {
                 tags.add(Tag.of("block"));
             }
         } else {
             tags.add(Tag.of("item"));
         }
 
+        ColorF color = main.getRegistry().getColor(stack, ColorF.EMPTY);
+        if (color != ColorF.EMPTY) {
+            ColorConst colorConst = ColorConst.nearest(color);
+            System.out.println(stack + " = " + colorConst);
+            tags.add(Tag.of(colorConst.name()));
+        }
+
         return tags;
+    }
+
+    private static boolean contains(int x, int y, int left, int top, int right, int bottom) {
+        return x > left && x < right && y > top && y < bottom;
     }
 }

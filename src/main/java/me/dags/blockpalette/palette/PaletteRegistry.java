@@ -44,6 +44,11 @@ public class PaletteRegistry {
         );
     }
 
+    public ColorF getColor(ItemStack stack, ColorF def) {
+        Texture texture = getTextureForStack(stack);
+        return texture.isPresent() ? texture.getColor() : def;
+    }
+
     public void buildPalettes() {
         for (Block block : Block.REGISTRY) {
             if (!blacklist.contains(block)) {

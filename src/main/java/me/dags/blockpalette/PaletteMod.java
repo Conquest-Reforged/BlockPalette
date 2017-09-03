@@ -16,7 +16,7 @@ import java.util.Collections;
  * @author dags <dags@dags.me>
  */
 @SideOnly(Side.CLIENT)
-@Mod(modid = PaletteMod.MOD_ID, version = PaletteMod.VERSION, clientSideOnly = true)
+@Mod(modid = PaletteMod.MOD_ID, version = PaletteMod.VERSION, clientSideOnly = true, canBeDeactivated = true)
 public class PaletteMod {
 
     public static final String MOD_ID = "blockpalette";
@@ -28,7 +28,6 @@ public class PaletteMod {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         main.onPreInit(event.getSuggestedConfigurationFile());
-
         ModMetadata modMetadata = event.getModMetadata();
         modMetadata.modId = MOD_ID;
         modMetadata.version = VERSION;
