@@ -66,16 +66,14 @@ public class PaletteScreen extends GuiScreen {
     };
 
     private final PaletteMain main;
-    private final Minecraft minecraft;
     private int width = 0;
     private int height = 0;
     private boolean isCreativeOverlay = false;
 
     public PaletteScreen(PaletteMain main) {
+        this.mc = Minecraft.getMinecraft();
         this.main = main;
         hotbar = new Hotbar(main.getPalette().getStackUnderMouse(), main.getPalette().getSelectedStack());
-
-        minecraft = Minecraft.getMinecraft();
 
         paletteSettings.add(new UI.Cycler<>(pickMode, PickMode.values(), "palette.control.pickmode"), pickMode);
         paletteSettings.add(new UI.Cycler<>(holdKey, new Boolean[]{true, false}, "palette.control.hold"), "palette.tooltip.hold");
@@ -121,15 +119,15 @@ public class PaletteScreen extends GuiScreen {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         if (!listeningToKeyRelease() && !isCreativeOverlay && isMouseBind(mouseButton)) {
-            minecraft.setIngameFocus();
+            mc.setIngameFocus();
             return;
         }
 
-        paletteSettings.mousePressed(minecraft, mouseX, mouseY);
-        colorSettings.mousePressed(minecraft, mouseX, mouseY);
+        paletteSettings.mousePressed(mc, mouseX, mouseY);
+        colorSettings.mousePressed(mc, mouseX, mouseY);
 
         for (GuiButton button : buttons) {
-            button.mousePressed(minecraft, mouseX, mouseY);
+            button.mousePressed(mc, mouseX, mouseY);
         }
     }
 
@@ -173,7 +171,7 @@ public class PaletteScreen extends GuiScreen {
 
         if (!isCreativeOverlay && code == main.show.getKeyCode()) {
             if (Config.pick_mode == PickMode.MOUSE || !Config.hold_key) {
-                minecraft.setIngameFocus();
+                mc.setIngameFocus();
             }
         }
     }
@@ -194,14 +192,14 @@ public class PaletteScreen extends GuiScreen {
        // drawGradientRect(0, 0, this.width, this.height, 0x777777, -804253680);
        // Gui.drawRect(0, 0, width, height, 0x88000000);
 
-        paletteSettings.draw(minecraft, mouseX, mouseY, partialTicks);
-        colorSettings.draw(minecraft, mouseX, mouseY, partialTicks);
+        paletteSettings.draw(mc, mouseX, mouseY, partialTicks);
+        colorSettings.draw(mc, mouseX, mouseY, partialTicks);
 
         hotbar.draw(mouseX, mouseY, partialTicks);
         main.getPalette().drawScreen(mouseX, mouseY, partialTicks);
 
         for (GuiButton button : buttons) {
-            button.drawButton(minecraft, mouseX, mouseY, partialTicks);
+            button.drawButton(mc, mouseX, mouseY, partialTicks);
         }
 
         if (Config.show_tooltips) {
@@ -213,7 +211,7 @@ public class PaletteScreen extends GuiScreen {
         }
 
         if (listeningToKeyRelease() && keybindReleased()) {
-            minecraft.setIngameFocus();
+            mc.setIngameFocus();
         }
     }
 
@@ -242,7 +240,7 @@ public class PaletteScreen extends GuiScreen {
     }
 
     private void refreshScreen() {
-        ScaledResolution resolution = new ScaledResolution(minecraft);
+        ScaledResolution resolution = new ScaledResolution(mc);
         main.getPalette().resize(resolution.getScaledWidth(), resolution.getScaledHeight());
         main.getPalette().setHighlightColor(highlightRed.get(), highlightGreen.get(), highlightBlue.get());
 
@@ -260,7 +258,7 @@ public class PaletteScreen extends GuiScreen {
     }
 
     private void resize() {
-        ScaledResolution resolution = new ScaledResolution(minecraft);
+        ScaledResolution resolution = new ScaledResolution(mc);
         width = resolution.getScaledWidth();
         height = resolution.getScaledHeight();
         main.getPalette().resize(resolution.getScaledWidth(), resolution.getScaledHeight());
@@ -343,8 +341,8 @@ public class PaletteScreen extends GuiScreen {
         pickMode.setListener(value -> {
             Config.pick_mode = value;
             if (isCreativeOverlay) {
-                GuiContainerCreative creative = new GuiContainerCreative(minecraft.player);
-                minecraft.displayGuiScreen(creative);
+                GuiContainerCreative creative = new GuiContainerCreative(mc.player);
+                mc.displayGuiScreen(creative);
             }
         });
 
