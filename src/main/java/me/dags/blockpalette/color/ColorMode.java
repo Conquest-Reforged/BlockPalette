@@ -1,10 +1,13 @@
 package me.dags.blockpalette.color;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author dags <dags@dags.me>
  */
+@SideOnly(Side.CLIENT)
 public enum ColorMode {
 
     COMPLIMENTARY("palette.colormode.complimentary"),

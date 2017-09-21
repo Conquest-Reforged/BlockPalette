@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class Tooltip {
 
-    private final FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+    private final FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
     private final Provider tooltip;
     private final int width;
     private final int pad = 5;

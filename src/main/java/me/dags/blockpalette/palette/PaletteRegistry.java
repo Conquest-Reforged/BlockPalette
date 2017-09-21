@@ -13,9 +13,9 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -52,18 +52,20 @@ public class PaletteRegistry {
     public void buildPalettes() {
         for (Block block : Block.REGISTRY) {
             if (!blacklist.contains(block)) {
-                NonNullList<ItemStack> items = NonNullList.create();
-                block.getSubBlocks(CreativeTabs.SEARCH, items);
-                for (ItemStack stack : items) {
-                    stack.setCount(1);
-                    register(stack);
+                Item item = Item.getItemFromBlock(block);
+                if (item != null) {
+                    List<ItemStack> items = new ArrayList<>();
+                    block.getSubBlocks(item, CreativeTabs.SEARCH, items);
+                    for (ItemStack stack : items) {
+                        register(stack);
+                    }
                 }
             }
         }
     }
 
     public Palette getPalette(ItemStack itemStack) {
-        if (itemStack.isEmpty() || Block.getBlockFromItem(itemStack.getItem()) == Blocks.AIR) {
+        if (itemStack == null || Block.getBlockFromItem(itemStack.getItem()) == null) {
             return Palette.EMPTY;
         }
 
@@ -72,7 +74,7 @@ public class PaletteRegistry {
         }
 
         itemStack = itemStack.copy();
-        itemStack.setCount(1);
+        itemStack.stackSize = 1;
 
         colorWheel.setAngle(Config.angle);
         colorWheel.setLeniency(Config.leniency);
@@ -168,7 +170,7 @@ public class PaletteRegistry {
     private List<Mapping> getMatchingTexture(ItemStack itemStack) {
         String texture = getItemModel(itemStack).getParticleTexture().getIconName();
         List<Mapping> states = textureVariants.get(texture);
-        return states != null ? states : Collections.emptyList();
+        return states != null ? states : Collections.<Mapping>emptyList();
     }
 
     private List<PaletteItem> statesToVariants(List<Mapping> variants, Set<Mapping> filter) {

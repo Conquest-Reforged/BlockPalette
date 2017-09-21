@@ -58,34 +58,34 @@ public class Hotbar {
         if (contains(mouseX, mouseY, left, top, right, bottom)) {
             if (hoveredSlot != -1) {
                 if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-                    setSlotStack(hoveredSlot, ItemStack.EMPTY);
+                    setSlotStack(hoveredSlot, null);
                     return true;
                 }
 
                 ItemStack current = getSlotStack(hoveredSlot);
                 ItemStack selected = this.selected.get();
 
-                if (!selected.isEmpty()) {
-                    if (!current.isEmpty() && current.isItemEqual(selected)) {
+                if (selected != null) {
+                    if (current != null && current.isItemEqual(selected)) {
                         ItemStack copy = selected.copy();
-                        int total = copy.getCount() + current.getCount();
+                        int total = copy.stackSize + current.stackSize;
                         int count = Math.max(total, copy.getMaxStackSize());
-                        int remaining = Math.min(0, current.getCount() - count);
+                        int remaining = Math.min(0, current.stackSize - count);
 
-                        copy.setCount(count);
+                        copy.stackSize = count;
                         setSlotStack(hoveredSlot, copy);
 
                         // TODO test!
                         if (remaining == 0) {
-                            current = ItemStack.EMPTY;
+                            current = null;
                         } else {
-                            current.setCount(remaining);
+                            current.stackSize = remaining;
                         }
                     } else {
                         setSlotStack(hoveredSlot, selected.copy());
                     }
                 } else {
-                    setSlotStack(hoveredSlot, ItemStack.EMPTY);
+                    setSlotStack(hoveredSlot, null);
                 }
 
                 this.selected.setNullable(current);
@@ -107,7 +107,7 @@ public class Hotbar {
     }
 
     public void onClose() {
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
         CreativeCrafting crafting = new CreativeCrafting(Minecraft.getMinecraft());
         player.inventoryContainer.addListener(crafting);
 
@@ -119,11 +119,11 @@ public class Hotbar {
     }
 
     private ItemStack getSlotStack(int index) {
-        return Minecraft.getMinecraft().player.inventory.getStackInSlot(index);
+        return Minecraft.getMinecraft().thePlayer.inventory.getStackInSlot(index);
     }
 
     private void setSlotStack(int index, ItemStack stack) {
-        Minecraft.getMinecraft().player.inventory.setInventorySlotContents(index, stack);
+        Minecraft.getMinecraft().thePlayer.inventory.setInventorySlotContents(index, stack);
     }
 
     private static boolean contains(int x, int y, int left, int top, int right, int bottom) {

@@ -32,9 +32,9 @@ public class UI {
         }
 
         @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY, float ticks) {
-            FontRenderer renderer = mc.fontRenderer;
-            renderer.drawStringWithShadow(displayString, x, y + 10, color);
+        public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+            FontRenderer renderer = mc.fontRendererObj;
+            renderer.drawStringWithShadow(displayString, xPosition, yPosition + 10, color);
         }
     }
 
@@ -48,14 +48,14 @@ public class UI {
         }
 
         @Override
-        public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float ticks) {
-            hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+        public void drawButton(Minecraft minecraft, int mouseX, int mouseY) {
+            hovered = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
 
             if (hovered) {
                 Render.cleanup();
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                Render.drawTexture(texture, x, y, width, height, 0, 0, width, height);
+                Render.drawTexture(texture, xPosition, yPosition, width, height, 0, 0, width, height);
             }
         }
     }

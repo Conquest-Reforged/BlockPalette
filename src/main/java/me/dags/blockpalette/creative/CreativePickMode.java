@@ -17,7 +17,7 @@ import org.lwjgl.input.Mouse;
 public abstract class CreativePickMode {
 
     final PaletteMain main;
-    ItemStack stackUnderMouse = ItemStack.EMPTY;
+    ItemStack stackUnderMouse = null;
     int mouseX = 0;
     int mouseY = 0;
     private int width = 0;
@@ -43,7 +43,7 @@ public abstract class CreativePickMode {
         }
 
         Slot slot = creative.getSlotUnderMouse();
-        stackUnderMouse = slot != null ? slot.getStack() : ItemStack.EMPTY;
+        stackUnderMouse = slot != null ? slot.getStack() : null;
 
         drawScreen(event);
     }

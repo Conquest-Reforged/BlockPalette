@@ -63,9 +63,9 @@ public class PaletteMain implements IResourceManagerReloadListener {
 
     public void onTick() {
         Minecraft minecraft = Minecraft.getMinecraft();
-        if (minecraft.player != null && minecraft.currentScreen == null && Minecraft.isGuiEnabled()) {
+        if (minecraft.thePlayer != null && minecraft.currentScreen == null && Minecraft.isGuiEnabled()) {
             if (!getPalette().isPresent() && show.isPressed()) {
-                newPalette(minecraft.player.getHeldItemMainhand());
+                newPalette(minecraft.thePlayer.getHeldItemMainhand());
                 showPaletteScreen();
                 return;
             }

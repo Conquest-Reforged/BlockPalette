@@ -130,11 +130,11 @@ public class Settings implements Positional {
         drawBackground();
 
         for (GuiButton button : buttons) {
-            button.y = top;
-            button.x = left;
+            button.yPosition = top;
+            button.xPosition = left;
             button.width = buttonWidth;
             button.height = buttonHeight;
-            button.drawButton(minecraft, mouseX, mouseY, ticks);
+            button.drawButton(minecraft, mouseX, mouseY);
             top += buttonHeight + buttonSeparator;
         }
     }

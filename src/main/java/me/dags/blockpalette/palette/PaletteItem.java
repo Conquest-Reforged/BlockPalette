@@ -19,7 +19,7 @@ public final class PaletteItem {
     private final int hashCode;
 
     private PaletteItem() {
-        this.itemStack = ItemStack.EMPTY;
+        this.itemStack = null;
         this.colorF = ColorF.EMPTY;
         this.hashCode = super.hashCode();
     }
@@ -59,12 +59,10 @@ public final class PaletteItem {
     }
 
     public static PaletteItem of(ItemStack stack) {
-        Preconditions.checkNotNull(stack);
-        return stack.isEmpty() ? EMPTY : new PaletteItem(stack.copy());
+        return stack == null ? EMPTY : new PaletteItem(stack.copy());
     }
 
     public static PaletteItem of(ItemStack stack, ColorF color) {
-        Preconditions.checkNotNull(stack);
-        return stack.isEmpty() ? EMPTY : new PaletteItem(stack.copy(), color);
+        return stack == null ? EMPTY : new PaletteItem(stack.copy(), color);
     }
 }

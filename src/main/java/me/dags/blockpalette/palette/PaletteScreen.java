@@ -16,7 +16,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -181,7 +180,7 @@ public class PaletteScreen extends GuiScreen {
         super.onGuiClosed();
         hotbar.onClose();
         main.getPalette().close();
-        main.newPalette(ItemStack.EMPTY);
+        main.newPalette(null);
         Config.save();
     }
 
@@ -199,7 +198,7 @@ public class PaletteScreen extends GuiScreen {
         main.getPalette().drawScreen(mouseX, mouseY, partialTicks);
 
         for (GuiButton button : buttons) {
-            button.drawButton(mc, mouseX, mouseY, partialTicks);
+            button.drawButton(mc, mouseX, mouseY);
         }
 
         if (Config.show_tooltips) {
@@ -274,13 +273,13 @@ public class PaletteScreen extends GuiScreen {
         colorSettings.setPosition(width, 0);
         colorSettings.setSize(settingsWidth, height);
 
-        toggleSettings.x = centerX - 80 - 12;
-        toggleSettings.y = centerY - 78 - 12;
+        toggleSettings.xPosition = centerX - 80 - 12;
+        toggleSettings.yPosition = centerY - 78 - 12;
         toggleSettings.width = 24;
         toggleSettings.height = 24;
 
-        toggleMode.x = centerX - 30 - 12;
-        toggleMode.y = centerY - 106 - 12;
+        toggleMode.xPosition = centerX - 30 - 12;
+        toggleMode.yPosition = centerY - 106 - 12;
         toggleMode.width = 24;
         toggleMode.height = 24;
 
@@ -341,7 +340,7 @@ public class PaletteScreen extends GuiScreen {
         pickMode.setListener(value -> {
             Config.pick_mode = value;
             if (isCreativeOverlay) {
-                GuiContainerCreative creative = new GuiContainerCreative(mc.player);
+                GuiContainerCreative creative = new GuiContainerCreative(mc.thePlayer);
                 mc.displayGuiScreen(creative);
             }
         });

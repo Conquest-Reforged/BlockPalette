@@ -51,8 +51,8 @@ public class Palette {
     private int centerX = 0;
     private int centerY = 0;
 
-    private Value<ItemStack> stackUnderMouse = Value.of(ItemStack.EMPTY);
-    private Value<ItemStack> selectedStack = Value.of(ItemStack.EMPTY);
+    private Value<ItemStack> stackUnderMouse = Value.of(null);
+    private Value<ItemStack> selectedStack = Value.of(null);
 
     private Palette(Slot center, List<Slot> slots, float scale) {
         this.center = center;
@@ -127,7 +127,7 @@ public class Palette {
         ItemStack selected = selectedStack.get();
         ItemStack underMouse = stackUnderMouse.get();
 
-        if (!selected.isEmpty()) {
+        if (selected != null) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0, 0, 500);
             Render.drawHighlightedItemStack(selected, mouseX, mouseY, highlightRadius, selectedColor);
@@ -137,8 +137,8 @@ public class Palette {
 
         Render.endItems();
 
-        if (!underMouse.isEmpty()) {
-            FontRenderer renderer = Minecraft.getMinecraft().fontRenderer;
+        if (underMouse != null) {
+            FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
             String text = underMouse.getDisplayName();
             int length = renderer.getStringWidth(text);
             int half = length / 2;
@@ -158,7 +158,7 @@ public class Palette {
         }
 
         if (hovered == null) {
-            getSelectedStack().setNullable(ItemStack.EMPTY);
+            getSelectedStack().setNullable(null);
             return;
         }
 
@@ -170,7 +170,7 @@ public class Palette {
     }
 
     private void handleMouse(int mouseX, int mouseY) {
-        stackUnderMouse.setNullable(ItemStack.EMPTY);
+        stackUnderMouse.setNullable(null);
 
         float radsq = radius * radius;
         float distance = radsq;
@@ -239,7 +239,7 @@ public class Palette {
             return;
         }
 
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
         CreativeCrafting crafting = new CreativeCrafting(Minecraft.getMinecraft());
         player.inventoryContainer.addListener(crafting);
 

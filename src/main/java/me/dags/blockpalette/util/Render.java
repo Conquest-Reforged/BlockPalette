@@ -94,7 +94,7 @@ public class Render {
     }
 
     public static void drawItemStack(ItemStack stack, int x, int y) {
-        if (stack == null || stack.isEmpty()) {
+        if (stack == null) {
             return;
         }
 
@@ -102,18 +102,18 @@ public class Render {
     }
 
     public static void drawOverlays(ItemStack stack, int x, int y) {
-        if (stack == null || stack.isEmpty()) {
+        if (stack == null) {
             return;
         }
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, 0);
-        Minecraft.getMinecraft().getRenderItem().renderItemOverlays(Minecraft.getMinecraft().fontRenderer, stack, -8, -8);
+        Minecraft.getMinecraft().getRenderItem().renderItemOverlays(Minecraft.getMinecraft().fontRendererObj, stack, -8, -8);
         GlStateManager.popMatrix();
     }
 
     public static void drawHighlightedItemStack(ItemStack stack, int x, int y, float scale, int color) {
-        if (stack == null || stack.isEmpty()) {
+        if (stack == null) {
             return;
         }
 
