@@ -1,5 +1,7 @@
 package me.dags.blockpalette.color;
 
+import java.awt.*;
+
 /**
  * @author dags <dags@dags.me>
  */
@@ -10,6 +12,12 @@ public class ColorF {
     public final float red;
     public final float green;
     public final float blue;
+
+    ColorF(Color color) {
+        red = color.getRed() / 255F;
+        green = color.getGreen() / 255F;
+        blue = color.getBlue() / 255F;
+    }
 
     ColorF(Texture texture) {
         red = texture.red;
@@ -27,6 +35,14 @@ public class ColorF {
         red = 1F;
         green = 1F;
         blue = 1F;
+    }
+
+    public int toARGB(float opacity) {
+        int argb = (int) (opacity * 255);
+        argb = (argb << 8) + (int) (red * 255);
+        argb = (argb << 8) + (int) (green * 255);
+        argb = (argb << 8) + (int) (blue * 255);
+        return argb;
     }
 
     public int colorCode() {

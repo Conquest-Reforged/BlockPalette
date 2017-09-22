@@ -1,5 +1,6 @@
 package me.dags.blockpalette.palette;
 
+import com.google.common.base.Preconditions;
 import me.dags.blockpalette.color.ColorF;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,7 +19,7 @@ public final class PaletteItem {
     private final int hashCode;
 
     private PaletteItem() {
-        this.itemStack = null;
+        this.itemStack = ItemStack.EMPTY;
         this.colorF = ColorF.EMPTY;
         this.hashCode = super.hashCode();
     }
@@ -49,7 +50,7 @@ public final class PaletteItem {
 
     @Override
     public boolean equals(Object o) {
-        return o != null && o.hashCode() == hashCode();
+        return o != null && o.getClass() == this.getClass() && o.hashCode() == hashCode();
     }
 
     @Override
@@ -58,10 +59,12 @@ public final class PaletteItem {
     }
 
     public static PaletteItem of(ItemStack stack) {
-        return stack == null ? EMPTY : new PaletteItem(stack.copy());
+        Preconditions.checkNotNull(stack);
+        return stack.isEmpty() ? EMPTY : new PaletteItem(stack.copy());
     }
 
     public static PaletteItem of(ItemStack stack, ColorF color) {
-        return stack == null ? EMPTY : new PaletteItem(stack.copy(), color);
+        Preconditions.checkNotNull(stack);
+        return stack.isEmpty() ? EMPTY : new PaletteItem(stack.copy(), color);
     }
 }

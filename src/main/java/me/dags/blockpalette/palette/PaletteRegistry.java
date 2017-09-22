@@ -44,12 +44,18 @@ public class PaletteRegistry {
         );
     }
 
+    public ColorF getColor(ItemStack stack, ColorF def) {
+        Texture texture = getTextureForStack(stack);
+        return texture.isPresent() ? texture.getColor() : def;
+    }
+
     public void buildPalettes() {
         for (Block block : Block.REGISTRY) {
             if (!blacklist.contains(block)) {
                 NonNullList<ItemStack> items = NonNullList.create();
                 block.getSubBlocks(CreativeTabs.SEARCH, items);
                 for (ItemStack stack : items) {
+                    stack.setCount(1);
                     register(stack);
                 }
             }
@@ -57,7 +63,7 @@ public class PaletteRegistry {
     }
 
     public Palette getPalette(ItemStack itemStack) {
-        if (itemStack == null || Block.getBlockFromItem(itemStack.getItem()) == Blocks.AIR) {
+        if (itemStack.isEmpty() || Block.getBlockFromItem(itemStack.getItem()) == Blocks.AIR) {
             return Palette.EMPTY;
         }
 
@@ -162,7 +168,7 @@ public class PaletteRegistry {
     private List<Mapping> getMatchingTexture(ItemStack itemStack) {
         String texture = getItemModel(itemStack).getParticleTexture().getIconName();
         List<Mapping> states = textureVariants.get(texture);
-        return states != null ? states : Collections.<Mapping>emptyList();
+        return states != null ? states : Collections.emptyList();
     }
 
     private List<PaletteItem> statesToVariants(List<Mapping> variants, Set<Mapping> filter) {

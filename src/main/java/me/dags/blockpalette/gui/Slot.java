@@ -54,7 +54,7 @@ public class Slot {
     }
 
     public ItemStack getStack() {
-        return item.isEmpty() ? null : item.getItemStack();
+        return item.getItemStack();
     }
 
     public boolean mouseOver(int x, int y) {
@@ -94,9 +94,9 @@ public class Slot {
             Render.drawTexture(SLOT, -11, -11, 22, 22, 0, 0, 22, 22);
             if (hovered || selected) {
                 int color = selected ? invertColor : highlightColor;
-                Render.drawHighlightedItemStack(item.getItemStack(), 0, 0, highlightSize, color);
+                Render.drawHighlightedItemStack(getStack(), 0, 0, highlightSize, color);
             } else {
-                Render.drawItemStack(item.getItemStack(), -8, -8);
+                Render.drawItemStack(getStack(), -8, -8);
             }
             Render.endSlot();
         }

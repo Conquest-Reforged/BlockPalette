@@ -58,15 +58,16 @@ public class Hotbar {
         if (contains(mouseX, mouseY, left, top, right, bottom)) {
             if (hoveredSlot != -1) {
                 if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-                    setSlotStack(hoveredSlot, null);
+                    setSlotStack(hoveredSlot, ItemStack.EMPTY);
                     return true;
                 }
 
                 ItemStack current = getSlotStack(hoveredSlot);
+                ItemStack selected = this.selected.get();
 
-                if (selected.isPresent()) {
-                    if (current != null && current.isItemEqual(selected.get())) {
-                        ItemStack copy = selected.get().copy();
+                if (!selected.isEmpty()) {
+                    if (!current.isEmpty() && current.isItemEqual(selected)) {
+                        ItemStack copy = selected.copy();
                         int total = copy.getCount() + current.getCount();
                         int count = Math.max(total, copy.getMaxStackSize());
                         int remaining = Math.min(0, current.getCount() - count);
@@ -76,18 +77,18 @@ public class Hotbar {
 
                         // TODO test!
                         if (remaining == 0) {
-                            current = null;
+                            current = ItemStack.EMPTY;
                         } else {
                             current.setCount(remaining);
                         }
                     } else {
-                        setSlotStack(hoveredSlot, selected.get().copy());
+                        setSlotStack(hoveredSlot, selected.copy());
                     }
                 } else {
-                    setSlotStack(hoveredSlot, null);
+                    setSlotStack(hoveredSlot, ItemStack.EMPTY);
                 }
 
-                selected.setNullable(current);
+                this.selected.setNullable(current);
             }
             return true;
         }

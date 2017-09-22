@@ -94,7 +94,7 @@ public class Render {
     }
 
     public static void drawItemStack(ItemStack stack, int x, int y) {
-        if (stack == null) {
+        if (stack == null || stack.isEmpty()) {
             return;
         }
 
@@ -102,6 +102,10 @@ public class Render {
     }
 
     public static void drawOverlays(ItemStack stack, int x, int y) {
+        if (stack == null || stack.isEmpty()) {
+            return;
+        }
+
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, 0);
         Minecraft.getMinecraft().getRenderItem().renderItemOverlays(Minecraft.getMinecraft().fontRenderer, stack, -8, -8);
@@ -109,7 +113,7 @@ public class Render {
     }
 
     public static void drawHighlightedItemStack(ItemStack stack, int x, int y, float scale, int color) {
-        if (stack == null) {
+        if (stack == null || stack.isEmpty()) {
             return;
         }
 
