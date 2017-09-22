@@ -45,7 +45,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
         }
     }
 
-    public void newPaletteCreative(ItemStack itemStack) {
+    public void newCreativePalette(ItemStack itemStack) {
         palette = getRegistry().getPalette(itemStack);
     }
 
@@ -91,7 +91,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
 
         if (show.isPressed()) {
             if (player.isCreative()) {
-                newPaletteCreative(player.getHeldItemMainhand());
+                newCreativePalette(player.getHeldItemMainhand());
                 showPaletteScreen();
             } else {
                 newCraftingPalette(player.getHeldItemMainhand());

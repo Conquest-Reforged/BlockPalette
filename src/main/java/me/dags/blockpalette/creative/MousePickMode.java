@@ -24,7 +24,7 @@ public class MousePickMode extends CreativePickMode {
         super(main);
         this.screen = new PaletteScreen(main);
         this.screen.initGui();
-        this.main.newPaletteCreative(null);
+        this.main.newCreativePalette(null);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class MousePickMode extends CreativePickMode {
                 e.printStackTrace();
             }
         } else if (stackUnderMouse != null && button == 0 && !modifierKey()) {
-            main.newPaletteCreative(stackUnderMouse);
+            main.newCreativePalette(stackUnderMouse);
             screen = new PaletteScreen(main);
             screen.setCreativeOverlay(true);
             screen.initGui();
@@ -61,7 +61,7 @@ public class MousePickMode extends CreativePickMode {
             event.setCanceled(true);
             if (isMouseBind(button)) {
                 screen.onGuiClosed();
-                main.newPaletteCreative(null);
+                main.newCreativePalette(null);
             } else {
                 screen.mouseReleased(mouseX, mouseY, button);
             }
@@ -103,7 +103,7 @@ public class MousePickMode extends CreativePickMode {
         if (main.getPalette().isPresent()) {
             if (keyCode == Keyboard.KEY_ESCAPE || keyCode == main.show.getKeyCode() || main.isInventoryKey(keyCode)) {
                 screen.onGuiClosed();
-                main.newPaletteCreative(null);
+                main.newCreativePalette(null);
             }
             event.setCanceled(true);
         }
