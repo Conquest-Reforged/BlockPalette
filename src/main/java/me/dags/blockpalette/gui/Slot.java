@@ -88,7 +88,7 @@ public class Slot {
         this.selected = selected;
     }
 
-    public void draw() {
+    public void drawSlot() {
         if (!isEmpty()) {
             Render.beginSlot(xPos, yPos, scale);
             Render.drawTexture(SLOT, -11, -11, 22, 22, 0, 0, 22, 22);
@@ -98,6 +98,14 @@ public class Slot {
             } else {
                 Render.drawItemStack(item.getItemStack(), -8, -8);
             }
+            Render.endSlot();
+        }
+    }
+
+    public void drawOverlays() {
+        if (!isEmpty()) {
+            Render.beginSlot(xPos, yPos, scale);
+            Render.drawOverlays(item.getItemStack(), -8, -8);
             Render.endSlot();
         }
     }

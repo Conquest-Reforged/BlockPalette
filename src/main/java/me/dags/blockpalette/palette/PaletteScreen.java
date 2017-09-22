@@ -60,7 +60,7 @@ public class PaletteScreen extends GuiScreen {
     private final Hotbar hotbar;
 
     private final Runnable refresh = () -> {
-        PaletteScreen.this.main.newPalette(PaletteScreen.this.main.getPalette().getCenter());
+        PaletteScreen.this.main.newPaletteCreative(PaletteScreen.this.main.getPalette().getCenter());
         refreshScreen();
     };
 
@@ -144,7 +144,7 @@ public class PaletteScreen extends GuiScreen {
         }
 
         if (mouseButton == 0 && Keyboard.isKeyDown(PaletteMain.switchKeyID) && main.getPalette().getStackUnderMouse().isPresent()) {
-            main.newPalette(main.getPalette().getStackUnderMouse().get());
+            main.newPaletteCreative(main.getPalette().getStackUnderMouse().get());
             refresh.run();
             return;
         }
@@ -182,7 +182,7 @@ public class PaletteScreen extends GuiScreen {
         super.onGuiClosed();
         hotbar.onClose();
         main.getPalette().close();
-        main.newPalette(null);
+        main.newPaletteCreative(null);
         Config.save();
     }
 
