@@ -95,11 +95,13 @@ public class ColorWheel {
     }
 
     public ColorHue getHue(Texture texture) {
-        return getHue(texture.hue);
+        return getHue(clampHue(texture.hue));
     }
 
     public ColorHue getHue(int hue) {
-        int index = Math.min(359, Math.max(0, hue / mod));
+        int modified = hue / mod;
+        int max = hues.length - 1;
+        int index = Math.min(max, Math.max(0, modified));
         return hues[index];
     }
 
