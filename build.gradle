@@ -11,7 +11,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.4.2-mc1.12.1"
+version = "1.4.3-mc1.12.1"
 group= "me.dags.blockpalette"
 archivesBaseName = "blockpalette"
 sourceCompatibility = targetCompatibility = "1.8"
