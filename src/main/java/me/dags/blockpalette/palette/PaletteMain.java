@@ -23,8 +23,15 @@ public class PaletteMain implements IResourceManagerReloadListener {
     public final KeyBinding search = new KeyBinding("key.blockpalette.search", Keyboard.KEY_V, "Block Palette");
     private PaletteRegistry registry = new PaletteRegistry();
     private Palette palette = Palette.EMPTY;
+    private volatile boolean reloaded = false;
 
     public PaletteRegistry getRegistry() {
+        if (reloaded) {
+            reloaded = false;
+            registry = new PaletteRegistry();
+            getRegistry().buildPalettes();
+            palette = Palette.EMPTY;
+        }
         return registry;
     }
 
@@ -48,9 +55,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
-        registry = new PaletteRegistry();
-        getRegistry().buildPalettes();
-        palette = Palette.EMPTY;
+        reloaded = true;
     }
 
     public void onPreInit(File config) {

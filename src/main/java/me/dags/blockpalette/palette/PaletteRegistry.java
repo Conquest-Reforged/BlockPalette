@@ -19,6 +19,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -202,43 +204,38 @@ public class PaletteRegistry {
     }
 
     private void register(ItemStack stack) {
-        try {
-            IBakedModel model = getModel(stack);
+        IBakedModel model = getModel(stack);
+        if (!isValidModel(model)) {
+            writeItemError("Unable to register model for Item: %s, Texture: %s", stack, model);
+            return;
+        }
 
-            if (model == missingModel()) {
-                return;
-            }
+        if (!hasParticleTexture(model)) {
+            writeItemError("Unable to determine particle texture for Item: %s, Texture: %s", stack, model);
+            return;
+        }
 
-            if (model.getParticleTexture().getIconName().equals("missingno")) {
-                return;
-            }
+        String iconName = model.getParticleTexture().getIconName();
+        if (iconName == null) {
+            writeItemError("Null particle texture!? Item: %s, Texture: %s", stack, model);
+            return;
+        }
 
-            String iconName = model.getParticleTexture().getIconName();
-            Mapping mapping = new Mapping(stack);
-            Mapping current = mappings.get(iconName);
+        Mapping mapping = new Mapping(stack);
+        Mapping current = mappings.get(iconName);
+        if (mapping.overrides(current)) {
+            mappings.put(iconName, mapping);
+        }
 
-            if (mapping.overrides(current)) {
-                mappings.put(iconName, mapping);
-            }
+        textureVariants.computeIfAbsent(iconName, k -> new ArrayList<>()).add(mapping);
 
-            List<Mapping> variants = textureVariants.get(iconName);
-            if (variants == null) {
-                textureVariants.put(iconName, variants = new ArrayList<>());
-            }
+        if (colorWheel.hasTexture(iconName)) {
+            return;
+        }
 
-            variants.add(mapping);
-
-            if (colorWheel.hasTexture(iconName)) {
-                return;
-            }
-
-            Texture texture = PaletteRegistry.fromSprite(model.getParticleTexture());
-            if (texture != null) {
-                colorWheel.addTexture(texture);
-            }
-        } catch (Throwable t) {
-            String warning = String.format("Unable to register invalid block model for itemstack: %s", stack.getUnlocalizedName());
-            new UnsupportedOperationException(warning, t).printStackTrace();
+        Texture texture = PaletteRegistry.fromSprite(model.getParticleTexture());
+        if (texture != null) {
+            colorWheel.addTexture(texture);
         }
     }
 
@@ -288,8 +285,39 @@ public class PaletteRegistry {
         return null;
     }
 
+    private static boolean isValidModel(@Nullable IBakedModel model) {
+        return model != null && model != Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel();
+    }
+
+    private static boolean hasParticleTexture(@Nonnull IBakedModel model) {
+        TextureAtlasSprite particle = model.getParticleTexture();
+        return particle != null && !particle.getIconName().equals("missinno");
+    }
+
     private static IBakedModel missingModel() {
         return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel();
+    }
+
+    private static void writeItemError(String format, ItemStack stack, IBakedModel model) {
+        String item;
+        if (stack == null || stack.getItem() == null) {
+            item = "null";
+        } else {
+            item = String.format("%s (%s)", toString(stack.getItem().getRegistryName()), stack.getMetadata());
+        }
+
+        String modl;
+        if (model == null || model.getParticleTexture() == null) {
+            modl = "null";
+        } else {
+            modl = String.format("%s (%s)", toString(model.getParticleTexture().getIconName()), model.getClass());
+        }
+
+        System.err.println(String.format(format, item, modl));
+    }
+
+    private static String toString(@Nullable Object o) {
+        return "" + o;
     }
 
     private static class Mapping {

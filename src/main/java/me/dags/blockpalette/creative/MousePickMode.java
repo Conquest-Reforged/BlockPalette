@@ -2,7 +2,6 @@ package me.dags.blockpalette.creative;
 
 import me.dags.blockpalette.palette.PaletteMain;
 import me.dags.blockpalette.palette.PaletteScreen;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
