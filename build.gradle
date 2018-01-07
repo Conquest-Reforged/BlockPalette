@@ -40,7 +40,7 @@ processResources {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: 'http://127.0.01:8081/nexus/content/repositories/snapshots/') {
+            repository(url: 'http://127.0.0.1:8081/nexus/content/repositories/snapshots/') {
                 authentication(userName: System.getenv('maven_user'), password: System.getenv('maven_pass'))
             }
         }
