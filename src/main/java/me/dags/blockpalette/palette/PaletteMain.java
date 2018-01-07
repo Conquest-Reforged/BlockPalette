@@ -86,7 +86,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
         }
 
         if (search.isPressed()) {
-            Minecraft.getMinecraft().displayGuiScreen(new SearchScreen());
+            Minecraft.getMinecraft().displayGuiScreen(new SearchScreen(this));
         }
 
         if (show.isPressed()) {
