@@ -95,11 +95,13 @@ public class ColorWheel {
     }
 
     public ColorHue getHue(Texture texture) {
-        return getHue(texture.hue);
+        return getHue(clampHue(texture.hue));
     }
 
     public ColorHue getHue(int hue) {
-        int index = Math.min(359, Math.max(0, hue / mod));
+        int modified = hue / mod;
+        int max = hues.length - 1;
+        int index = Math.min(max, Math.max(0, modified));
         return hues[index];
     }
 
@@ -364,14 +366,14 @@ public class ColorWheel {
         }
     }
 
-    static int clampHue(float input) {
+    private static int clampHue(float input) {
         int hue = Math.round(input);
         if (hue < 0) {
-            return 360 + (hue % 360);
+            hue = 360 + (hue % 360);
         } else if (hue > 360) {
-            return hue % 360;
+            hue %= 360;
         }
-        return Math.min(hue, 359);
+        return Math.min(359, Math.max(0, hue));
     }
 
     private static Comparator<Texture> sortGray() {

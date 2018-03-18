@@ -58,15 +58,15 @@ public class Hotbar {
         if (contains(mouseX, mouseY, left, top, right, bottom)) {
             if (hoveredSlot != -1) {
                 if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-                    setSlotStack(hoveredSlot, ItemStack.EMPTY);
+                    setSlotStack(hoveredSlot, null);
                     return true;
                 }
 
                 ItemStack current = getSlotStack(hoveredSlot);
                 ItemStack selected = this.selected.get();
 
-                if (!selected.isEmpty()) {
-                    if (!current.isEmpty() && current.isItemEqual(selected)) {
+                if (selected != null) {
+                    if (current != null && current.isItemEqual(selected)) {
                         ItemStack copy = selected.copy();
                         int total = copy.getCount() + current.getCount();
                         int count = Math.max(total, copy.getMaxStackSize());
@@ -77,7 +77,7 @@ public class Hotbar {
 
                         // TODO test!
                         if (remaining == 0) {
-                            current = ItemStack.EMPTY;
+                            current = null;
                         } else {
                             current.setCount(remaining);
                         }
@@ -85,7 +85,7 @@ public class Hotbar {
                         setSlotStack(hoveredSlot, selected.copy());
                     }
                 } else {
-                    setSlotStack(hoveredSlot, ItemStack.EMPTY);
+                    setSlotStack(hoveredSlot, null);
                 }
 
                 this.selected.setNullable(current);
@@ -123,6 +123,9 @@ public class Hotbar {
     }
 
     private void setSlotStack(int index, ItemStack stack) {
+        if (stack == null) {
+            stack = ItemStack.EMPTY;
+        }
         Minecraft.getMinecraft().player.inventory.setInventorySlotContents(index, stack);
     }
 

@@ -1,10 +1,8 @@
 package me.dags.blockpalette.palette;
 
-import me.dags.blockpalette.crafting.RecipeTree;
 import me.dags.blockpalette.search.SearchScreen;
 import me.dags.blockpalette.util.Config;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
@@ -24,15 +22,17 @@ public class PaletteMain implements IResourceManagerReloadListener {
     public final KeyBinding show = new KeyBinding("key.blockpalette.open", Keyboard.KEY_C, "Block Palette");
     public final KeyBinding search = new KeyBinding("key.blockpalette.search", Keyboard.KEY_V, "Block Palette");
     private PaletteRegistry registry = new PaletteRegistry();
-    private RecipeTree recipeTree = new RecipeTree();
     private Palette palette = Palette.EMPTY;
+    private volatile boolean reloaded = false;
 
     public PaletteRegistry getRegistry() {
+        if (reloaded) {
+            reloaded = false;
+            registry = new PaletteRegistry();
+            getRegistry().buildPalettes();
+            palette = Palette.EMPTY;
+        }
         return registry;
-    }
-
-    public RecipeTree getRecipeTree() {
-        return recipeTree;
     }
 
     public Palette getPalette() {
@@ -45,12 +45,8 @@ public class PaletteMain implements IResourceManagerReloadListener {
         }
     }
 
-    public void newCreativePalette(ItemStack itemStack) {
+    public void newPalette(ItemStack itemStack) {
         palette = getRegistry().getPalette(itemStack);
-    }
-
-    public void newCraftingPalette(ItemStack itemStack) {
-        palette = getRecipeTree().getPalette(itemStack);
     }
 
     public boolean isInventoryKey(int keyCode) {
@@ -59,11 +55,7 @@ public class PaletteMain implements IResourceManagerReloadListener {
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
-        registry = new PaletteRegistry();
-        recipeTree = new RecipeTree();
-        registry.buildPalettes();
-        recipeTree.buildRecipeTree();
-        palette = Palette.EMPTY;
+        reloaded = true;
     }
 
     public void onPreInit(File config) {
@@ -76,26 +68,15 @@ public class PaletteMain implements IResourceManagerReloadListener {
 
     public void onTick() {
         Minecraft minecraft = Minecraft.getMinecraft();
-        EntityPlayerSP player = minecraft.player;
-        if (player == null || minecraft.currentScreen != null || !Minecraft.isGuiEnabled()) {
-            return;
-        }
-
-        if (getPalette().isPresent()) {
-            return;
-        }
-
-        if (search.isPressed()) {
-            Minecraft.getMinecraft().displayGuiScreen(new SearchScreen(this));
-        }
-
-        if (show.isPressed()) {
-            if (player.isCreative()) {
-                newCreativePalette(player.getHeldItemMainhand());
+        if (minecraft.player != null && minecraft.currentScreen == null && Minecraft.isGuiEnabled()) {
+            if (!getPalette().isPresent() && show.isPressed()) {
+                newPalette(minecraft.player.getHeldItemMainhand());
                 showPaletteScreen();
-            } else {
-                newCraftingPalette(player.getHeldItemMainhand());
-                showPaletteScreen();
+                return;
+            }
+
+            if (search.isPressed()) {
+                Minecraft.getMinecraft().displayGuiScreen(new SearchScreen(this));
             }
         }
     }

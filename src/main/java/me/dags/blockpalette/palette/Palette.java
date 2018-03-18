@@ -1,6 +1,5 @@
 package me.dags.blockpalette.palette;
 
-import com.google.common.collect.ImmutableList;
 import me.dags.blockpalette.color.ColorF;
 import me.dags.blockpalette.gui.Slot;
 import me.dags.blockpalette.gui.SlotBounds;
@@ -36,13 +35,11 @@ public class Palette {
     private static final ResourceLocation MASK1 = new ResourceLocation("blockpalette", "textures/gui/wheel_mask1.png");
 
     private static final int EDGES = 6; // number of sides on polygon
-    private static final int RADIUS = 40; // radius of polygon
-    private static final int PADDING = 1; // inner/outer padding
     private static final int SCALE_THRESHOLD = 18; // number of filled slots before scaling down items
     private static final float CENTER_SCALE = 1.75F; // scale of item in center
 
-    private final List<Slot> allSlots;
-    private final List<Slot> slots;
+    private final List<Slot> allSlots = new ArrayList<>();
+    private final List<Slot> slots = new ArrayList<>();
     private final int radius = 75;
     private final float scale;
     private final Slot center;
@@ -59,8 +56,9 @@ public class Palette {
 
     private Palette(Slot center, List<Slot> slots, float scale) {
         this.center = center;
-        this.slots = ImmutableList.copyOf(slots);
-        this.allSlots = ImmutableList.<Slot>builder().add(center).addAll(slots).build();
+        this.slots.addAll(slots);
+        this.allSlots.add(center);
+        this.allSlots.addAll(slots);
         this.scale = scale;
     }
 
@@ -97,23 +95,17 @@ public class Palette {
         if (!isPresent()) {
             return;
         }
+
         handleMouse(mouseX, mouseY);
+
         int rad = radius + 44;
-        int diam = rad * 2;
+        int dim = (radius + 44) * 2;
         int left = centerX - rad;
         int top = centerY - rad;
-        renderContainer(left, top, diam);
-        renderMasks(left, top, diam);
-        renderItems(mouseX, mouseY);
-        renderToolTip(rad);
-    }
 
-    public void renderContainer(int left, int top, int dim) {
         Render.cleanup();
         Render.drawTexture(WHEEL, left, top, dim, dim, 0, 0, dim, dim);
-    }
 
-    public void renderMasks(int left, int top, int dim) {
         if (!Config.match_textures) {
             Render.beginMask(MASK0, left, top, dim, dim, 0, 0, dim, dim);
             for (Slot slot : slots) {
@@ -125,36 +117,32 @@ public class Palette {
             center.drawBounds();
             Render.endMask();
         }
-    }
 
-    public void renderItems(int mouseX, int mouseY) {
         Render.beginItems();
         for (Slot slot : allSlots) {
             slot.setHighlight(highlightColor, selectedColor, highlightRadius);
-            slot.drawSlot();
+            slot.draw();
         }
 
-        for (Slot slot : allSlots) {
-            slot.drawOverlays();
-        }
+        ItemStack selected = selectedStack.get();
+        ItemStack underMouse = stackUnderMouse.get();
 
-        if (selectedStack.isPresent()) {
+        if (selected != null) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0, 0, 500);
-            Render.drawHighlightedItemStack(selectedStack.get(), mouseX, mouseY, highlightRadius, selectedColor);
-            Render.drawOverlays(selectedStack.get(), mouseX, mouseY);
+            Render.drawHighlightedItemStack(selected, mouseX, mouseY, highlightRadius, selectedColor);
+            Render.drawOverlays(selected, mouseX, mouseY);
             GlStateManager.popMatrix();
         }
-        Render.endItems();
-    }
 
-    public void renderToolTip(int radius) {
-        if (stackUnderMouse.isPresent()) {
+        Render.endItems();
+
+        if (underMouse != null) {
             FontRenderer renderer = Minecraft.getMinecraft().fontRenderer;
-            String text = stackUnderMouse.get().getDisplayName();
+            String text = underMouse.getDisplayName();
             int length = renderer.getStringWidth(text);
             int half = length / 2;
-            int cy = centerY + radius - 15;
+            int cy = centerY + rad - 15;
             renderer.drawStringWithShadow(text, centerX - half, cy, 0xFFFFFF);
         }
     }
@@ -181,19 +169,19 @@ public class Palette {
         }
     }
 
-    public void handleMouse(int mouseX, int mouseY) {
+    private void handleMouse(int mouseX, int mouseY) {
         stackUnderMouse.setNullable(null);
 
-        float rad2 = radius * radius;
-        float distance = rad2;
+        float radsq = radius * radius;
+        float distance = radsq;
 
         Slot hovered = null;
 
         for (Slot slot : allSlots) {
             int dx = mouseX - slot.xPos();
             int dy = mouseY - slot.yPos();
-            float ds2 = (dx * dx + dy * dy);
-            float ds = (rad2 - ds2) / rad2;
+            float dsq = (dx * dx + dy * dy);
+            float ds = (radsq - dsq) / radsq;
             float scale = this.scale;
 
             if (ds > 0.5) {
@@ -204,9 +192,9 @@ public class Palette {
             slot.setHovered(false);
             slot.setScale(slot == center ? CENTER_SCALE : scale);
 
-            if (!slot.isEmpty() && slot.mouseOver(mouseX, mouseY) && ds2 < distance) {
+            if (!slot.isEmpty() && slot.mouseOver(mouseX, mouseY) && dsq < distance) {
                 hovered = slot;
-                distance = ds2;
+                distance = dsq;
             }
         }
 
@@ -273,31 +261,40 @@ public class Palette {
     }
 
     private static SlotBounds innerBounds(int centerX, int centerY) {
-        Polygon polygon = new Polygon(EDGES, RADIUS, PADDING, PADDING);
+        Polygon polygon = new Polygon(6, 40, 1, 1);
         polygon.init(centerX, centerY);
         return polygon.outline();
     }
 
     public static Palette texturePalette(PaletteItem centerItem, List<PaletteItem> items) {
-        return palette(centerItem, items, Math.max(SCALE_THRESHOLD, items.size()));
-    }
-
-    public static Palette colorPalette(PaletteItem centerItem, List<PaletteItem> items) {
-        return palette(centerItem, items, items.size());
-    }
-
-    public static Palette craftingPalette(PaletteItem centerItem, List<PaletteItem> items) {
-        return palette(centerItem, items, Math.max(SCALE_THRESHOLD, items.size()));
-    }
-
-    private static Palette palette(PaletteItem centerItem, List<PaletteItem> items, int count) {
+        int count = Math.max(SCALE_THRESHOLD, items.size());
         float scale = 1.15F;
         if (count > SCALE_THRESHOLD) {
             float dif = (count - SCALE_THRESHOLD) / (float) SCALE_THRESHOLD;
             scale -= Math.min(dif, 0.45F);
         }
 
-        List<Slot> slots = new ArrayList<>(count);
+        List<Slot> slots = new ArrayList<>();
+        Slot center = new Slot(centerItem);
+
+        for (int i = 0; i < count; i++) {
+            PaletteItem stack = i < items.size() ? items.get(i) : PaletteItem.EMPTY;
+            Slot slot = new Slot(stack);
+            slots.add(slot);
+        }
+
+        return new Palette(center, slots, scale);
+    }
+
+    public static Palette colorPalette(PaletteItem centerItem, List<PaletteItem> items) {
+        int count = items.size();
+        float scale = 1.15F;
+        if (count > SCALE_THRESHOLD) {
+            float dif = (count - SCALE_THRESHOLD) / (float) SCALE_THRESHOLD;
+            scale -= Math.min(dif, 0.45F);
+        }
+
+        List<Slot> slots = new ArrayList<>();
         Slot center = new Slot(centerItem);
 
         for (int i = 0; i < count; i++) {

@@ -13,12 +13,16 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -52,18 +56,20 @@ public class PaletteRegistry {
     public void buildPalettes() {
         for (Block block : Block.REGISTRY) {
             if (!blacklist.contains(block)) {
-                NonNullList<ItemStack> items = NonNullList.create();
-                block.getSubBlocks(CreativeTabs.SEARCH, items);
-                for (ItemStack stack : items) {
-                    stack.setCount(1);
-                    register(stack);
+                Item item = Item.getItemFromBlock(block);
+                if (item != Items.AIR) {
+                    NonNullList<ItemStack> list = NonNullList.create();
+                    block.getSubBlocks(CreativeTabs.SEARCH, list);
+                    for (ItemStack stack : list) {
+                        register(stack);
+                    }
                 }
             }
         }
     }
 
     public Palette getPalette(ItemStack itemStack) {
-        if (itemStack.isEmpty() || Block.getBlockFromItem(itemStack.getItem()) == Blocks.AIR) {
+        if (itemStack == null || itemStack == ItemStack.EMPTY || Block.getBlockFromItem(itemStack.getItem()) == Blocks.AIR) {
             return Palette.EMPTY;
         }
 
@@ -168,7 +174,7 @@ public class PaletteRegistry {
     private List<Mapping> getMatchingTexture(ItemStack itemStack) {
         String texture = getItemModel(itemStack).getParticleTexture().getIconName();
         List<Mapping> states = textureVariants.get(texture);
-        return states != null ? states : Collections.emptyList();
+        return states != null ? states : Collections.<Mapping>emptyList();
     }
 
     private List<PaletteItem> statesToVariants(List<Mapping> variants, Set<Mapping> filter) {
@@ -200,43 +206,38 @@ public class PaletteRegistry {
     }
 
     private void register(ItemStack stack) {
-        try {
-            IBakedModel model = getModel(stack);
+        IBakedModel model = getModel(stack);
+        if (!isValidModel(model)) {
+            writeItemError("Unable to register model for Item: %s, Texture: %s", stack, model);
+            return;
+        }
 
-            if (model == missingModel()) {
-                return;
-            }
+        if (!hasParticleTexture(model)) {
+            writeItemError("Unable to determine particle texture for Item: %s, Texture: %s", stack, model);
+            return;
+        }
 
-            if (model.getParticleTexture().getIconName().equals("missingno")) {
-                return;
-            }
+        String iconName = model.getParticleTexture().getIconName();
+        if (iconName == null) {
+            writeItemError("Null particle texture!? Item: %s, Texture: %s", stack, model);
+            return;
+        }
 
-            String iconName = model.getParticleTexture().getIconName();
-            Mapping mapping = new Mapping(stack);
-            Mapping current = mappings.get(iconName);
+        Mapping mapping = new Mapping(stack);
+        Mapping current = mappings.get(iconName);
+        if (mapping.overrides(current)) {
+            mappings.put(iconName, mapping);
+        }
 
-            if (mapping.overrides(current)) {
-                mappings.put(iconName, mapping);
-            }
+        textureVariants.computeIfAbsent(iconName, k -> new ArrayList<>()).add(mapping);
 
-            List<Mapping> variants = textureVariants.get(iconName);
-            if (variants == null) {
-                textureVariants.put(iconName, variants = new ArrayList<>());
-            }
+        if (colorWheel.hasTexture(iconName)) {
+            return;
+        }
 
-            variants.add(mapping);
-
-            if (colorWheel.hasTexture(iconName)) {
-                return;
-            }
-
-            Texture texture = PaletteRegistry.fromSprite(model.getParticleTexture());
-            if (texture != null) {
-                colorWheel.addTexture(texture);
-            }
-        } catch (Throwable t) {
-            String warning = String.format("Unable to register invalid block model for itemstack: %s", stack.getUnlocalizedName());
-            new UnsupportedOperationException(warning, t).printStackTrace();
+        Texture texture = PaletteRegistry.fromSprite(model.getParticleTexture());
+        if (texture != null) {
+            colorWheel.addTexture(texture);
         }
     }
 
@@ -286,8 +287,39 @@ public class PaletteRegistry {
         return null;
     }
 
+    private static boolean isValidModel(@Nullable IBakedModel model) {
+        return model != null && model != Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel();
+    }
+
+    private static boolean hasParticleTexture(@Nonnull IBakedModel model) {
+        TextureAtlasSprite particle = model.getParticleTexture();
+        return particle != null && !particle.getIconName().equals("missinno");
+    }
+
     private static IBakedModel missingModel() {
         return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel();
+    }
+
+    private static void writeItemError(String format, ItemStack stack, IBakedModel model) {
+        String item;
+        if (stack == null || stack.getItem() == null || stack.getItem() == Items.AIR) {
+            item = "null";
+        } else {
+            item = String.format("%s (%s)", toString(stack.getItem().getRegistryName()), stack.getMetadata());
+        }
+
+        String modl;
+        if (model == null || model.getParticleTexture() == null) {
+            modl = "null";
+        } else {
+            modl = String.format("%s (%s)", toString(model.getParticleTexture().getIconName()), model.getClass());
+        }
+
+        System.err.println(String.format(format, item, modl));
+    }
+
+    private static String toString(@Nullable Object o) {
+        return "" + o;
     }
 
     private static class Mapping {
@@ -302,7 +334,7 @@ public class PaletteRegistry {
             this.itemStack = stack;
             this.hashCode = itemStack.getItem().getUnlocalizedName(itemStack).hashCode();
             this.mainTab = itemStack.getItem().getCreativeTab() == CreativeTabs.BUILDING_BLOCKS;
-            this.isFullBlock = block != null && block.getDefaultState().isFullBlock();
+            this.isFullBlock = block != Blocks.AIR && block.getDefaultState().isFullBlock();
         }
 
         private boolean overrides(Mapping other) {

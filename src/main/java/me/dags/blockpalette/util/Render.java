@@ -94,7 +94,7 @@ public class Render {
     }
 
     public static void drawItemStack(ItemStack stack, int x, int y) {
-        if (stack == null || stack.isEmpty()) {
+        if (stack == null) {
             return;
         }
 
@@ -102,7 +102,7 @@ public class Render {
     }
 
     public static void drawOverlays(ItemStack stack, int x, int y) {
-        if (stack == null || stack.isEmpty()) {
+        if (stack == null) {
             return;
         }
 
@@ -113,7 +113,7 @@ public class Render {
     }
 
     public static void drawHighlightedItemStack(ItemStack stack, int x, int y, float scale, int color) {
-        if (stack == null || stack.isEmpty()) {
+        if (stack == null) {
             return;
         }
 

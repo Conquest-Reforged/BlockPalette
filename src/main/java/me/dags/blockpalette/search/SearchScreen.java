@@ -32,8 +32,8 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class SearchScreen extends GuiScreen {
 
-    private final Value<ItemStack> selected = Value.of(ItemStack.EMPTY);
-    private final Value<ItemStack> hovered = Value.of(ItemStack.EMPTY);
+    private final Value<ItemStack> selected = Value.of(null);
+    private final Value<ItemStack> hovered = Value.of(null);
     private final ColorF emptyColor = new ColorF(0.05F, 0.05F, 0.05F);
     private final int width = 200;
     private final int slotSize = 24;
@@ -53,6 +53,7 @@ public class SearchScreen extends GuiScreen {
     public SearchScreen(PaletteMain main) {
         NonNullList<ItemStack> stacks = NonNullList.create();
         for (Block block : Block.REGISTRY) {
+            Item item = Item.getItemFromBlock(block);
             block.getSubBlocks(CreativeTabs.SEARCH, stacks);
         }
 
@@ -65,7 +66,7 @@ public class SearchScreen extends GuiScreen {
 
         Index.Builder<ItemStack> builder = Index.builder();
         for (ItemStack stack : stacks) {
-            if (!stack.isEmpty()) {
+            if (stack != null && stack.getItem() != null) {
                 int id = 31 * stack.getItem().hashCode() + stack.getMetadata();
                 String name = stack.getDisplayName();
                 List<Tag> tags = getTags(main, stack);
@@ -125,12 +126,12 @@ public class SearchScreen extends GuiScreen {
         ItemStack select = selected.get();
         ItemStack hover = hovered.get();
 
-        if (!select.isEmpty()) {
-            selected.setNullable(ItemStack.EMPTY);
+        if (select != null) {
+            selected.setNullable(null);
             return;
         }
 
-        if (!hover.isEmpty()) {
+        if (hover != null) {
             selected.setNullable(hover);
         }
     }
@@ -142,7 +143,7 @@ public class SearchScreen extends GuiScreen {
 
 
     private void drawGrid(int mouseX, int mouseY) {
-        hovered.setNullable(ItemStack.EMPTY);
+        hovered.setNullable(null);
         displayLeft = input.x;
         displayTop = input.y + (input.height / 2) + 15;
 
@@ -200,7 +201,7 @@ public class SearchScreen extends GuiScreen {
     }
 
     private void drawHovered() {
-        if (!hovered.get().isEmpty()) {
+        if (hovered.get() != null) {
             int right = hoveredLeft + slotSize;
             int bottom = hoveredTop + slotSize;
             Gui.drawRect(hoveredLeft, hoveredTop, hoveredLeft + 1, bottom, 0xFFFFFFFF);
@@ -212,7 +213,7 @@ public class SearchScreen extends GuiScreen {
 
     private void drawSelected(int mouseX, int mouseY) {
         ItemStack select = selected.get();
-        if (!select.isEmpty()) {
+        if (select != null) {
             GlStateManager.pushMatrix();
             GlStateManager.enableDepth();
             GlStateManager.translate(0F, 0F, 300F);
@@ -229,7 +230,7 @@ public class SearchScreen extends GuiScreen {
 
     private void drawTooltip(int columns) {
         ItemStack hover = hovered.get();
-        if (!hover.isEmpty()) {
+        if (hover != null) {
             String text = hover.getDisplayName();
             int left = (windowWidth / 2) - (fontRenderer.getStringWidth(text) / 2);
             int rows = display.size() / columns;
@@ -263,7 +264,6 @@ public class SearchScreen extends GuiScreen {
         ColorF color = main.getRegistry().getColor(stack, ColorF.EMPTY);
         if (color != ColorF.EMPTY) {
             ColorConst colorConst = ColorConst.nearest(color);
-            System.out.println(stack + " = " + colorConst);
             tags.add(Tag.of(colorConst.name()));
         }
 

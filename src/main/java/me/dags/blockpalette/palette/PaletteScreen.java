@@ -16,7 +16,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -61,8 +60,7 @@ public class PaletteScreen extends GuiScreen {
     private final Hotbar hotbar;
 
     private final Runnable refresh = () -> {
-        PaletteMain main = PaletteScreen.this.main;
-        main.newCraftingPalette(main.getPalette().getCenter());
+        PaletteScreen.this.main.newPalette(PaletteScreen.this.main.getPalette().getCenter());
         refreshScreen();
     };
 
@@ -144,7 +142,7 @@ public class PaletteScreen extends GuiScreen {
         }
 
         if (mouseButton == 0 && Keyboard.isKeyDown(PaletteMain.switchKeyID) && main.getPalette().getStackUnderMouse().isPresent()) {
-            main.newCreativePalette(main.getPalette().getStackUnderMouse().get());
+            main.newPalette(main.getPalette().getStackUnderMouse().get());
             refresh.run();
             return;
         }
@@ -182,7 +180,7 @@ public class PaletteScreen extends GuiScreen {
         super.onGuiClosed();
         hotbar.onClose();
         main.getPalette().close();
-        main.newCreativePalette(ItemStack.EMPTY);
+        main.newPalette(null);
         Config.save();
     }
 
