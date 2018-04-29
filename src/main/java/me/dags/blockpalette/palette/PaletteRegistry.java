@@ -9,15 +9,18 @@ import me.dags.blockpalette.util.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -54,14 +57,24 @@ public class PaletteRegistry {
     }
 
     public void buildPalettes() {
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        BlockPos pos = player.getPosition().down();
+        World world = player.world;
+
         for (Block block : Block.REGISTRY) {
             if (!blacklist.contains(block)) {
-                Item item = Item.getItemFromBlock(block);
-                if (item != Items.AIR) {
-                    NonNullList<ItemStack> list = NonNullList.create();
-                    block.getSubBlocks(CreativeTabs.SEARCH, list);
-                    for (ItemStack stack : list) {
-                        register(stack);
+                NonNullList<ItemStack> stacks = NonNullList.create();
+                block.getSubBlocks(CreativeTabs.SEARCH, stacks);
+                for (ItemStack stack : stacks) {
+                    if (stack.isEmpty() || stack.getItem() == Items.AIR) {
+                        continue;
+                    }
+
+                    try {
+                        IBlockState state = block.getStateForPlacement(world, pos, EnumFacing.UP, 0.5F, 0.5F, 0.5F, stack.getMetadata(), player, EnumHand.MAIN_HAND);
+                        register(stack, state);
+                    } catch (Throwable t) {
+                        System.err.printf("Unable to register Item: %s (%s) for Block: %s\n", stack.getItem(), stack.getMetadata(), block.getRegistryName());
                     }
                 }
             }
@@ -205,8 +218,8 @@ public class PaletteRegistry {
         return colorWheel.getTexture(icon);
     }
 
-    private void register(ItemStack stack) {
-        IBakedModel model = getModel(stack);
+    private void register(ItemStack stack, IBlockState state) {
+        IBakedModel model = getModel(state);
         if (!isValidModel(model)) {
             writeItemError("Unable to register model for Item: %s, Texture: %s", stack, model);
             return;
@@ -241,27 +254,9 @@ public class PaletteRegistry {
         }
     }
 
-    private static IBakedModel getModel(ItemStack itemStack) {
-        IBakedModel blockModel = getBlockModel(itemStack);
-        IBakedModel itemModel = getItemModel(itemStack);
-
-        if (blockModel == missingModel()) {
-            return itemModel;
-        }
-
-        if (!blockModel.getParticleTexture().getIconName().equals(itemModel.getParticleTexture().getIconName())) {
-            return itemModel;
-        }
-
-        return blockModel;
-    }
-
-    private static IBakedModel getBlockModel(ItemStack itemStack) {
-        if (itemStack.getItem() instanceof ItemBlock) {
-            IBlockState state = ((ItemBlock) itemStack.getItem()).getBlock().getStateFromMeta(itemStack.getMetadata());
-            return ensure(Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state), missingModel());
-        }
-        return missingModel();
+    private static IBakedModel getModel(IBlockState state) {
+        IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
+        return ensure(model, missingModel());
     }
 
     private static IBakedModel getItemModel(ItemStack itemStack) {
